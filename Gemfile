@@ -31,6 +31,16 @@ gem "dotenv-rails", "~> 2.7"
 gem "letter_opener_web", "~> 2.0"
 gem "spring"
 
+# gem "ransack", "~> 4.0"
+gem "actionpack", "~> 7.0.8.7"
+gem "rails-html-sanitizer", "~> 1.6.1"
+gem "net-imap", "~> 0.5.6"
+
+gem "omniauth-rails_csrf_protection"
+gem "omniauth-saml"
+
+# gem "veracode"
+
 group :development, :test do
   gem "byebug", "~> 11.0", platform: :mri
 

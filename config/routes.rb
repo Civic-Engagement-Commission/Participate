@@ -12,6 +12,8 @@ Rails.application.routes.draw do
     mount Sidekiq::Web => "/sidekiq"
   end
 
+  get "/sign_in_redirect/:provider", to: "decidim/omniauth/switch#redirect"
+
   mount LetterOpenerWeb::Engine, at: "/letter_opener" if Rails.env.development? || ENV.fetch("ENABLE_LETTER_OPENER", "0") == "1"
 
   mount Decidim::Core::Engine => "/"

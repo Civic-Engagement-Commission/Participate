@@ -128,4 +128,10 @@ Rails.application.configure do
                            redirect: false
                          }
                        end
+
+  # # Veracode configuration
+  # config.cache_classes = false
+
+  # # Log error messages when you accidentally call methods on nil.
+  # config.whiny_nils = true
 end
