@@ -26,5 +26,10 @@ module DecidimLite
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+
+    config.after_initialize do
+      # Controllers
+      require "extends/controllers/decidim/devise/omniauth_registrations_controller_extends"
+    end
   end
 end
