@@ -30,6 +30,7 @@ module DecidimLite
     config.after_initialize do
       # Controllers
       require "extends/controllers/decidim/devise/omniauth_registrations_controller_extends"
+      require "extends/controllers/decidim/errors_controller_extends"
     end
   end
 end
