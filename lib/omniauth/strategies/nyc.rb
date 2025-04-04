@@ -37,12 +37,12 @@ module OmniAuth
           [key, attribute]
         end
 
-        hash_attributes = Hash[found_attributes]
+        hash_attributes = found_attributes.to_h
 
         hash_attributes["name"] = "#{hash_attributes["first_name"]} #{hash_attributes["last_name"]}"
 
         if hash_attributes["first_name"].present? && hash_attributes["last_name"].present?
-          hash_attributes["nickname"] = "#{hash_attributes["first_name"].split(" ").first}#{hash_attributes["last_name"][0]}".downcase
+          hash_attributes["nickname"] = "#{hash_attributes["first_name"].split.first}#{hash_attributes["last_name"][0]}".downcase
         end
 
         hash_attributes.except!("email") if hash_attributes["nycExtEmailValidationFlag"] == "False"

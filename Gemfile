@@ -33,8 +33,8 @@ gem "spring"
 
 # gem "ransack", "~> 4.0"
 gem "actionpack", "~> 7.0.8.7"
-gem "rails-html-sanitizer", "~> 1.6.1"
 gem "net-imap", "~> 0.5.6"
+gem "rails-html-sanitizer", "~> 1.6.1"
 
 gem "omniauth-rails_csrf_protection"
 gem "omniauth-saml"

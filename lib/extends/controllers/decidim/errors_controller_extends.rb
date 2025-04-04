@@ -4,7 +4,6 @@ module ErrorsControllerExtends
   extend ActiveSupport::Concern
 
   included do
-
     before_action :delete_headers
     skip_after_action :append_content_security_policy_headers
 
