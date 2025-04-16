@@ -41,6 +41,10 @@ gem "omniauth-saml"
 
 # gem "veracode"
 
+# External Decidim gems
+gem "decidim-decidim_awesome", git: "https://github.com/OpenSourcePolitics/decidim-module-decidim_awesome.git", branch: "fix/update_packages_dependancies"
+gem "decidim-term_customizer", git: "https://github.com/OpenSourcePolitics/decidim-module-term_customizer.git", branch: "backport/fix_database_not_available"
+
 group :development, :test do
   gem "byebug", "~> 11.0", platform: :mri
 

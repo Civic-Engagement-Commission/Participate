@@ -1,4 +1,24 @@
 GIT
+  remote: https://github.com/OpenSourcePolitics/decidim-module-decidim_awesome.git
+  revision: 5148029a3d2e25873ce86c48448bc862ef283677
+  branch: fix/update_packages_dependancies
+  specs:
+    decidim-decidim_awesome (0.12.0)
+      decidim-admin (>= 0.29.1, < 0.30)
+      decidim-core (>= 0.29.1, < 0.30)
+      deface (>= 1.5)
+      sassc (~> 2.3)
+
+GIT
+  remote: https://github.com/OpenSourcePolitics/decidim-module-term_customizer.git
+  revision: f3b55cae4e22713d7c842f0de4c421e9765ad7b0
+  branch: backport/fix_database_not_available
+  specs:
+    decidim-term_customizer (0.29.0)
+      decidim-admin (~> 0.29.0)
+      decidim-core (~> 0.29.0)
+
+GIT
   remote: https://github.com/decidim/decidim.git
   revision: af8d33194b3b011e8ae2517bf9cd8476e806c363
   tag: v0.29.1
@@ -334,6 +354,12 @@ GEM
     declarative-builder (0.2.0)
       trailblazer-option (~> 0.1.0)
     declarative-option (0.1.0)
+    deface (1.9.0)
+      actionview (>= 5.2)
+      nokogiri (>= 1.6)
+      polyglot
+      railties (>= 5.2)
+      rainbow (>= 2.1.0)
     devise (4.9.4)
       bcrypt (~> 3.0)
       orm_adapter (~> 0.1)
@@ -596,6 +622,7 @@ GEM
     pg_search (2.3.7)
       activerecord (>= 6.1)
       activesupport (>= 6.1)
+    polyglot (0.3.5)
     premailer (1.27.0)
       addressable
       css_parser (>= 1.19.0)
@@ -763,6 +790,8 @@ GEM
     rubyzip (2.3.2)
     rufus-scheduler (3.9.2)
       fugit (~> 1.1, >= 1.11.1)
+    sassc (2.4.0)
+      ffi (~> 1.9)
     selenium-webdriver (4.26.0)
       base64 (~> 0.2)
       logger (~> 1.4)
@@ -889,6 +918,7 @@ DEPENDENCIES
   decidim-comments!
   decidim-core!
   decidim-debates!
+  decidim-decidim_awesome!
   decidim-dev!
   decidim-forms!
   decidim-meetings!
@@ -897,6 +927,7 @@ DEPENDENCIES
   decidim-proposals!
   decidim-surveys!
   decidim-system!
+  decidim-term_customizer!
   decidim-verifications!
   dotenv-rails (~> 2.7)
   flamegraph
