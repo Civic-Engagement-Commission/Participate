@@ -1,0 +1,2 @@
+<!-- insert_after "div.main-bar" -->
+  <%= render partial: "/layouts/decidim/language_chooser_bar" %>

@@ -1,0 +1,2 @@
+<!-- insert_before "div.main-bar__links-desktop" -->
+  <%= render partial: "/layouts/decidim/language_chooser_icon" %>

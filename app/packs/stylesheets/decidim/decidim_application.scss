@@ -6,3 +6,34 @@
 // available at https://docs.decidim.org/en/develop/customize/styles.html#_tailwind_css
 //
 // By default this is empty.
+
+header {
+  .main-bar {
+    &__logo {
+      @apply col-span-2;
+    }
+  
+    &__lc-button {
+      @apply text-secondary justify-self-end xl:col-start-7;
+    }
+  }
+}
+
+.language-chooser-bar {
+
+  @apply container items-center py-5 h-24 relative z-40;
+
+  .goog-te-gadget {
+    @apply w-full text-center;
+
+    select {
+      @apply block w-full xl:w-2/3 px-4 py-1.5 mx-auto font-sans text-md;
+      color: var(--secondary);
+    }
+
+    img {
+      @apply inline box-content;
+    }
+  }
+}
+
