@@ -87,4 +87,6 @@ Rails.application.configure do
     # Compress the HTML responses with gzip
     config.middleware.use Rack::Deflater
   end
+
+  config.deface.enabled = true
 end

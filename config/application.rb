@@ -2,6 +2,7 @@
 
 require_relative "boot"
 
+require "decidim/version"
 require "decidim/rails"
 
 # Add the frameworks used by your app that are not loaded by Decidim.

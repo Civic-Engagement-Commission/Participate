@@ -1,0 +1,2 @@
+<!-- replace "erb[silent]:contains('if current_organization.sign_in_enabled?'):last" -->
+  <% if current_organization.sign_in_enabled? || request.env['PATH_INFO'].include?("/admin_sign_in") %>

@@ -41,11 +41,7 @@ Rails.application.configure do
   # Store uploaded files on the local file system (see config/storage.yml for options).
   config.active_storage.service = Rails.application.secrets.dig(:storage, :provider)&.to_sym || :local
 
-  config.active_storage.service_urls_expire_in = if %w(amazon amazon_instance_profile minio).include?(Rails.application.secrets.dig(:storage, :provider))
-                                                   Rails.application.secrets.dig(:decidim, :service_urls_expires_in)
-                                                 else
-                                                   "120000"
-                                                 end.to_i.weeks
+  config.active_storage.service_urls_expire_in = Rails.application.secrets.dig(:decidim, :service_urls_expires_in).to_i.days
 
   # Mount Action Cable outside main process or domain.
   # config.action_cable.mount_path = nil
@@ -134,4 +130,6 @@ Rails.application.configure do
 
   # # Log error messages when you accidentally call methods on nil.
   # config.whiny_nils = true
+
+  config.deface.enabled = ENV.fetch("DEFACE_ENABLED", nil) == "true"
 end
