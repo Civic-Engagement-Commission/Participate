@@ -5,3 +5,17 @@ en:
         assembly:
           fields:
             promoted: "Promoted"
+  layouts:
+    decidim:
+      data_consent:
+        details:
+          items:
+            airtable:
+              service: "Airtable"
+              description: "We need these for airtable"
+            google-maps:
+              service: "Google Maps"
+              description: "We need these for maps"
+            youtube-nocookie:
+              service: "YouTube (no cookies)"
+              description: "We need these for video"

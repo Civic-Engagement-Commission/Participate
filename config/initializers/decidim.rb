@@ -357,34 +357,34 @@ Decidim.configure do |config|
   config.consent_cookie_name = Rails.application.secrets.decidim[:consent_cookie_name] if Rails.application.secrets.decidim[:consent_cookie_name].present?
 
   # Defines data consent categories and the data stored in each category.
-  # config.consent_categories = [
-  #   {
-  #     slug: "essential",
-  #     mandatory: true,
-  #     items: [
-  #       {
-  #         type: "cookie",
-  #         name: "_session_id"
-  #       },
-  #       {
-  #         type: "cookie",
-  #         name: Decidim.consent_cookie_name
-  #       }
-  #     ]
-  #   },
-  #   {
-  #     slug: "preferences",
-  #     mandatory: false
-  #   },
-  #   {
-  #     slug: "analytics",
-  #     mandatory: false
-  #   },
-  #   {
-  #     slug: "marketing",
-  #     mandatory: false
-  #   }
-  # ]
+  config.consent_categories = [
+    {
+      slug: "essential",
+      mandatory: true,
+      items: [
+        {
+          type: "cookie",
+          name: "_session_id"
+        },
+        {
+          type: "cookie",
+          name: Decidim.consent_cookie_name
+        },
+        {
+          type: "cookie",
+          name: "youtube-nocookie"
+        },
+        {
+          type: "cookie",
+          name: "google-maps"
+        },
+        {
+          type: "cookie",
+          name: "airtable"
+        }
+      ]
+    }
+  ]
 
   # Defines additional content security policies following the structure
   # Read more: https://docs.decidim.org/en/develop/configure/initializer#_content_security_policy
