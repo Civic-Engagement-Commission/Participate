@@ -8,6 +8,7 @@ local:
 
 amazon:
   service: S3
+  public: true
   region: <%= Rails.application.secrets.dig(:storage, :amazon, :region) %>
   bucket: <%= Rails.application.secrets.dig(:amazon, :bucket) %>
   access_key_id: <%= Rails.application.secrets.dig(:storage, :amazon, :access_key_id) %>
