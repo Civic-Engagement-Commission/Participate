@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/OpenSourcePolitics/decidim-module-decidim_awesome.git
-  revision: 5148029a3d2e25873ce86c48448bc862ef283677
+  revision: 002f1c933b05ed4d93b7c0dd68b4a476c8cb1d4d
   branch: fix/update_packages_dependancies
   specs:
     decidim-decidim_awesome (0.12.0)
