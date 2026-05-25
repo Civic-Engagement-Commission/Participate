@@ -1,39 +1,33 @@
-# Decidim app by OSP
+# decidim-nyc
 
-![](./docs/decidim-logo-claim.svg)
+A Decidim instance for New York City participatory democracy initiatives, maintained by [openpoke](https://github.com/openpoke).
 
-[Decidim](https://github.com/decidim/decidim) is a digital platform for citizen participation. Related documentation can be found [here](https://docs.decidim.org)
+Based on the [Decidim](https://github.com/decidim/decidim) framework. Decidim and this distribution are licensed under [AGPLv3](./LICENSE-AGPLv3.txt).
 
-## [Open Source Politics](https://opensourcepolitics.eu/)
-![Open Source Politics](./docs/open-source-politics.svg)
+## Decidim version
 
-This repository contains the code of the **decidim-lite** implemented for our customers.
+Currently running **Decidim v0.29.1**.
 
-It consists of the main application with modules developed by the community that we often use.
+### Installed modules
 
-It includes **official modules** supported by the community and **community-based modules** developed by us our [our partners](https://github.com/decidim-ice)
+Sourced from `Gemfile`:
 
-### List of our modules
+| Module                          | Source                                                                                          |
+|---------------------------------|-------------------------------------------------------------------------------------------------|
+| Official Decidim modules        | `decidim/decidim` @ `v0.29.1` (accountability, admin, api, assemblies, blogs, budgets, comments, core, debates, forms, meetings, pages, participatory_processes, proposals, surveys, system, verifications) |
+| `decidim-decidim_awesome`       | OpenSourcePolitics fork (temporary — see `.claude/tasks/phase-1.5-internal-gems-migration.md`)  |
+| `decidim-term_customizer`       | OpenSourcePolitics fork (temporary — see `.claude/tasks/phase-1.5-internal-gems-migration.md`)  |
 
-You can find below an exhaustive list of modules with their repository links and latest version available :
+## Getting started
 
-Here's the revised and improved formatting of the table:
+Local development with Docker: see [docs/DOCKER.md](./docs/DOCKER.md).
 
-| Decidim Module                                                                                                          | Version | Brief Description                                                                                                                                                             |
-|-------------------------------------------------------------------------------------------------------------------------|---------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| decidim-core                                                                                                            | v0.29.1 | Core functionality for the Decidim platform.                                                                                                                                  |
-| decidim-conferences                                                                                                     | v0.29.1 | Module for managing conferences and events.                                                                                                                                   |
-| decidim-initiatives                                                                                                     | v0.29.1 | Module for managing citizen initiatives.                                                                                                                                      |
-| decidim-templates                                                                                                       | v0.29.1 | Module for using templates within the Decidim platform.       
+## Security
 
-## 🚀 Getting started
-- Local development setup with Docker can be found [here](./docs/DOCKER.md)
-
-## 👋 Contributing
-- See our [contributing guide](./docs/CONTRIBUTING.md)
-
-## 🔒 Security
-Security is very important to us. If you have any issue regarding security, please disclose the information responsibly by sending an email to **security[at]opensourcepolitics[dot]eu** and not by creating a Github issue.
+Please report security issues responsibly by emailing the maintainers rather than opening a public issue.
 
 ## License
-The decidim-lite is licensed under the [AGPLv3](./LICENSE-AGPLV3.txt), same license as Decidim.
+
+AGPLv3. See [LICENSE-AGPLv3.txt](./LICENSE-AGPLv3.txt).
+
+This work is a derivative of [Decidim](https://github.com/decidim/decidim) (AGPLv3) and includes patches over the upstream framework. Modifications relative to upstream are tracked through this repository's git history.

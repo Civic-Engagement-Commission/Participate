@@ -56,3 +56,5 @@ minio_data
 
 # Ignore byebug history file.
 .byebug_history
+
+.rspec-failures
