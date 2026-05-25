@@ -10,11 +10,13 @@
           <%= provider_config[:sign_in_button_text] || provider_name %>
         </span>
       <% end %>
-      <%= link_to(omniauth_sign_up_url(provider_config), class: link_classes) do %>
-        <%= oauth_icon provider_key %>
-        <span>
-          <%= provider_config[:sign_up_button_text] || provider_name %>
-        </span>
+      <% if (sign_up_url = omniauth_sign_up_url(provider_config)).present? %>
+        <%= link_to(sign_up_url, class: link_classes) do %>
+          <%= oauth_icon provider_key %>
+          <span>
+            <%= provider_config[:sign_up_button_text] || provider_name %>
+          </span>
+        <% end %>
       <% end %>
     <% end %>
   </div>

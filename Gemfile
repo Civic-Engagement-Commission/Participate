@@ -4,7 +4,7 @@ source "https://rubygems.org"
 
 ruby RUBY_VERSION
 
-DECIDIM_VERSION = { github: "decidim/decidim", tag: "v0.30.9" }.freeze
+DECIDIM_VERSION = { github: "decidim/decidim", tag: "v0.31.5" }.freeze
 
 gem "decidim", DECIDIM_VERSION
 # Optional Decidim modules (not in the meta-gem). Uncomment what you need.
@@ -15,8 +15,8 @@ gem "decidim", DECIDIM_VERSION
 # gem "decidim-templates", DECIDIM_VERSION
 
 # External Decidim modules
-gem "decidim-decidim_awesome", github: "decidim-ice/decidim-module-decidim_awesome", branch: "release/0.30-stable"
-gem "decidim-term_customizer", github: "openpoke/decidim-module-term_customizer", branch: "release/0.30-stable"
+gem "decidim-decidim_awesome", github: "decidim-ice/decidim-module-decidim_awesome", branch: "release/0.31-stable"
+gem "decidim-term_customizer", github: "openpoke/decidim-module-term_customizer", branch: "release/0.31-stable"
 
 gem "bootsnap", "~> 1.4"
 gem "deface"

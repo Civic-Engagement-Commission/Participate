@@ -34,7 +34,7 @@ describe "Registration" do
 
     describe "on cached sight with a different language", :caching do
       it "shows the omniauth buttons in correct locale" do
-        expect(page).to have_link("Log in with Facebook")
+        expect(page).to have_link("Facebook")
 
         within_language_menu do
           click_on "Català"

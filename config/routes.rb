@@ -4,9 +4,9 @@ require "sidekiq/web"
 require "sidekiq-scheduler/web"
 
 Rails.application.routes.draw do
-  if Rails.application.secrets.puma[:health_check][:enabled]
-    get "/stats", to: redirect { |_params, request| "http://#{request.host}:#{Rails.application.secrets.puma[:health_check][:port]}/stats?#{request.params.to_query}" }
-  end
+  # Rails 7.1+ built-in health check. Returns 200 if the app booted with no
+  # exceptions, 500 otherwise. Used by load balancers / uptime monitors.
+  get "up" => "rails/health#show", as: :rails_health_check
 
   authenticate :admin do
     mount Sidekiq::Web => "/sidekiq"

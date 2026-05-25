@@ -8,7 +8,7 @@ on:
 
 env:
   RUBY_VERSION: 3.3.4
-  NODE_VERSION: 18.17.1
+  NODE_VERSION: 22.14.0
   RAILS_ENV: test
   AVAILABLE_LOCALES: "en,fr,ca,es"
   DATABASE_USERNAME: postgres

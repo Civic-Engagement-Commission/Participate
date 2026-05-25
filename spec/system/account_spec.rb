@@ -255,43 +255,8 @@ describe "Account" do
       end
     end
 
-    context "when on the interests page" do
-      before do
-        visit decidim.user_interests_path
-      end
-
-      it "does not find any scopes" do
-        expect(page).to have_content("My interests")
-        expect(page).to have_content("This organization does not have any scope yet")
-      end
-
-      context "when scopes are defined" do
-        let!(:scopes) { create_list(:scope, 3, organization:) }
-        let!(:subscopes) { create_list(:subscope, 3, parent: scopes.first) }
-
-        before do
-          visit decidim.user_interests_path
-        end
-
-        it "display translated scope name" do
-          expect(page).to have_content("My interests")
-          within "label[for='user_scopes_#{scopes.first.id}_checked']" do
-            expect(page).to have_content(translated(scopes.first.name))
-          end
-        end
-
-        it "allows to choose interests" do
-          label_field = "label[for='user_scopes_#{scopes.first.id}_checked']"
-          expect(page).to have_content("My interests")
-          find(label_field).click
-          click_on "Update my interests"
-
-          within_flash_messages do
-            expect(page).to have_content("Your interests have been successfully updated.")
-          end
-        end
-      end
-    end
+    # User Interests feature removed in Decidim 0.30 (PR #13910).
+    # See changelog Phase 3 — corresponding spec block deleted.
 
     context "when on the delete my account page" do
       before do
@@ -352,7 +317,8 @@ describe "Account" do
 
     context "when VAPID keys are set" do
       before do
-        Rails.application.secrets[:vapid] = vapid_keys
+        allow(Decidim).to receive(:vapid_public_key).and_return(vapid_keys[:public_key])
+        allow(Decidim).to receive(:vapid_private_key).and_return(vapid_keys[:private_key])
         driven_by(:pwa_chrome)
         switch_to_host(organization.host)
         login_as user, scope: :user
@@ -382,7 +348,8 @@ describe "Account" do
 
     context "when VAPID is disabled" do
       before do
-        Rails.application.secrets[:vapid] = { enabled: false }
+        allow(Decidim).to receive(:vapid_public_key).and_return(nil)
+        allow(Decidim).to receive(:vapid_private_key).and_return(nil)
         driven_by(:pwa_chrome)
         switch_to_host(organization.host)
         login_as user, scope: :user
@@ -396,7 +363,8 @@ describe "Account" do
 
     context "when VAPID keys are not set" do
       before do
-        Rails.application.secrets.delete(:vapid)
+        allow(Decidim).to receive(:vapid_public_key).and_return(nil)
+        allow(Decidim).to receive(:vapid_private_key).and_return(nil)
         driven_by(:pwa_chrome)
         switch_to_host(organization.host)
         login_as user, scope: :user
