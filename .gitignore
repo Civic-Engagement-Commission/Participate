@@ -58,3 +58,6 @@ minio_data
 .byebug_history
 
 .rspec-failures
+
+/public/sw.js*
+app/views/static/api/docs/

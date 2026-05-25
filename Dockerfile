@@ -1,4 +1,4 @@
-FROM ruby:3.2.2-slim as builder
+FROM ruby:3.3.4-slim as builder
 
 ENV RAILS_ENV=production \
     NODE_ENV=production \
@@ -23,7 +23,8 @@ COPY . .
 RUN bundle exec rake decidim:webpacker:install && \
     bundle exec rake assets:precompile && \
     bundle exec rails shakapacker:compile && \
-    bundle exec rails deface:precompile
+    bundle exec rails deface:precompile && \
+    bundle exec rails decidim_api:generate_docs
 
 RUN rm -rf node_modules tmp/cache vendor/bundle/spec \
     && rm -rf /usr/local/bundle/cache/*.gem \
@@ -34,7 +35,7 @@ RUN rm -rf node_modules tmp/cache vendor/bundle/spec \
     && find /usr/local/bundle/bundler/gems/decidim-* -type d -name "docs" -prune -exec rm -rf {} \; \
     && rm -rf log/*.log
 
-FROM ruby:3.2.2-slim as runner
+FROM ruby:3.3.4-slim as runner
 
 ENV RAILS_ENV=production \
     NODE_ENV=production \
