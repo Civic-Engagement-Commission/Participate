@@ -105,6 +105,7 @@ describe "Authentication" do
           uid: "123545",
           info: {
             email: "user@from-facebook.com",
+            nickname: "facebook_user",
             name: "Facebook User"
           }
         )
@@ -219,6 +220,8 @@ describe "Authentication" do
 
             within ".new_user" do
               fill_in :registration_user_email, with: "user@from-twitter.com"
+              check :registration_user_tos_agreement
+              check :registration_user_newsletter
               find("*[type=submit]").click
             end
 
@@ -274,6 +277,7 @@ describe "Authentication" do
           uid: "123545",
           info: {
             name: "Google User",
+            nickname: "google_user",
             email: "user@from-google.com"
           }
         )
@@ -802,6 +806,7 @@ describe "Authentication" do
         info: {
           email: user.email,
           name: "Facebook User",
+          nickname: "facebook_user",
           verified: true
         }
       )
@@ -827,7 +832,13 @@ describe "Authentication" do
 
           find(".login__omniauth-button.login__omniauth-button--facebook").click
 
-          expect(page).to have_content("Successfully")
+          expect(page).to have_content("Finish creating your account")
+
+          check :registration_user_tos_agreement
+          check :registration_user_newsletter
+          within "#omniauth-register-form" do
+            click_on "Create an account"
+          end
           expect_user_logged
         end
       end
