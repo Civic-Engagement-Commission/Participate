@@ -19,6 +19,14 @@ header {
   }
 }
 
+.login__omniauth-button--nyc {
+  @apply flex;
+
+  svg {
+    @apply fill-current;
+  }
+}
+
 .language-chooser-bar {
 
   @apply container items-center py-5 h-24 relative z-40;
