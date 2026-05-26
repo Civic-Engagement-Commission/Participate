@@ -63,13 +63,16 @@ describe "NYC.ID login" do
   describe "full sign-in flow via NYC.ID" do
     it "creates a new user and logs them in" do
       visit decidim.new_user_session_path
-      find(".login__omniauth-button.login__omniauth-button--nyc", match: :first).click
+      click_on "Sign in with NYC.ID"
 
       check :registration_user_tos_agreement
       within "#omniauth-register-form" do
         click_on "Create an account"
       end
-      click_on("Keep unchecked")
+
+      sleep 1
+
+      click_on "Keep unchecked"
 
       expect(page).to have_content("Successfully")
       expect(Decidim::User.find_by(email: "user@nyc.gov")).to be_present
