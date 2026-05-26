@@ -25,7 +25,7 @@ Decidim.omniauth_providers[:nyc] = {
   sign_up_button_text: ENV.fetch("SIGN_UP_BUTTON_TEXT", nil)
 }
 
-if Decidim.omniauth_providers.dig(:nyc, :enabled)
+if Decidim.omniauth_providers.dig(:nyc, :enabled) || Rails.env.test?
   Rails.application.config.middleware.use OmniAuth::Builder do
     OmniAuth.config.logger = Rails.logger
 

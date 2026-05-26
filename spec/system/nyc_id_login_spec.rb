@@ -9,11 +9,10 @@ describe "NYC.ID login" do
       nyc: {
         enabled: true,
         provider_name: "NYC ID",
-        icon_path: "media/images/nyc-id.svg",
         sign_in_button_text: "Sign in with NYC.ID",
-        sign_up_button_url: "https://accounts-nonprd.nyc.gov/account/user/register.htm",
+        sign_up_button_url: "https://example.test/register",
         sign_up_button_sp_name: "Decidim NYC",
-        sign_up_button_target: "https://example.org/users/auth/nyc/callback",
+        sign_up_button_target: "https://example.test/users/auth/nyc/callback",
         sign_up_button_text: "Create account with NYC.ID"
       }
     }
@@ -55,7 +54,7 @@ describe "NYC.ID login" do
 
     it "renders the NYC.ID 'Create account' button pointing to the external sign-up URL" do
       link = find_link("Create account with NYC.ID")
-      expect(link[:href]).to start_with("https://accounts-nonprd.nyc.gov/account/user/register.htm")
+      expect(link[:href]).to start_with("https://example.test/register")
       expect(link[:href]).to include("spName=Decidim+NYC")
     end
   end

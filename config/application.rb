@@ -5,9 +5,6 @@ require_relative "boot"
 require "decidim/version"
 require "decidim/rails"
 
-# Add the frameworks used by your app that are not loaded by Decidim.
-# require "action_mailbox/engine"
-# require "action_text/engine"
 require "action_cable/engine"
 require "rails/test_unit/railtie"
 

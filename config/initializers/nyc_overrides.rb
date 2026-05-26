@@ -5,6 +5,13 @@
 # Decidim::Env (see decidim-core/lib/decidim/core.rb), so they do not need
 # duplicating here. Only NYC overrides live in this file.
 
+# Fallback icon for the NYC.ID omniauth button. Used when
+# `OMNIAUTH_NYC_ICON_PATH` is not set (dev/test, or prod without an explicit
+# icon asset). External icon from ENV always takes precedence in `oauth_icon`.
+Rails.application.config.to_prepare do
+  Decidim.icons.register(name: "nyc-fill", icon: "government-fill", description: "NYC.ID omniauth provider icon", category: "system", engine: :core)
+end
+
 Decidim.configure do |config|
   # Cookie consent categories — extended to cover third-party services NYC
   # embeds (Airtable, Google Maps, YouTube nocookie).
