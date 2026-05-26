@@ -22,10 +22,11 @@ Decidim.configure do |config|
     }
   ]
 
-  # Extra CSP rules for third-party hosts and the MinIO storage backend.
+  # Extra CSP rules for third-party hosts used by NYC customizations
+  # (Google Translate widget loaded from gstatic/google/googleapis).
   config.content_security_policies_extra = {
-    "connect-src" => %w(http://minio:9000 http://minio http://localhost:9000 https://localhost:3000 *.gstatic.com *.google.com *.googleapis.com),
-    "img-src" => %w(http://minio:9000 http://minio http://localhost:9000 https://localhost:3000 *.gstatic.com *.google.com *.googleapis.com),
+    "connect-src" => %w(*.gstatic.com *.google.com *.googleapis.com),
+    "img-src" => %w(*.gstatic.com *.google.com *.googleapis.com),
     "script-src" => %w(*.gstatic.com *.google.com *.googleapis.com),
     "style-src" => %w(*.gstatic.com *.google.com *.googleapis.com)
   }

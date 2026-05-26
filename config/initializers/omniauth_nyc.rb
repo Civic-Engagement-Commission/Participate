@@ -7,22 +7,22 @@ require "omniauth/strategies/nyc"
 # per-organization settings against this hash at runtime.
 Decidim.omniauth_providers[:nyc] = {
   enabled: ENV["OMNIAUTH_NYC_PROVIDER_NAME"].present?,
-  icon_path: ENV["OMNIAUTH_NYC_ICON_PATH"],
-  provider_name: ENV["OMNIAUTH_NYC_PROVIDER_NAME"],
-  idp_cert_fingerprint: ENV["OMNIAUTH_NYC_CERT_FINGERPRINT"],
-  idp_cert: ENV["OMNIAUTH_NYC_CERT"],
-  idp_key: ENV["OMNIAUTH_NYC_KEY"],
-  issuer: ENV["OMNIAUTH_NYC_ISSUER"],
-  authn_context: ENV["OMNIAUTH_NYC_AUTHN_CONTEXT"],
-  assertion_consumer_service_url: ENV["OMNIAUTH_NYC_CALLBACK"],
-  idp_sso_target_callback_origin: ENV["OMNIAUTH_NYC_SSO_CALLBACK_ORIGIN"],
-  idp_sso_target_url: ENV["OMNIAUTH_NYC_SSO_URL"],
-  idp_slo_target_url: ENV["OMNIAUTH_NYC_SLO_URL"],
-  sign_in_button_text: ENV["SIGN_IN_BUTTON_TEXT"],
-  sign_up_button_url: ENV["SIGN_UP_BUTTON_NYID_URL"],
-  sign_up_button_sp_name: ENV["SIGN_UP_BUTTON_SP_NAME"],
-  sign_up_button_target: ENV["SIGN_UP_BUTTON_TARGET"],
-  sign_up_button_text: ENV["SIGN_UP_BUTTON_TEXT"]
+  icon_path: ENV.fetch("OMNIAUTH_NYC_ICON_PATH", nil),
+  provider_name: ENV.fetch("OMNIAUTH_NYC_PROVIDER_NAME", nil),
+  idp_cert_fingerprint: ENV.fetch("OMNIAUTH_NYC_CERT_FINGERPRINT", nil),
+  idp_cert: ENV.fetch("OMNIAUTH_NYC_CERT", nil),
+  idp_key: ENV.fetch("OMNIAUTH_NYC_KEY", nil),
+  issuer: ENV.fetch("OMNIAUTH_NYC_ISSUER", nil),
+  authn_context: ENV.fetch("OMNIAUTH_NYC_AUTHN_CONTEXT", nil),
+  assertion_consumer_service_url: ENV.fetch("OMNIAUTH_NYC_CALLBACK", nil),
+  idp_sso_target_callback_origin: ENV.fetch("OMNIAUTH_NYC_SSO_CALLBACK_ORIGIN", nil),
+  idp_sso_target_url: ENV.fetch("OMNIAUTH_NYC_SSO_URL", nil),
+  idp_slo_target_url: ENV.fetch("OMNIAUTH_NYC_SLO_URL", nil),
+  sign_in_button_text: ENV.fetch("SIGN_IN_BUTTON_TEXT", nil),
+  sign_up_button_url: ENV.fetch("SIGN_UP_BUTTON_NYID_URL", nil),
+  sign_up_button_sp_name: ENV.fetch("SIGN_UP_BUTTON_SP_NAME", nil),
+  sign_up_button_target: ENV.fetch("SIGN_UP_BUTTON_TARGET", nil),
+  sign_up_button_text: ENV.fetch("SIGN_UP_BUTTON_TEXT", nil)
 }
 
 if Decidim.omniauth_providers.dig(:nyc, :enabled)

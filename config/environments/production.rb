@@ -47,8 +47,8 @@ Rails.application.configure do
 
   if ENV["RAILS_LOG_TO_STDOUT"].present?
     config.logger = ActiveSupport::Logger.new($stdout)
-                      .tap { |logger| logger.formatter = ::Logger::Formatter.new }
-                      .then { |logger| ActiveSupport::TaggedLogging.new(logger) }
+                                         .tap { |logger| logger.formatter = Logger::Formatter.new }
+                                         .then { |logger| ActiveSupport::TaggedLogging.new(logger) }
   end
 
   # Include generic and useful information about system operation, but avoid logging too much
