@@ -4,7 +4,7 @@ source "https://rubygems.org"
 
 ruby RUBY_VERSION
 
-DECIDIM_VERSION = { github: "decidim/decidim", tag: "v0.31.5" }.freeze
+DECIDIM_VERSION = { github: "decidim/decidim", branch: "release/0.31-stable" }.freeze
 
 gem "decidim", DECIDIM_VERSION
 # Optional Decidim modules (not in the meta-gem). Uncomment what you need.
