@@ -10,11 +10,13 @@ module Decidim
           alias_method :original_produce, :produce
           alias_method :original_finish!, :finish!
 
+          # NYC: organization as coauthor instead of current_user.
           def produce
             resource.add_coauthor(context[:current_organization])
             resource
           end
 
+          # NYC: skips `notify` (organization has no followers) and keeps the 0.29-style publish.
           def finish!
             Decidim.traceability.perform_action!(:create, self.class.resource_klass, context[:current_user], visibility: "admin-only") do
               resource.save!

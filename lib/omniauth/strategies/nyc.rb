@@ -45,7 +45,8 @@ module OmniAuth
           hash_attributes["nickname"] = "#{hash_attributes["first_name"].split.first}#{hash_attributes["last_name"][0]}".downcase
         end
 
-        hash_attributes.except!("email") if hash_attributes["nycExtEmailValidationFlag"] == "False"
+        # Nil (not delete) — OmniAuth merges parent SAML info, which would re-add email.
+        hash_attributes["email"] = nil if hash_attributes["nycExtEmailValidationFlag"] == "False"
 
         hash_attributes
       end
@@ -72,7 +73,7 @@ module OmniAuth
       def handle_response(raw_response, opts, settings)
         super do
           if @response_object.success?
-            nyc_ext_email_validation_flag = find_attribute_by(options.attribute_statements["nycExtEmailValidationFlag"])
+            nyc_ext_email_validation_flag = find_attribute_by(options.attribute_statements[:nycExtEmailValidationFlag])
             Rails.logger.debug { "nycExtEmailValidationFlag --> #{nyc_ext_email_validation_flag}" }
             raise OmniAuth::Strategies::EmailNotValidatedError if nyc_ext_email_validation_flag == "False"
           end
