@@ -1,7 +1,7 @@
 GIT
   remote: https://github.com/decidim-ice/decidim-module-decidim_awesome.git
-  revision: 6351cdc9f414b642f713392a760f47c77ac8f947
-  branch: release/0.31-stable
+  revision: 59daca63d716d6472f83287b430d4f75f8b0e0f3
+  branch: main
   specs:
     decidim-decidim_awesome (0.14.2)
       active_hashcash (~> 0.4.0)
@@ -198,8 +198,8 @@ GIT
 
 GIT
   remote: https://github.com/openpoke/decidim-module-term_customizer.git
-  revision: 8cd8bafc273b34ff7dae7c0dcbf231062aa68466
-  branch: release/0.31-stable
+  revision: 67bfd1e341312fd383699f6724dbd519b242dc6d
+  branch: main
   specs:
     decidim-term_customizer (0.31)
       decidim-admin (~> 0.31.0)
@@ -581,8 +581,9 @@ GEM
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     jmespath (1.6.2)
-    json (2.19.5)
+    json (2.19.7)
     jwt (3.1.2)
+      base64
     kaminari (1.2.2)
       activesupport (>= 4.1.0)
       kaminari-actionview (= 1.2.2)

@@ -8,15 +8,13 @@ Rails.application.routes.draw do
   # exceptions, 500 otherwise. Used by load balancers / uptime monitors.
   get "up" => "rails/health#show", :as => :rails_health_check
 
-  authenticate :admin do
+  authenticate :user, ->(u) { u.admin? } do
     mount Sidekiq::Web => "/sidekiq"
   end
 
   devise_scope :user do
     get "/admin_sign_in", to: "decidim/devise/sessions#new"
   end
-
-  get "/sign_in_redirect/:provider", to: "decidim/omniauth/switch#redirect"
 
   mount LetterOpenerWeb::Engine, at: "/letter_opener" if Rails.env.development? || ENV.fetch("ENABLE_LETTER_OPENER", "0") == "1"
 

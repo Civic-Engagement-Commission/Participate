@@ -1,33 +1,25 @@
-# decidim-nyc
+# Decidim NYC
 
-A Decidim instance for New York City participatory democracy initiatives, maintained by [openpoke](https://github.com/openpoke).
+Free Open-Source participatory democracy, citizen participation and open government for cities and organizations
 
-Based on the [Decidim](https://github.com/decidim/decidim) framework. Decidim and this distribution are licensed under [AGPLv3](./LICENSE-AGPLv3.txt).
+This is the open-source repository for Decidim NYC, based on [Decidim](https://github.com/decidim/decidim) `v0.31.5`.
 
-## Decidim version
+## Setting up the application
 
-Currently running **Decidim v0.29.1**.
+You will need to do some steps before having the app working properly once you have deployed it:
 
-### Installed modules
+1. Create a System Admin user: `bin/rails decidim_system:create_admin`
+1. Visit `<your app url>/system` and log in with your system admin credentials
+1. Create a new organization. Check the locales you want to use for that organization, and select a default locale.
+1. Set the correct default host for the organization, otherwise the app will not work properly. Note that you need to include any subdomain you might be using.
+1. Fill the rest of the form and submit it.
 
-Sourced from `Gemfile`:
+You are good to go!
 
-| Module                          | Source                                                                                          |
-|---------------------------------|-------------------------------------------------------------------------------------------------|
-| Official Decidim modules        | `decidim/decidim` @ `v0.29.1` (accountability, admin, api, assemblies, blogs, budgets, comments, core, debates, forms, meetings, pages, participatory_processes, proposals, surveys, system, verifications) |
-| `decidim-decidim_awesome`       | OpenSourcePolitics fork (temporary — see `.claude/tasks/phase-1.5-internal-gems-migration.md`)  |
-| `decidim-term_customizer`       | OpenSourcePolitics fork (temporary — see `.claude/tasks/phase-1.5-internal-gems-migration.md`)  |
+## Local development
 
-## Getting started
-
-Local development with Docker: see [docs/DOCKER.md](./docs/DOCKER.md).
-
-## Security
-
-Please report security issues responsibly by emailing the maintainers rather than opening a public issue.
+The app runs on Docker. See [docs/DOCKER.md](docs/DOCKER.md).
 
 ## License
 
-AGPLv3. See [LICENSE-AGPLv3.txt](./LICENSE-AGPLv3.txt).
-
-This work is a derivative of [Decidim](https://github.com/decidim/decidim) (AGPLv3) and includes patches over the upstream framework. Modifications relative to upstream are tracked through this repository's git history.
+This repository is a derivative of [Decidim](https://github.com/decidim/decidim), licensed under the [GNU Affero General Public License v3.0](LICENSE-AGPLv3.txt).

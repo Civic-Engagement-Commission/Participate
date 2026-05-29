@@ -7,10 +7,9 @@ on:
   pull_request:
 
 env:
-  RUBY_VERSION: 3.3.4
+  RUBY_VERSION: 3.3.11
   NODE_VERSION: 22.14.0
   RAILS_ENV: test
-  AVAILABLE_LOCALES: "en,fr,ca,es"
   DATABASE_USERNAME: postgres
   DATABASE_PASSWORD: postgres
   DATABASE_HOST: localhost

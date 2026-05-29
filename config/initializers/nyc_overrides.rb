@@ -10,6 +10,11 @@
 # icon asset). External icon from ENV always takes precedence in `oauth_icon`.
 Rails.application.config.to_prepare do
   Decidim.icons.register(name: "nyc-fill", icon: "government-fill", description: "NYC.ID omniauth provider icon", category: "system", engine: :core)
+
+  # Wire concern-based overrides into Decidim core classes on every code reload
+  # (moved here from the former decidim_overrides.rb to keep overrides in one place).
+  Decidim::Devise::OmniauthRegistrationsController.include(Decidim::Devise::OmniauthRegistrationsControllerOverride)
+  Decidim::Proposals::Import::ProposalCreator.include(Decidim::Proposals::Import::ProposalCreatorOverride)
 end
 
 Decidim.configure do |config|
