@@ -62,7 +62,7 @@ services:
       - RAILS_LOG_LEVEL=debug
       - ASSET_HOST=localhost:3000
       - DECIDIM_FORCE_SSL=true
-      - ENABLE_LETTER_OPENER=1
+      - QUEUE_ADAPTER=sidekiq
       - SEED=true
       - DEFACE_ENABLED=false
       - QUESTION_CAPTCHA_HOST=
@@ -105,7 +105,7 @@ services:
       - RAILS_LOG_LEVEL=debug
       - ASSET_HOST=localhost:3000
       - DECIDIM_FORCE_SSL=true
-      - ENABLE_LETTER_OPENER=1
+      - QUEUE_ADAPTER=sidekiq
       - SEED=true
       - DEFACE_ENABLED=false
       - QUESTION_CAPTCHA_HOST=

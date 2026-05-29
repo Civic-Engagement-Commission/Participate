@@ -62,32 +62,26 @@ Rails.application.configure do
   config.cache_store = :mem_cache_store, ENV.fetch("MEMCACHE_SERVERS", "localhost:11211")
 
   # Use a real queuing backend for Active Job (and separate queues per environment).
-  config.active_job.queue_adapter = ENV.fetch("QUEUE_ADAPTER", "sidekiq").to_sym
+  config.active_job.queue_adapter = ENV["QUEUE_ADAPTER"] if ENV["QUEUE_ADAPTER"].present?
   # config.active_job.queue_name_prefix = "decidim_nyc_production"
 
   # Disable caching for Action Mailer templates even if Action Controller caching is enabled.
   config.action_mailer.perform_caching = false
 
-  # Mailer setup: letter_opener_web for staging / dev-like envs, SMTP for real production.
-  if ENV.fetch("ENABLE_LETTER_OPENER", "0") == "1"
-    config.action_mailer.delivery_method = :letter_opener_web
-    config.action_mailer.default_url_options = { port: 3000 }
-  else
-    # Prevent mailer from crashing on seeds with missing SMTP config.
-    config.action_mailer.raise_delivery_errors = false
+  # Prevent mailer from crashing on seeds with missing SMTP config.
+  config.action_mailer.raise_delivery_errors = false
 
-    config.action_mailer.delivery_method = :smtp
-    config.action_mailer.smtp_settings = {
-      address: Decidim::Env.new("SMTP_ADDRESS").to_s,
-      port: Decidim::Env.new("SMTP_PORT", 587).to_i,
-      authentication: Decidim::Env.new("SMTP_AUTHENTICATION", "plain").to_s,
-      user_name: Decidim::Env.new("SMTP_USERNAME").to_s,
-      password: Decidim::Env.new("SMTP_PASSWORD").to_s,
-      domain: Decidim::Env.new("SMTP_DOMAIN").to_s,
-      enable_starttls_auto: Decidim::Env.new("SMTP_STARTTLS_AUTO", true).present?,
-      openssl_verify_mode: "none"
-    }
-  end
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = {
+    address: Decidim::Env.new("SMTP_ADDRESS").to_s,
+    port: Decidim::Env.new("SMTP_PORT", 587).to_i,
+    authentication: Decidim::Env.new("SMTP_AUTHENTICATION", "plain").to_s,
+    user_name: Decidim::Env.new("SMTP_USERNAME").to_s,
+    password: Decidim::Env.new("SMTP_PASSWORD").to_s,
+    domain: Decidim::Env.new("SMTP_DOMAIN").to_s,
+    enable_starttls_auto: Decidim::Env.new("SMTP_STARTTLS_AUTO", true).present?,
+    openssl_verify_mode: "none"
+  }
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).

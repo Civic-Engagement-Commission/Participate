@@ -16,7 +16,7 @@ Rails.application.routes.draw do
     get "/admin_sign_in", to: "decidim/devise/sessions#new"
   end
 
-  mount LetterOpenerWeb::Engine, at: "/letter_opener" if Rails.env.development? || ENV.fetch("ENABLE_LETTER_OPENER", "0") == "1"
+  mount LetterOpenerWeb::Engine, at: "/letter_opener" if Rails.env.development?
 
   mount Decidim::Core::Engine => "/"
 end
