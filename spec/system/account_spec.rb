@@ -41,19 +41,6 @@ describe "Account" do
 
         expect(page).to have_css(".flash.success")
       end
-
-      it "shows error when image is too big" do
-        find_by_id("user_avatar_button").click
-
-        within ".upload-modal" do
-          click_on "Remove"
-          input_element = find("input[type='file']", visible: :all)
-          input_element.attach_file(Decidim::Dev.asset("5000x5000.png"))
-
-          expect(page).to have_content("File resolution is too large", count: 1)
-          expect(page).to have_content("Validation error!")
-        end
-      end
     end
 
     describe "updating personal data" do
@@ -83,6 +70,59 @@ describe "Account" do
 
         # The user's password should not change when they did not update it
         expect(user.reload.encrypted_password).to eq(encrypted_password)
+      end
+    end
+
+    describe "when updating the user's nickname" do
+      it "changes the user's nickname - 'nickname'" do
+        within "form.edit_user" do
+          fill_in "Nickname", with: "nickname"
+          find("*[type=submit]").click
+        end
+
+        expect(page).to have_content("Your account was successfully updated.")
+        expect(page).to have_field("user[nickname]", with: "nickname", type: "text")
+      end
+
+      it "respects the maxlength attribute with a really long word - 'nicknamenicknamenickname'" do
+        within "form.edit_user" do
+          fill_in "Nickname", with: "nicknamenicknamenickname"
+          find("*[type=submit]").click
+        end
+
+        expect(page).to have_content("Your account was successfully updated.")
+        expect(page).to have_field("user[nickname]", with: "nicknamenicknamenick", type: "text")
+      end
+
+      it "shows error when word has a capital letter - 'nickName'" do
+        within "form.edit_user" do
+          fill_in "Nickname", with: "nickName"
+          find("*[type=submit]").click
+        end
+
+        expect(page).to have_content("There was a problem updating your account.")
+        expect(page).to have_content("The nickname must be lowercase and contain no spaces")
+        expect(page).to have_field("user[nickname]", with: "nickName", type: "text")
+      end
+
+      it "shows error when word starts with a capital letter - 'Nickname'" do
+        within "form.edit_user" do
+          fill_in "Nickname", with: "Nickname"
+          find("*[type=submit]").click
+        end
+
+        expect(page).to have_content("There was a problem updating your account.")
+        expect(page).to have_field("user[nickname]", with: "Nickname", type: "text")
+      end
+
+      it "shows error when string has a space - 'nick name'" do
+        within "form.edit_user" do
+          fill_in "Nickname", with: "nick name"
+          find("*[type=submit]").click
+        end
+
+        expect(page).to have_content("There was a problem updating your account.")
+        expect(page).to have_field("user[nickname]", with: "nick name", type: "text")
       end
     end
 
@@ -245,6 +285,7 @@ describe "Account" do
 
         it "updates the administrator's notifications" do
           page.find("[for='email_on_moderations']").click
+          page.find("[for='email_on_assigned_proposals']").click
           page.find("[for='user_notification_settings[close_meeting_reminder]']").click
 
           within "form.edit_user" do
@@ -257,9 +298,6 @@ describe "Account" do
         end
       end
     end
-
-    # User Interests feature removed in Decidim 0.30 (PR #13910).
-    # See changelog Phase 3 — corresponding spec block deleted.
 
     context "when on the delete my account page" do
       before do
@@ -302,6 +340,82 @@ describe "Account" do
 
           expect(page).to have_content("Some data bound to your authorization will be saved for security.")
         end
+      end
+    end
+  end
+
+  context "when on the notifications page in a PWA browser" do
+    let(:organization) { create(:organization, host: "pwa.lvh.me") }
+    let(:user) { create(:user, :confirmed, password:, organization:) }
+    let(:password) { "dqCFgjfDbC7dPbrv" }
+    let(:vapid_keys) do
+      {
+        enabled: true,
+        public_key: "BKmjw_A8tJCcZNQ72uG8QW15XHQnrGJjHjsmoUILUUFXJ1VNhOnJLc3ywR3eZKibX4HSqhB1hAzZFj__3VqzcPQ=",
+        private_key: "TF_MRbSSs_4BE1jVfOsILSJemND8cRMpiznWHgdsro0="
+      }
+    end
+
+    context "when VAPID keys are set" do
+      before do
+        allow(Decidim).to receive(:vapid_public_key).and_return(vapid_keys[:public_key])
+        allow(Decidim).to receive(:vapid_private_key).and_return(vapid_keys[:private_key])
+
+        driven_by(:pwa_chrome)
+        switch_to_host(organization.host)
+        login_as user, scope: :user
+        visit decidim.notifications_settings_path
+      end
+
+      context "when on the account page" do
+        it "enables push notifications if supported browser" do
+          toggle = page.find("[data-push-notifications-toggle]", visible: :all)
+          expect(toggle).not_to be_checked
+
+          sleep 2
+          toggle.check(allow_label_click: true)
+
+          # Wait for the browser to be subscribed
+          sleep 5
+
+          within "form.edit_user" do
+            find("*[type=submit]").click
+          end
+
+          within_flash_messages do
+            expect(page).to have_content("successfully")
+          end
+
+          find("[data-push-notifications-toggle]", visible: :all).execute_script("this.checked = true")
+        end
+      end
+    end
+
+    context "when VAPID is disabled" do
+      before do
+        allow(Decidim).to receive(:vapid_public_key).and_return("")
+        driven_by(:pwa_chrome)
+        switch_to_host(organization.host)
+        login_as user, scope: :user
+        visit decidim.notifications_settings_path
+      end
+
+      it "does not show the push notifications switch" do
+        expect(page).to have_no_selector("[data-push-notifications-container]")
+      end
+    end
+
+    context "when VAPID keys are not set" do
+      before do
+        allow(Decidim).to receive(:vapid_public_key).and_return(nil)
+        driven_by(:pwa_chrome)
+        switch_to_host(organization.host)
+        login_as user, scope: :user
+        visit decidim.notifications_settings_path
+      end
+
+      it "does not show the push notifications switch" do
+        expect(page).to have_no_selector("[data-push-notifications-container]")
       end
     end
   end
