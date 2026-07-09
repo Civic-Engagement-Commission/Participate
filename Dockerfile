@@ -1,4 +1,4 @@
-FROM ruby:3.3.11-slim AS builder
+FROM ruby:3.3.11 AS builder
 
 ENV RAILS_ENV=production \
     NODE_ENV=production \
@@ -7,12 +7,18 @@ ENV RAILS_ENV=production \
 WORKDIR /opt/decidim
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    libpq-dev curl git libicu-dev build-essential \
+    libpq-dev libyaml-dev curl git libicu-dev build-essential \
     && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
     && apt-get install -y --no-install-recommends nodejs \
     && npm install --global yarn \
     && gem install bundler:2.5.22 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+COPY package.json  ./package.json
+COPY package-lock.json ./package-lock.json
+COPY packages ./packages/
+
+RUN npm ci
 
 COPY Gemfile Gemfile.lock ./
 
@@ -20,9 +26,7 @@ RUN bundle install --jobs="$(nproc)" --retry=3
 
 COPY . .
 
-RUN bundle exec rake decidim:webpacker:install && \
-    bundle exec rake assets:precompile && \
-    bundle exec rails deface:precompile && \
+RUN bin/rails assets:precompile && \
     bundle exec rails decidim_api:generate_docs
 
 RUN rm -rf node_modules tmp/cache vendor/bundle/spec \
