@@ -27,7 +27,8 @@ RUN bundle install --jobs="$(nproc)" --retry=3
 COPY . .
 
 RUN bin/rails assets:precompile && \
-    bundle exec rails decidim_api:generate_docs
+    bin/rails deface:precompile && \
+    bin/rails decidim_api:generate_docs
 
 RUN rm -rf node_modules tmp/cache vendor/bundle/spec \
     && rm -rf /usr/local/bundle/cache/*.gem \
@@ -41,6 +42,8 @@ RUN rm -rf node_modules tmp/cache vendor/bundle/spec \
 FROM ruby:3.3.11-slim AS runner
 
 ENV RAILS_ENV=production \
+    RAILS_LOG_TO_STDOUT=true \
+    RAILS_SERVE_STATIC_FILES=true \
     NODE_ENV=production \
     SECRET_KEY_BASE=dummy \
     LD_PRELOAD="libjemalloc.so.2" \
@@ -61,6 +64,9 @@ COPY --from=builder /opt/decidim /opt/decidim
 
 RUN chown -R decidim:decidim /opt/decidim
 USER decidim
+
+HEALTHCHECK --interval=1m --timeout=5s --start-period=30s \
+    CMD (curl -sS http://localhost:3000/up | grep success) || exit 1
 
 EXPOSE 3000
 CMD ["bundle", "exec", "rails", "server", "-b", "0.0.0.0"]
