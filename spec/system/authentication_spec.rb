@@ -34,6 +34,16 @@ describe "Authentication" do
     visit decidim.root_path
   end
 
+  around do |example|
+    previous_value = ActionController::Base.allow_forgery_protection
+    ActionController::Base.allow_forgery_protection = true
+    begin
+      example.run
+    ensure
+      ActionController::Base.allow_forgery_protection = previous_value
+    end
+  end
+
   describe "Create an account" do
     around do |example|
       perform_enqueued_jobs { example.run }
@@ -41,7 +51,7 @@ describe "Authentication" do
 
     context "when using email and password" do
       it "creates a new User" do
-        click_on("Create an account")
+        click_on "Create an account"
 
         within ".new_user" do
           fill_in :registration_user_email, with: "user@example.org"
@@ -82,7 +92,7 @@ describe "Authentication" do
 
     context "when being a robot" do
       it "denies the sign up" do
-        click_on("Create an account")
+        click_on "Create an account"
 
         within ".new_user" do
           page.execute_script("$($('.new_user > div > input')[0]).val('Ima robot :D')")
@@ -126,7 +136,7 @@ describe "Authentication" do
 
       context "when the user has confirmed the email in facebook" do
         it "creates a new User without sending confirmation instructions" do
-          click_on("Create an account")
+          click_on "Create an account"
 
           find(".login__omniauth-button.login__omniauth-button--facebook").click
 
@@ -138,11 +148,12 @@ describe "Authentication" do
 
           expect(page).to have_content("Successfully")
           expect_user_logged
+          expect(Decidim::Identity.where(provider: :facebook, uid: "123545").first.user.newsletter_notifications_at).not_to be_present
         end
       end
 
       it "sends a welcome notification" do
-        click_on("Create an account")
+        click_on "Create an account"
 
         find(".login__omniauth-button.login__omniauth-button--facebook").click
 
@@ -161,6 +172,37 @@ describe "Authentication" do
         end
 
         expect(last_email_body).to include("thanks for joining #{translated(organization.name)}")
+      end
+
+      context "when user did not fill one of the fields" do
+        let(:omniauth_hash) do
+          OmniAuth::AuthHash.new(
+            provider: "facebook",
+            uid: "123545",
+            info: {
+              nickname: "facebook_user",
+              name: "Facebook User"
+            }
+          )
+        end
+
+        it "has to complete the account profile" do
+          within "#main-bar" do
+            click_on("Log in")
+          end
+
+          find(".login__omniauth-button.login__omniauth-button--facebook").click
+          expect(page).to have_content("Please complete your profile")
+          expect(page).to have_content("cannot be blank")
+
+          fill_in "Your email", with: "user@from-developer.com"
+          page.find_by_id("registration_user_tos_agreement").check
+          page.find_by_id("registration_user_newsletter").check
+          click_on "Complete profile"
+
+          expect(page).to have_content("A message with a confirmation link has been sent to your email address. Please follow the link to activate your account.")
+          expect(Decidim::Identity.where(provider: :facebook, uid: "123545").first.user.newsletter_notifications_at).to be_present
+        end
       end
     end
 
@@ -194,7 +236,7 @@ describe "Authentication" do
 
       context "when the response does not include the email" do
         it "redirects the user to a finish signup page" do
-          click_on("Create an account")
+          click_on "Create an account"
 
           find(".login__omniauth-button--x").click
 
@@ -211,7 +253,7 @@ describe "Authentication" do
         context "and a user already exists with the given email" do
           it "does not allow it" do
             create(:user, :confirmed, email: "user@from-twitter.com", organization:)
-            click_on("Create an account")
+            click_on "Create an account"
 
             find(".login__omniauth-button--x").click
 
@@ -235,7 +277,7 @@ describe "Authentication" do
         let(:email) { "user@from-twitter.com" }
 
         it "creates a new User" do
-          click_on("Create an account")
+          click_on "Create an account"
           find(".login__omniauth-button.login__omniauth-button--x").click
 
           check :registration_user_tos_agreement
@@ -248,9 +290,8 @@ describe "Authentication" do
         end
 
         it "sends a welcome notification" do
-          click_on("Create an account")
+          click_on "Create an account"
           find(".login__omniauth-button.login__omniauth-button--x").click
-
           check :registration_user_tos_agreement
           check :registration_user_newsletter
           within "#omniauth-register-form" do
@@ -298,10 +339,9 @@ describe "Authentication" do
       end
 
       it "creates a new User" do
-        click_on("Create an account")
+        click_on "Create an account"
 
-        find(".login__omniauth-button.login__omniauth-button--google").click
-
+        click_on "Log in with Google"
         check :registration_user_tos_agreement
         check :registration_user_newsletter
         within "#omniauth-register-form" do
@@ -312,10 +352,9 @@ describe "Authentication" do
       end
 
       it "sends a welcome notification" do
-        click_on("Create an account")
+        click_on "Create an account"
 
-        find(".login__omniauth-button.login__omniauth-button--google").click
-
+        click_on "Log in with Google"
         check :registration_user_tos_agreement
         check :registration_user_newsletter
         within "#omniauth-register-form" do
@@ -334,11 +373,11 @@ describe "Authentication" do
       end
     end
 
-    context "when nickname is not unique case-insensitively" do
+    context "when nickname is not unique" do
       let!(:user) { create(:user, nickname: "responsible_citizen", organization:) }
 
       it "creates a new User" do
-        click_on("Create an account")
+        click_on "Create an account"
 
         within ".new_user" do
           fill_in :registration_user_email, with: "user@example.org"
@@ -386,12 +425,14 @@ describe "Authentication" do
   end
 
   context "when confirming the account" do
-    let!(:user) { create(:user, organization:) }
+    let!(:user) { create(:user, :malicious, organization:) }
 
     before do
       perform_enqueued_jobs { user.confirm }
       switch_to_host(user.organization.host)
       login_as user, scope: :user
+      # Prevent flaky spec where user is not logged in
+      sleep 1
       visit decidim.root_path
     end
 
@@ -443,6 +484,25 @@ describe "Authentication" do
         expect_current_user_to_be(user)
       end
 
+      context "when CSRF token is invalid" do
+        it "displays a retry error" do
+          click_on("Log in", match: :first)
+          within "#session_new_user" do
+            fill_in :session_user_email, with: user.email
+            fill_in :session_user_password, with: "DfyvHn425mYAy2HL"
+          end
+
+          page.driver.browser.manage.delete_all_cookies
+          expect(page.driver.browser.manage.all_cookies).to be_empty
+
+          within "#session_new_user" do
+            find("*[type=submit]").click
+          end
+
+          expect(page).to have_content("Unable to verify your request. Please retry.")
+        end
+      end
+
       context "when email validation is triggered in the log in form" do
         before do
           click_on("Log in", match: :first)
@@ -491,7 +551,7 @@ describe "Authentication" do
 
       it "caches the omniauth buttons correctly with different languages", :caching do
         click_on("Log in", match: :first)
-        expect(page).to have_link("Facebook")
+        expect(page).to have_link("Log in with Facebook")
 
         within_language_menu do
           click_on "Català"
@@ -550,8 +610,9 @@ describe "Authentication" do
         end
 
         expect(page).to have_content("10 characters minimum")
-        expect(page).to have_content("must be different from")
+        expect(page).to have_content("must contain at least 5 different characters")
         expect(page).to have_content("must not be too common")
+        expect(page).to have_content("must be different from your name, nickname, email and the organization's host")
         expect(page).to have_current_path "/users/password"
       end
 
@@ -570,6 +631,8 @@ describe "Authentication" do
     describe "Log Out" do
       before do
         login_as user, scope: :user
+        # Prevent flaky spec where user is not logged in
+        sleep 1
         visit decidim.root_path
       end
 
@@ -584,7 +647,22 @@ describe "Authentication" do
     end
 
     context "with lockable account" do
-      Devise.maximum_attempts = 3
+      around do |example|
+        original_maximum_attempts = Devise.maximum_attempts
+        original_unlock_strategy = Devise.unlock_strategy
+        original_lock_strategy = Devise.lock_strategy
+
+        Devise.maximum_attempts = 3
+        Devise.unlock_strategy = :email
+        Devise.lock_strategy = :failed_attempts
+
+        example.run
+      ensure
+        Devise.maximum_attempts = original_maximum_attempts
+        Devise.unlock_strategy = original_unlock_strategy
+        Devise.lock_strategy = original_lock_strategy
+      end
+
       let!(:maximum_attempts) { Devise.maximum_attempts }
 
       describe "when attempting to log in with failing password" do
@@ -622,7 +700,7 @@ describe "Authentication" do
               within ".new_user" do
                 fill_in :session_user_email, with: user.email
                 fill_in :session_user_password, with: "not-the-password"
-                find("*[type=submit]").click
+                perform_enqueued_jobs { find("*[type=submit]").click }
               end
             end
           end
@@ -631,10 +709,12 @@ describe "Authentication" do
             within ".new_user" do
               fill_in :session_user_email, with: user.email
               fill_in :session_user_password, with: "not-the-password"
-              perform_enqueued_jobs { find("*[type=submit]").click }
+              find("*[type=submit]").click
             end
 
             expect(page).to have_content("Invalid")
+
+            perform_enqueued_jobs(only: ActionMailer::MailDeliveryJob)
             expect(emails.count).to eq(1)
           end
         end
@@ -764,7 +844,7 @@ describe "Authentication" do
 
           it "can log in without being prompted to change the password" do
             click_on("Log in", match: :first)
-            click_on "Facebook"
+            click_on "Log in with Facebook"
             expect(page).to have_content("Successfully")
           end
         end
@@ -778,7 +858,7 @@ describe "Authentication" do
     describe "Create an account" do
       context "when using the same email" do
         it "creates a new User" do
-          click_on("Create an account")
+          click_on "Create an account"
 
           within ".new_user" do
             fill_in :registration_user_email, with: user.email
@@ -828,7 +908,7 @@ describe "Authentication" do
     describe "Create an account" do
       context "when the user has confirmed the email in facebook" do
         it "creates a new User without sending confirmation instructions" do
-          click_on("Create an account")
+          click_on "Create an account"
 
           find(".login__omniauth-button.login__omniauth-button--facebook").click
 
