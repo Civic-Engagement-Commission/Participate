@@ -19,7 +19,7 @@ amazon:
 amazon_instance_profile:
   service: S3
   public: <%= Decidim::Env.new("AWS_S3_PUBLIC_ACCESS", "true").to_boolean_string %>
-  region: <%= Decidim::Env.new("AWS_REGION").to_s %>
+  <%= "region: #{Decidim::Env.new("AWS_REGION").to_s}" if Decidim::Env.new("AWS_REGION").present? %>
   bucket: <%= Decidim::Env.new("AWS_BUCKET").to_s %>
   # In production this service relies on the EC2/ECS instance IAM role for
   # credentials; do not set access_key_id / secret_access_key here.

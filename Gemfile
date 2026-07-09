@@ -12,7 +12,7 @@ gem "decidim", DECIDIM_VERSION
 # gem "decidim-conferences", DECIDIM_VERSION
 # gem "decidim-design", DECIDIM_VERSION
 # gem "decidim-initiatives", DECIDIM_VERSION
-# gem "decidim-templates", DECIDIM_VERSION
+gem "decidim-templates", DECIDIM_VERSION
 
 # External Decidim modules
 gem "decidim-decidim_awesome", github: "decidim-ice/decidim-module-decidim_awesome", branch: "main"
@@ -25,13 +25,10 @@ gem "puma", ">= 6.3.1"
 gem "aws-sdk-s3"
 gem "dalli"
 gem "dotenv-rails", "~> 2.7"
-gem "spring"
-
-gem "net-imap", "~> 0.5.6"
-gem "rails-html-sanitizer", "~> 1.6.1"
 
 gem "omniauth-rails_csrf_protection"
 gem "omniauth-saml"
+gem "rails_semantic_logger"
 
 group :development, :test do
   gem "byebug", "~> 11.0", platform: :mri
@@ -45,16 +42,14 @@ end
 group :development do
   gem "bullet"
   gem "flamegraph"
-  gem "letter_opener_web", "~> 2.0"
-  gem "listen", "~> 3.1"
+  gem "letter_opener_web"
   gem "memory_profiler"
   gem "rack-mini-profiler", require: false
   gem "stackprof"
-  gem "web-console", "~> 4.2"
+  gem "web-console"
 end
 
 group :production do
-  gem "activejob-uniqueness", require: "active_job/uniqueness/sidekiq_patch"
-  gem "sidekiq", "~> 6.0"
-  gem "sidekiq-scheduler", "~> 5.0"
+  gem "sidekiq"
+  gem "sidekiq-cron"
 end

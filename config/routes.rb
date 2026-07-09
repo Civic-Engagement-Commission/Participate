@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require "sidekiq/web"
-require "sidekiq-scheduler/web"
+require "sidekiq/cron/web"
 
 Rails.application.routes.draw do
   # Rails 7.1+ built-in health check. Returns 200 if the app booted with no

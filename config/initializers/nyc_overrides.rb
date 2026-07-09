@@ -8,9 +8,8 @@
 # Fallback icon for the NYC.ID omniauth button. Used when
 # `OMNIAUTH_NYC_ICON_PATH` is not set (dev/test, or prod without an explicit
 # icon asset). External icon from ENV always takes precedence in `oauth_icon`.
+Decidim.icons.register(name: "nyc-fill", icon: "government-fill", description: "NYC.ID omniauth provider icon", category: "system", engine: :core)
 Rails.application.config.to_prepare do
-  Decidim.icons.register(name: "nyc-fill", icon: "government-fill", description: "NYC.ID omniauth provider icon", category: "system", engine: :core)
-
   # Wire concern-based overrides into Decidim core classes on every code reload
   # (moved here from the former decidim_overrides.rb to keep overrides in one place).
   Decidim::Devise::OmniauthRegistrationsController.include(Decidim::Devise::OmniauthRegistrationsControllerOverride)

@@ -22,7 +22,7 @@ default: &default
   # For details on connection pooling, see rails configuration guide
   # http://guides.rubyonrails.org/configuring.html#database-pooling
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-  host: <%= ENV.fetch("DATABASE_HOST") { "" } %>
+  host: <%= ENV.fetch("DATABASE_HOST") { "localhost" } %>
   port: <%= ENV.fetch("DATABASE_PORT") { "5432" } %>
   username: <%= ENV.fetch("DATABASE_USERNAME") { "" } %>
   password: <%= ENV.fetch("DATABASE_PASSWORD") { "" } %>
@@ -31,6 +31,7 @@ default: &default
 
 development:
   <<: *default
+  database: decidim_nyc_development
 
   # The specified database role being used to connect to postgres.
   # To create additional roles in postgres see `$ createuser --help`.
