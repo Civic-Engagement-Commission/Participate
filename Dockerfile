@@ -83,7 +83,7 @@ RUN chown -R decidim:decidim /opt/decidim
 USER decidim
 
 HEALTHCHECK --interval=1m --timeout=5s --start-period=30s \
-    CMD (curl -sS http://localhost:3000/up | grep success) || exit 1
+    CMD (curl -sS http://localhost:3000/up | grep green) || exit 1
 
 EXPOSE 3000
 CMD ["bundle", "exec", "rails", "server", "-b", "0.0.0.0"]
