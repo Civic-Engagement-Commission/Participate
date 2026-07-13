@@ -19,7 +19,6 @@ module OmniAuth
              last_name: %w(sn),
              nickname: %w(sn),
              nycExtEmailValidationFlag: %w(nycExtEmailValidationFlag)
-      option :idp_cert_fingerprint_validator, ->(fingerprint) { fingerprint }
       option :force_authn, true
       option :security,
              authn_requests_signed: true, # Enable or not signature on AuthNRequest
@@ -55,9 +54,6 @@ module OmniAuth
         raise OmniAuth::Strategies::SAML::ValidationError, "SAML response missing" unless request.params["SAMLResponse"]
 
         with_settings do |settings|
-          # Call a fingerprint validation method if there's one
-          validate_fingerprint(settings) if options.idp_cert_fingerprint_validator
-
           handle_response(request.params["SAMLResponse"], options_for_response_object, settings) do
             super
           end

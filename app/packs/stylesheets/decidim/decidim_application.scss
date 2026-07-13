@@ -7,6 +7,27 @@
 //
 // By default this is empty.
 
+.login__omniauth {
+  @apply flex flex-col items-center justify-center;
+}
+
+.login__omniauth-button--nyc {
+  @apply flex !w-full !py-4 !px-6;
+
+  svg, svg g {
+    @apply fill-current;
+  }
+
+  &:hover {
+    background: linear-gradient(0deg,#0000004d,#0000004d),rgb(var(--secondary-rgb));
+    color: rgb(255 255 255 / var(--tw-text-opacity, 1));
+    svg, svg g {
+      fill: rgb(255 255 255 / var(--tw-text-opacity, 1));
+    }
+  }
+}
+
+
 header {
   .main-bar {
     &__logo {
@@ -19,13 +40,6 @@ header {
   }
 }
 
-.login__omniauth-button--nyc {
-  @apply flex;
-
-  svg {
-    @apply fill-current;
-  }
-}
 
 .language-chooser-bar {
 
