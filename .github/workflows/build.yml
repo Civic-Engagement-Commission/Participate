@@ -4,6 +4,7 @@ on:
     branches:
       - main
       - upgrade-0.31
+      - spruce-31
   workflow_dispatch:
 
 jobs:
