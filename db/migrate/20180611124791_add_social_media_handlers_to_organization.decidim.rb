@@ -1,0 +1,12 @@
+# frozen_string_literal: true
+
+# This migration comes from decidim (originally 20170207091021)
+# This file has been modified by `decidim upgrade:migrations` task on 2026-07-21 08:50:52 UTC
+class AddSocialMediaHandlersToOrganization < ActiveRecord::Migration[5.0]
+  def change
+    add_column :decidim_organizations, :instagram_handler, :string
+    add_column :decidim_organizations, :facebook_handler, :string
+    add_column :decidim_organizations, :youtube_handler, :string
+    add_column :decidim_organizations, :github_handler, :string
+  end
+end
