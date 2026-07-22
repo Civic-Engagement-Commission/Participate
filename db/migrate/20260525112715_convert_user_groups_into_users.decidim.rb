@@ -34,8 +34,8 @@ class ConvertUserGroupsIntoUsers < ActiveRecord::Migration[7.0]
   def up
     User.old_group.find_each do |group|
       if group.email.blank? || another_user_with_same_email_in_organization?(group)
-        group.update_attribute(:email, "user_group_#{group.id}@#{group.organization.host}.invalid")
         group.update_attribute(:extended_data, (group.extended_data || {}).merge("patched" => true, "previous_email" => group.email))
+        group.update_attribute(:email, "user_group_#{group.id}@#{group.organization.host}.invalid")
 
         group.reload
       end
