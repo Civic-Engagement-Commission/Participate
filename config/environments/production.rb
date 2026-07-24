@@ -109,7 +109,7 @@ Rails.application.configure do
   # Only use :id for inspections in production.
   config.active_record.attributes_for_inspect = [:id]
 
-  config.deface.enabled = ENV.fetch("DEFACE_ENABLED", nil) == "true"
+  config.deface.enabled = ENV.fetch("DEFACE_ENABLED", "true") == "true"
 
   # Enable DNS rebinding protection and other `Host` header attacks.
   # config.hosts = [

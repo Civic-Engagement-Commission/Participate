@@ -14,7 +14,7 @@ threads min_threads, max_threads
 
 environment rails_env
 port ENV.fetch("PORT", 3000)
-pidfile ENV.fetch("PIDFILE", "tmp/pids/server.pid")
+pidfile ENV.fetch("PIDFILE", "tmp/puma.pid")
 
 # Specifies the `worker_timeout` threshold that Puma will use to wait before
 # terminating a worker in development environments.

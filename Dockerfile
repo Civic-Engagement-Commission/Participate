@@ -51,7 +51,6 @@ RUN bundle exec bootsnap precompile --gemfile || true
 
 RUN SECRET_KEY_BASE=dummy \
     bin/rails assets:precompile && \
-    bin/rails deface:precompile && \
     bin/rails decidim_api:generate_docs
 
 RUN bundle clean --force && \
