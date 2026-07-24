@@ -46,9 +46,22 @@ Rails.application.configure do
                        end
 
   if ENV["RAILS_LOG_TO_STDOUT"].present?
-    config.logger = ActiveSupport::Logger.new($stdout)
-                                         .tap { |logger| logger.formatter = Logger::Formatter.new }
-                                         .then { |logger| ActiveSupport::TaggedLogging.new(logger) }
+    if defined?(SemanticLogger)
+      config.rails_semantic_logger.add_file_appender = false
+
+      SemanticLogger.appenders
+                    .grep(SemanticLogger::Appender::File)
+                    .each { |appender| SemanticLogger.remove_appender(appender) }
+
+      config.semantic_logger.add_appender(
+        io: $stdout,
+        formatter: config.rails_semantic_logger.format
+      )
+    else
+      stdout_logger = ActiveSupport::Logger.new($stdout)
+      stdout_logger.formatter = config.log_formatter
+      config.logger = ActiveSupport::TaggedLogging.new(stdout_logger)
+    end
   end
 
   # Include generic and useful information about system operation, but avoid logging too much

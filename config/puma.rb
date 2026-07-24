@@ -1,47 +1,32 @@
 # frozen_string_literal: true
 
+rails_env = ENV.fetch("RAILS_ENV", "development")
+
 # Puma can serve each request in a thread from an internal thread pool.
 # The `threads` method setting takes two numbers: a minimum and maximum.
 # Any libraries that use thread pools should be configured to match
 # the maximum value specified for Puma. Default is set to 5 threads for minimum
 # and maximum; this matches the default thread size of Active Record.
-#
-max_threads_count = ENV.fetch("RAILS_MAX_THREADS", 5)
-min_threads_count = ENV.fetch("RAILS_MIN_THREADS") { max_threads_count }
-threads min_threads_count, max_threads_count
+max_threads = ENV.fetch("RAILS_MAX_THREADS", 5).to_i
+min_threads = ENV.fetch("RAILS_MIN_THREADS", max_threads).to_i
+
+threads min_threads, max_threads
+
+environment rails_env
+port ENV.fetch("PORT", 3000)
+pidfile ENV.fetch("PIDFILE", "tmp/pids/server.pid")
 
 # Specifies the `worker_timeout` threshold that Puma will use to wait before
 # terminating a worker in development environments.
-#
-worker_timeout 3600 if ENV.fetch("RAILS_ENV", "development") == "development"
+worker_timeout 3600 if rails_env == "development"
 
-# Specifies the `port` that Puma will listen on to receive requests; default is 3000.
-#
-port ENV.fetch("PORT", 3000)
-
-# Specifies the `environment` that Puma will run in.
-#
-environment ENV.fetch("RAILS_ENV", "development")
-
-# Specifies the `pidfile` that Puma will use.
-pidfile ENV.fetch("PIDFILE", "tmp/pids/server.pid")
-
-if defined?(SemanticLogger)
-  on_worker_boot do
-    # Re-open appenders after forking the process
-    SemanticLogger.reopen
-  end
-end
-
-if ENV.fetch("RAILS_ENV") == "production"
-  workers ENV.fetch("WEB_CONCURRENCY", 2)
-
-  # Use the `preload_app!` method when specifying a `workers` number.
-  # This directive tells Puma to first boot the application and load code
-  # before forking the application. This takes advantage of Copy On Write
-  # process behavior so workers use less memory.
-  #
+if rails_env == "production"
+  workers ENV.fetch("WEB_CONCURRENCY", 2).to_i
   preload_app!
+
+  on_worker_boot do
+    SemanticLogger.reopen if defined?(SemanticLogger)
+  end
 else
   # Development SSL
   if ENV.fetch("DEV_SSL", nil) && defined?(Bundler) && (dev_gem = Bundler.load.specs.find { |spec| spec.name == "decidim-dev" })
