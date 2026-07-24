@@ -49,7 +49,8 @@ COPY . .
 # Precompile
 RUN bundle exec bootsnap precompile --gemfile || true
 
-RUN bin/rails assets:precompile && \
+RUN SECRET_KEY_BASE=dummy \
+    bin/rails assets:precompile && \
     bin/rails deface:precompile && \
     bin/rails decidim_api:generate_docs
 
@@ -64,8 +65,8 @@ RUN bundle clean --force && \
     find /usr/local/bundle -name ".git" -prune -exec rm -rf {} + && \
     find /usr/local/bundle -name ".github" -prune -exec rm -rf {} + && \
     find /usr/local/bundle -type d -name spec -prune -exec rm -rf {} + && \
-    find /usr/local/bundle/bundler/gems/decidim-* -type d -name docs -prune -exec rm -rf {} + && \
-    find /usr/local/bundle/bundler/gems/decidim-* -type d -name db -prune -exec rm -rf {} + && \
+    find /usr/local/bundle -type d -name docs -prune -exec rm -rf {} + && \
+    find /usr/local/bundle -type d -name db -prune -exec rm -rf {} + && \
     find /usr/local/bundle -wholename "*/decidim-dev/lib/decidim/dev/assets/*" -exec rm -rf {} +
 
 ################################################################################
@@ -74,7 +75,6 @@ FROM ruby:3.3.11-slim
 
 ENV RAILS_ENV=production \
     NODE_ENV=production \
-    SECRET_KEY_BASE=dummy \
     RAILS_LOG_TO_STDOUT=true \
     RAILS_SERVE_STATIC_FILES=true \
     LD_PRELOAD=libjemalloc.so.2 \
