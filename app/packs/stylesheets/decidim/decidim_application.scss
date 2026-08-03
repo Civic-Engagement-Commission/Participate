@@ -14,6 +14,9 @@
 .login__omniauth-button--nyc {
   @apply flex !w-full !py-4 !px-6;
 
+  > span {
+    @apply block;
+  }
   svg, svg g {
     @apply fill-current;
   }
