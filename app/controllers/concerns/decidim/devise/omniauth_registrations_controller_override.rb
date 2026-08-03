@@ -13,7 +13,12 @@ module Decidim
         def saml_callback?
           custom_callback_origin = request.env["omniauth.strategy"]&.options&.[](:idp_sso_target_callback_origin)
           Rails.logger.debug { "OmniauthRegistrationsControllerOverride::saml_callback? Custom callback origin: #{custom_callback_origin}" }
-          result = request.path.end_with?("/callback") && custom_callback_origin.present? && URI.parse(request.origin).host == custom_callback_origin
+          origin_host = begin
+            request.origin.present? ? URI.parse(request.origin).host : nil
+          rescue URI::InvalidURIError
+            nil
+          end
+          result = request.path.end_with?("/callback") && custom_callback_origin.present? && origin_host == custom_callback_origin
           Rails.logger.debug { "OmniauthRegistrationsControllerOverride::saml_callback? Result: #{result}" }
 
           Rails.logger.info "Skip authenticity token verification for authorized origin: #{custom_callback_origin}" if result
