@@ -11,55 +11,34 @@
 Decidim.icons.register(name: "nyc-fill", icon: "government-fill", description: "NYC.ID omniauth provider icon", category: "system", engine: :core)
 
 # Prevent cascading failures when S3 is inaccessible during error handling
-if defined?(Decidim::MetaImageUrlResolver)
-  Decidim::MetaImageUrlResolver.class_eval do
-    def resolve_with_error_handling
-      resolve_without_error_handling
-    rescue Aws::S3::Errors::Forbidden, Aws::S3::Errors::ServiceError => e
-      Rails.logger.warn "S3 error during meta image resolution: #{e.class} - #{e.message}"
-      nil
-    end
-
-    alias_method :resolve_without_error_handling, :resolve
-    alias_method :resolve, :resolve_with_error_handling
-  end
-end
-
-if defined?(Decidim::MetaTagsHelper)
-  Decidim::MetaTagsHelper.module_eval do
-    def resolve_meta_image_url_with_error_handling(*args)
-      resolve_meta_image_url_without_error_handling(*args)
-    rescue Aws::S3::Errors::Forbidden, Aws::S3::Errors::ServiceError => e
-      Rails.logger.warn "S3 error during meta image resolution: #{e.class} - #{e.message}"
-      nil
-    end
-
-    alias_method :resolve_meta_image_url_without_error_handling, :resolve_meta_image_url
-    alias_method :resolve_meta_image_url, :resolve_meta_image_url_with_error_handling
-  end
-end
-
-# Wrap ActiveStorage S3 service to handle errors gracefully
-if defined?(ActiveStorage::Service::S3Service)
-  ActiveStorage::Service::S3Service.class_eval do
-    def exist_with_error_handling(key, **options)
-      exist_without_error_handling(key, **options)
-    rescue Aws::S3::Errors::Forbidden, Aws::S3::Errors::ServiceError => e
+# Handle at the AWS SDK object level to catch the waiter errors
+if defined?(Aws::S3::Object)
+  Aws::S3::Object.class_eval do
+    def exists_with_error_handling
+      exists_without_error_handling
+    rescue Aws::S3::Errors::Forbidden, Aws::S3::Errors::ServiceError, Aws::Waiters::Errors::UnexpectedError => e
       Rails.logger.warn "S3 error during existence check: #{e.class} - #{e.message}"
       false
     end
 
-    def url_with_error_handling(key, **options)
-      url_without_error_handling(key, **options)
-    rescue Aws::S3::Errors::Forbidden, Aws::S3::Errors::ServiceError => e
-      Rails.logger.warn "S3 error during URL generation: #{e.class} - #{e.message}"
-      nil
+    alias_method :exists_without_error_handling, :exists?
+    alias_method :exists?, :exists_with_error_handling
+  end
+end
+
+# Also handle at the view level as a fallback
+if defined?(Decidim::MetaTagsHelper)
+  Decidim::MetaTagsHelper.module_eval do
+    def add_decidim_meta_tags_with_error_handling
+      add_decidim_meta_tags_without_error_handling
+    rescue Aws::S3::Errors::Forbidden, Aws::S3::Errors::ServiceError, Aws::Waiters::Errors::UnexpectedError => e
+      Rails.logger.warn "S3 error during meta tags generation: #{e.class} - #{e.message}"
+      # Return empty to prevent cascading failures
+      ""
     end
 
-    alias_method :exist_without_error_handling, :exist?
-    alias_method :exist?, :exist_with_error_handling
-    alias_method :url_without_error_handling, :url
-    alias_method :url, :url_with_error_handling
+    alias_method :add_decidim_meta_tags_without_error_handling, :add_decidim_meta_tags
+    alias_method :add_decidim_meta_tags, :add_decidim_meta_tags_with_error_handling
   end
 end
 
