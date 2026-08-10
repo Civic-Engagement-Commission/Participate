@@ -25,15 +25,15 @@ namespace :dev do
                     password_updated_at: Time.current)
     else
       puts "Creating standard admin user..."
-      admin = organization.admins.create!(email: "admin@example.org",
-                                          nickname: "admin",
-                                          name: "Admin",
-                                          password: "decidim123456789",
-                                          password_updated_at: Time.current,
-                                          tos_agreement: true,
-                                          accepted_tos_version: Time.current,
+      organization.admins.create!(email: "admin@example.org",
+                                  nickname: "admin",
+                                  name: "Admin",
+                                  password: "decidim123456789",
+                                  password_updated_at: Time.current,
+                                  tos_agreement: true,
+                                  accepted_tos_version: Time.current,
 
-                                          confirmed_at: Time.current)
+                                  confirmed_at: Time.current)
 
     end
     system = Decidim::System::Admin.find_by(email: "system@example.org")
@@ -42,8 +42,8 @@ namespace :dev do
       system.update!(password: "decidim123456789")
     else
       puts "Creating standard system user..."
-      system = Decidim::System::Admin.create!(email: "system@example.org",
-                                              password: "decidim123456789")
+      Decidim::System::Admin.create!(email: "system@example.org",
+                                     password: "decidim123456789")
     end
   end
 end

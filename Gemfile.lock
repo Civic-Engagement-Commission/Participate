@@ -209,6 +209,12 @@ GIT
     decidim-verifications (0.31.7)
       decidim-core (= 0.31.7)
 
+PATH
+  remote: ../decidim-module-impex
+  specs:
+    decidim-impex (0.1.0)
+      decidim-core (~> 0.31.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -1087,6 +1093,7 @@ DEPENDENCIES
   decidim!
   decidim-decidim_awesome!
   decidim-dev!
+  decidim-impex!
   decidim-templates!
   decidim-term_customizer!
   deface
@@ -1180,6 +1187,7 @@ CHECKSUMS
   decidim-dev (0.31.7)
   decidim-forms (0.31.7)
   decidim-generators (0.31.7)
+  decidim-impex (0.1.0)
   decidim-meetings (0.31.7)
   decidim-pages (0.31.7)
   decidim-participatory_processes (0.31.7)
