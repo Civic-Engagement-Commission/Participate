@@ -12,14 +12,13 @@ checksums = [
       "/app/views/decidim/devise/shared/_omniauth_buttons.html.erb" => "688a13e36af349a91e37b04c6caaa3a9",
       "/app/views/layouts/decidim/header/_main.html.erb" => "a090eeca739613446d2eab8f4de513b1",
       "/app/views/decidim/devise/sessions/new.html.erb" => "da0d18178c8dcead2774956e989527c5",
-      "/app/cells/decidim/data_consent/category.erb" => "2ae94e0a35b44657f261ac90e955b305",
-      "/app/controllers/decidim/devise/omniauth_registrations_controller.rb" => "cafb652eb07048c88a4c233e4fce77d5"
+      "/app/controllers/decidim/devise/omniauth_registrations_controller.rb" => "4e1459fea748ed91b7f309838e447d40"
     }
   },
   {
     package: "decidim-proposals",
     files: {
-      "/lib/decidim/proposals/import/proposal_creator.rb" => "dbf50796e281271bbd1e830a10e57c80"
+      "/lib/decidim/proposals/import/proposal_creator.rb" => "02c7615192d42d6da3ed94d8c36754cc"
     }
   }
 ]
