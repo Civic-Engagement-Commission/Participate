@@ -2,7 +2,7 @@
 
 namespace :nyc do
   module Decidim
-    class UserGroupMembership < ApplicationRecord
+    class UserGroupMembership < ActiveRecord::Base
       self.table_name = "decidim_user_group_memberships"
 
       belongs_to :user, class_name: "Decidim::User", foreign_key: :decidim_user_id
