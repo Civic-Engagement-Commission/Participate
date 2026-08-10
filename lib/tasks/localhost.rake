@@ -2,16 +2,18 @@
 
 namespace :dev do
   desc "Convert the current database to a localhost environment and ensures the standard admin@example.org and system@example.org users are available"
-  task convert_to_localhost: :environment do
+  task :convert_to, [:host] => :environment do |_task, args|
     abort "Please run this task in the development environment only." unless Rails.env.development?
+    abort "Please provide a host as an argument. Example: rake dev:convert_to[localhost]" unless args[:host]
 
-    # Update the host in the database to localhost
-    puts "Updating host in the database to localhost..."
+    # Update the host in the database to the specified host
+    host = args[:host] || "localhost"
+    puts "Updating host in the database to #{host}..."
     organization = Decidim::Organization.first
     abort "No organization found in the database." unless organization
 
-    organization.update!(host: "localhost")
-    puts "Host updated to localhost for organization: #{organization.name}"
+    organization.update!(host: host)
+    puts "Host updated to #{host} for organization: #{organization.name}"
     organization.update!(users_registration_mode: "enabled")
     puts "Users registration mode updated to 'enabled' for organization: #{organization.name}"
 
