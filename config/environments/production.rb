@@ -47,16 +47,16 @@ Rails.application.configure do
 
   if ENV["RAILS_LOG_TO_STDOUT"].present?
     if defined?(SemanticLogger)
-      config.rails_semantic_logger.add_file_appender = false
-
       SemanticLogger.appenders
                     .grep(SemanticLogger::Appender::File)
                     .each { |appender| SemanticLogger.remove_appender(appender) }
 
-      config.semantic_logger.add_appender(
-        io: $stdout,
-        formatter: config.rails_semantic_logger.format
-      )
+      config.rails_semantic_logger.appenders do |appenders|
+        appenders.add(
+          io: $stdout,
+          formatter: config.rails_semantic_logger.format
+        )
+      end
     else
       stdout_logger = ActiveSupport::Logger.new($stdout)
       stdout_logger.formatter = config.log_formatter
