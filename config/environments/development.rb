@@ -89,4 +89,5 @@ Rails.application.configure do
   end
 
   config.hosts << "www.participate.nyc.gov"
+  config.hosts << "participate-stg.nyc.gov"
 end
