@@ -31,29 +31,31 @@ if Decidim.omniauth_providers.dig(:nyc, :enabled) || Rails.env.test?
     request = Rack::Request.new(env)
     organization = Decidim::Organization.find_by(host: request.host)
     provider_config = organization&.enabled_omniauth_providers&.dig(:nyc) || organization&.enabled_omniauth_providers&.dig("nyc") || {}
+    provider_config = provider_config.with_indifferent_access
 
     strategy_options = env["omniauth.strategy"].options
 
-    strategy_options[:icon_path] = provider_config[:icon_path] || provider_config["icon_path"]
-    strategy_options[:provider_name] = provider_config[:provider_name] || provider_config["provider_name"]
-    strategy_options[:idp_cert] = provider_config[:idp_cert] || provider_config["idp_cert"]
-    strategy_options[:certificate] = provider_config[:idp_cert] || provider_config["idp_cert"]
-    strategy_options[:private_key] = provider_config[:idp_key] || provider_config["idp_key"]
-    strategy_options[:issuer] = provider_config[:issuer] || provider_config["issuer"]
-    strategy_options[:authn_context] = provider_config[:authn_context] || provider_config["authn_context"]
-    strategy_options[:assertion_consumer_service_url] = provider_config[:assertion_consumer_service_url] || provider_config["assertion_consumer_service_url"]
-    strategy_options[:idp_sso_target_callback_origin] = provider_config[:idp_sso_target_callback_origin] || provider_config["idp_sso_target_callback_origin"]
-    strategy_options[:idp_sso_target_url] = provider_config[:idp_sso_target_url] || provider_config["idp_sso_target_url"]
-    strategy_options[:idp_slo_target_url] = provider_config[:idp_slo_target_url] || provider_config["idp_slo_target_url"]
+    strategy_options[:icon_path] = provider_config[:icon_path]
+    strategy_options[:provider_name] = provider_config[:provider_name]
+    strategy_options[:idp_cert] = provider_config[:idp_cert]
+    strategy_options[:certificate] = provider_config[:idp_cert]
+    strategy_options[:private_key] = provider_config[:idp_key]
+    # strategy_options[:issuer] = provider_config[:issuer]
+    strategy_options[:sp_entity_id] = provider_config[:issuer]
+    strategy_options[:authn_context] = provider_config[:authn_context]
+    strategy_options[:assertion_consumer_service_url] = provider_config[:assertion_consumer_service_url]
+    strategy_options[:idp_sso_target_callback_origin] = provider_config[:idp_sso_target_callback_origin]
+    strategy_options[:idp_sso_target_url] = provider_config[:idp_sso_target_url]
+    strategy_options[:idp_slo_target_url] = provider_config[:idp_slo_target_url]
 
     # Prefer certificate-based validation when available so stale fingerprints
     # do not break SAML responses after IdP cert rotations or algo changes.
-    if strategy_options[:idp_cert].present?
+    if strategy_options[:idp_cert].empty?
       strategy_options[:idp_cert_fingerprint] = nil
       strategy_options[:idp_cert_fingerprint_algorithm] = nil
     else
-      strategy_options[:idp_cert_fingerprint] = provider_config[:idp_cert_fingerprint] || provider_config["idp_cert_fingerprint"]
-      strategy_options[:idp_cert_fingerprint_algorithm] = provider_config[:idp_cert_fingerprint_algorithm] || provider_config["idp_cert_fingerprint_algorithm"] || XMLSecurity::Document::SHA256
+      strategy_options[:idp_cert_fingerprint] = provider_config[:idp_cert_fingerprint]
+      strategy_options[:idp_cert_fingerprint_algorithm] = provider_config[:idp_cert_fingerprint_algorithm] || XMLSecurity::Document::SHA256
     end
   end
 
