@@ -6,6 +6,7 @@ en:
           nyc:
             provider_name: "NYC"
             idp_cert: "IDP CERT"
+            idp_cert_fingerprint_algorithm: "IDP CERT Fingerprint Algorithm"
             idp_cert_fingerprint: "IDP CERT Fingerprint"
             idp_key: "IDP KEY"
             idp_sso_target_callback_origin: "IDP SSO Target Callback Origin"

@@ -27,8 +27,7 @@ module OmniAuth
              want_assertions_signed: false, # Enable or not the requirement of signed assertion
              metadata_signed: true, # Enable or not signature on Metadata
              digest_method: XMLSecurity::Document::SHA1,
-             signature_method: XMLSecurity::Document::RSA_SHA1,
-             embed_sign: false
+             signature_method: XMLSecurity::Document::RSA_SHA1
 
       info do
         found_attributes = options.attribute_statements.map do |key, values|
@@ -67,7 +66,7 @@ module OmniAuth
       end
 
       def handle_response(raw_response, opts, settings)
-        super do
+        super(raw_response, opts, settings) do
           if @response_object.success?
             nyc_ext_email_validation_flag = find_attribute_by(options.attribute_statements[:nycExtEmailValidationFlag])
             Rails.logger.debug { "nycExtEmailValidationFlag --> #{nyc_ext_email_validation_flag}" }
