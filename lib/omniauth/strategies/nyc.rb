@@ -66,7 +66,7 @@ module OmniAuth
       end
 
       def handle_response(raw_response, opts, settings)
-        super(raw_response, opts, settings) do
+        super do
           if @response_object.success?
             nyc_ext_email_validation_flag = find_attribute_by(options.attribute_statements[:nycExtEmailValidationFlag])
             Rails.logger.debug { "nycExtEmailValidationFlag --> #{nyc_ext_email_validation_flag}" }
