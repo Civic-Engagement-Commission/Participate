@@ -16,6 +16,8 @@ Rails.application.routes.draw do
     get "/admin_sign_in", to: "decidim/devise/sessions#new"
   end
 
+  get "/sign_in_redirect/:provider", to: "omniauth/switch#redirect"
+
   mount LetterOpenerWeb::Engine, at: "/letter_opener" if Rails.env.development?
 
   mount Decidim::Core::Engine => "/"

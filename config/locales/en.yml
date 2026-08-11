@@ -1,3 +1,4 @@
+---
 en:
   decidim:
     system:
@@ -25,18 +26,39 @@ en:
       models:
         assembly:
           fields:
-            promoted: "Promoted"
+            promoted: Promoted
+    system:
+      organizations:
+        omniauth_settings:
+          nyc:
+            assertion_consumer_service_url: Assertion Consumer Service URL
+            authn_context: Authn Context
+            idp_cert: IDP CERT
+            idp_cert_fingerprint: IDP CERT Fingerprint
+            idp_cert_fingerprint_algorithm: IDP CERT Fingerprint Algorithm
+            idp_key: IDP KEY
+            idp_slo_target_url: IDP SLO Target URL
+            idp_sso_target_callback_origin: IDP SSO Target Callback Origin
+            idp_sso_target_url: IDP SSO Target URL
+            issuer: Issuer
+            provider_name: NYC
+            sign_in_button_text: Sign in with NYC
+            sign_in_button_url: Sign in with NYC URL
+            sign_up_button_sp_name: Sign up with NYC SP Name
+            sign_up_button_target: Sign up with NYC Target
+            sign_up_button_text: Sign up with NYC
+            sign_up_button_url: Sign up with NYC URL
   layouts:
     decidim:
       data_consent:
         details:
           items:
             airtable:
-              service: "Airtable"
-              description: "We need these for airtable"
+              description: We need these for airtable
+              service: Airtable
             google-maps:
-              service: "Google Maps"
-              description: "We need these for maps"
+              description: We need these for maps
+              service: Google Maps
             youtube-nocookie:
-              service: "YouTube (no cookies)"
-              description: "We need these for video"
+              description: We need these for video
+              service: YouTube (no cookies)
