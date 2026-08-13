@@ -16,6 +16,7 @@ env:
   RUBYOPT: "-W:no-deprecated"
   # Chrome stability options for CI
   SELENIUM_DRIVER_ARGS: "--no-sandbox --disable-dev-shm-usage --disable-gpu --headless=new"
+  CHROME_VERSION: "139.0.7258.66"
 
 jobs:
   zeitwerk:
@@ -81,7 +82,7 @@ jobs:
       - name: Install ImageMagick
         run: |
           sudo apt-get update
-          sudo apt-get -f install -y imagemagick
+          sudo apt-get -f install -y libu2f-udev imagemagick
 
       - name: Setup Chrome
         uses: browser-actions/setup-chrome@v1
