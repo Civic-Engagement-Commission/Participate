@@ -11,9 +11,9 @@ Decidim.omniauth_providers[:nyc] = {
   provider_name: ENV.fetch("OMNIAUTH_NYC_PROVIDER_NAME", nil),
   idp_cert_fingerprint: ENV.fetch("OMNIAUTH_NYC_CERT_FINGERPRINT", nil),
   idp_cert_fingerprint_algorithm: ENV.fetch("OMNIAUTH_NYC_CERT_FINGERPRINT_ALGORITHM", XMLSecurity::Document::SHA256),
-  idp_cert: ENV.fetch("OMNIAUTH_NYC_CERT", nil),
-  idp_key: ENV.fetch("OMNIAUTH_NYC_KEY", nil),
-  issuer: ENV.fetch("OMNIAUTH_NYC_ISSUER", "https://www.participate.nyc.gov/users"),
+  sp_cert: ENV.fetch("OMNIAUTH_NYC_CERT", nil),
+  sp_key: ENV.fetch("OMNIAUTH_NYC_KEY", nil),
+  sp_entity_id: ENV.fetch("OMNIAUTH_NYC_SP_ENTITY_ID", "https://www.participate.nyc.gov/users"),
   authn_context: ENV.fetch("OMNIAUTH_NYC_AUTHN_CONTEXT", nil),
   assertion_consumer_service_url: ENV.fetch("OMNIAUTH_NYC_CALLBACK", "https://www.participate.nyc.gov/users/auth/nyc/callback"),
   idp_sso_target_callback_origin: ENV.fetch("OMNIAUTH_NYC_SSO_CALLBACK_ORIGIN", nil),
@@ -38,25 +38,16 @@ if Decidim.omniauth_providers.dig(:nyc, :enabled) || Rails.env.test?
     strategy_options[:icon_path] = provider_config[:icon_path]
     strategy_options[:provider_name] = provider_config[:provider_name]
     strategy_options[:idp_cert] = provider_config[:idp_cert]
-    strategy_options[:certificate] = provider_config[:idp_cert]
-    strategy_options[:private_key] = provider_config[:idp_key]
-    # strategy_options[:issuer] = provider_config[:issuer]
-    strategy_options[:sp_entity_id] = provider_config[:issuer]
+    strategy_options[:certificate] = provider_config[:sp_cert]
+    strategy_options[:private_key] = provider_config[:sp_key]
+    strategy_options[:sp_entity_id] = provider_config[:sp_entity_id]
     strategy_options[:authn_context] = provider_config[:authn_context]
     strategy_options[:assertion_consumer_service_url] = provider_config[:assertion_consumer_service_url]
     strategy_options[:idp_sso_target_callback_origin] = provider_config[:idp_sso_target_callback_origin]
     strategy_options[:idp_sso_target_url] = provider_config[:idp_sso_target_url]
     strategy_options[:idp_slo_target_url] = provider_config[:idp_slo_target_url]
-
-    # Prefer certificate-based validation when available so stale fingerprints
-    # do not break SAML responses after IdP cert rotations or algo changes.
-    if strategy_options[:idp_cert].empty?
-      strategy_options[:idp_cert_fingerprint] = nil
-      strategy_options[:idp_cert_fingerprint_algorithm] = nil
-    else
-      strategy_options[:idp_cert_fingerprint] = provider_config[:idp_cert_fingerprint]
-      strategy_options[:idp_cert_fingerprint_algorithm] = provider_config[:idp_cert_fingerprint_algorithm] || XMLSecurity::Document::SHA256
-    end
+    strategy_options[:idp_cert_fingerprint] = provider_config[:idp_cert_fingerprint]
+    strategy_options[:idp_cert_fingerprint_algorithm] = provider_config[:idp_cert_fingerprint_algorithm].presence || XMLSecurity::Document::SHA256
   end
 
   Rails.application.config.middleware.use OmniAuth::Builder do
