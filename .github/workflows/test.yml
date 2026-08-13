@@ -112,3 +112,11 @@ jobs:
 
       - name: Run RSpec
         run: SIMPLECOV=1 CODECOV=1 bundle exec rspec
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: screenshots
+          path: ./tmp/screenshots
+          if-no-files-found: ignore
+          overwrite: true
