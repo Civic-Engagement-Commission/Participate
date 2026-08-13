@@ -3,15 +3,13 @@
 require_relative "../../app/models/application_record"
 
 namespace :nyc do
-  module Decidim
-    class UserGroupMembership < ApplicationRecord
-      self.table_name = "decidim_user_group_memberships"
+  class UserGroupMembership < ApplicationRecord
+    self.table_name = "decidim_user_group_memberships"
 
-      belongs_to :user, class_name: "Decidim::User", foreign_key: :decidim_user_id
-      belongs_to :group, class_name: "Decidim::User", foreign_key: :decidim_user_group_id
+    belongs_to :user, class_name: "Decidim::User", foreign_key: :decidim_user_id
+    belongs_to :group, class_name: "Decidim::User", foreign_key: :decidim_user_group_id
 
-      scope :member, -> { where(role: %w(creator admin member)) }
-    end
+    scope :member, -> { where(role: %w(creator admin member)) }
   end
 
   desc "Patch user groups emails"
@@ -54,8 +52,8 @@ namespace :nyc do
 
   desc "Remove user groups memberships"
   task remove_user_group_memberships: :environment do
-    puts "Removing #{Decidim::UserGroupMembership.count} user group memberships..."
-    Decidim::UserGroupMembership.delete_all
+    puts "Removing #{UserGroupMembership.count} user group memberships..."
+    UserGroupMembership.delete_all
     puts "User group memberships removed."
   end
 end
