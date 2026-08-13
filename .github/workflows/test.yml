@@ -13,17 +13,18 @@ env:
   DATABASE_USERNAME: postgres
   DATABASE_PASSWORD: postgres
   DATABASE_HOST: localhost
-  RUBYOPT: '-W:no-deprecated'
-  CHROME_VERSION: 150.0.7871.0
+  RUBYOPT: "-W:no-deprecated"
 
 jobs:
   zeitwerk:
     name: Zeitwerk check
     runs-on: ubuntu-24.04
+
     services:
       postgres:
         image: postgres:17-alpine
-        ports: ["5432:5432"]
+        ports:
+          - "5432:5432"
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -31,26 +32,32 @@ jobs:
           --health-retries 5
         env:
           POSTGRES_PASSWORD: postgres
+
     steps:
       - uses: actions/checkout@v5
         with:
           fetch-depth: 1
+
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ env.RUBY_VERSION }}
           bundler-cache: true
+
       - name: Setup database
         run: bundle exec rails db:create db:schema:load
+
       - name: Zeitwerk check
         run: bundle exec rails zeitwerk:check
 
   rspec:
     name: RSpec
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+
     services:
       postgres:
         image: postgres:17-alpine
-        ports: ["5432:5432"]
+        ports:
+          - "5432:5432"
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -58,28 +65,31 @@ jobs:
           --health-retries 5
         env:
           POSTGRES_PASSWORD: postgres
+
       redis:
         image: redis:8-alpine
-        ports: ["6379:6379"]
+        ports:
+          - "6379:6379"
 
     steps:
       - uses: actions/checkout@v5
         with:
           fetch-depth: 1
 
-      - run: |
-          sudo apt-get update; sudo apt-get -f install imagemagick
-          
-      - uses: nanasess/setup-chromedriver@v2
-        with:
-          chromedriver-version: ${{ env.CHROME_VERSION }}
+      - name: Install ImageMagick
+        run: |
+          sudo apt-get update
+          sudo apt-get -f install -y imagemagick
 
-      - name: Remove Chrome
-        run: sudo apt remove google-chrome-stable
-
-      - uses: browser-actions/setup-chrome@v1
+      - name: Setup Chrome
+        uses: browser-actions/setup-chrome@v1
         with:
-          chrome-version: ${{ env.CHROME_VERSION }}
+          chrome-version: stable
+
+      - name: Show browser versions
+        run: |
+          google-chrome --version
+          chromedriver --version || true
 
       - uses: ruby/setup-ruby@v1
         with:
