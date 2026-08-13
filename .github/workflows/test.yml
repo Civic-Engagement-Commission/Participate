@@ -81,7 +81,7 @@ jobs:
 
       - uses: browser-actions/setup-chrome@v2
         with:
-          chrome-version: 147.0.7727.24
+          chrome-version: 150.0.7871.124
           install-chromedriver: true
 
       - uses: actions/setup-node@v4
