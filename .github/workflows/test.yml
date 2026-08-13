@@ -14,7 +14,7 @@ env:
   DATABASE_PASSWORD: postgres
   DATABASE_HOST: localhost
   RUBYOPT: '-W:no-deprecated'
-  CHROME_VERSION: 139.0.7258.66
+  CHROME_VERSION: 150.0.7871.0
 
 jobs:
   zeitwerk:
@@ -32,7 +32,7 @@ jobs:
         env:
           POSTGRES_PASSWORD: postgres
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 1
       - uses: ruby/setup-ruby@v1
@@ -74,12 +74,9 @@ jobs:
         with:
           chromedriver-version: ${{ env.CHROME_VERSION }}
 
-      - name: List Chrome
-        run: apt list --installed | grep chrome
-    
       - name: Remove Chrome
         run: sudo apt remove google-chrome-stable
-    
+
       - uses: browser-actions/setup-chrome@v1
         with:
           chrome-version: ${{ env.CHROME_VERSION }}
