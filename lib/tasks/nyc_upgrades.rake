@@ -3,15 +3,6 @@
 require_relative "../../app/models/application_record"
 
 namespace :nyc do
-  class UserGroupMembership < ApplicationRecord
-    self.table_name = "decidim_user_group_memberships"
-
-    belongs_to :user, class_name: "Decidim::User", foreign_key: :decidim_user_id
-    belongs_to :group, class_name: "Decidim::User", foreign_key: :decidim_user_group_id
-
-    scope :member, -> { where(role: %w(creator admin member)) }
-  end
-
   desc "Patch user groups emails"
   task :patch_user_groups_emails, [:file] => :environment do |_task, args|
     file = args[:file].to_s
@@ -52,8 +43,75 @@ namespace :nyc do
 
   desc "Remove user groups memberships"
   task remove_user_group_memberships: :environment do
+    class UserGroupMembership < ApplicationRecord
+      self.table_name = "decidim_user_group_memberships"
+
+      belongs_to :user, class_name: "Decidim::User", foreign_key: :decidim_user_id
+      belongs_to :group, class_name: "Decidim::User", foreign_key: :decidim_user_group_id
+
+      scope :member, -> { where(role: %w(creator admin member)) }
+    end
     puts "Removing #{UserGroupMembership.count} user group memberships..."
     UserGroupMembership.delete_all
     puts "User group memberships removed."
+  end
+
+  desc "Delete users"
+  task :delete_users, [:file] => :environment do |_task, args|
+    file = args[:file].to_s
+    unless File.exist?(file)
+      puts "File not found! [#{file}]"
+      puts
+      puts "Usage: rake nyc:delete_users[<file>]"
+      puts
+      puts "The file should be a CSV with the following format:"
+      puts "email"
+      puts "Example:"
+      puts "email@example.com"
+      abort
+    end
+
+    class SilentDestroyAccount < Decidim::DestroyAccount
+      def call
+        return broadcast(:invalid) unless @form.valid?
+
+        destroy_user_account!
+        destroy_user_identities
+        destroy_follows
+        destroy_user_versions
+        destroy_user_private_exports
+        destroy_user_access_grants
+        destroy_user_access_tokens
+        destroy_user_reminders
+        destroy_user_notifications
+        destroy_user_badges
+        destroy_user_likes
+        destroy_user_reports
+        destroy_participatory_space_private_user
+        delegate_destroy_to_participatory_spaces
+
+        broadcast(:ok)
+      end
+    end
+
+    emails = []
+    CSV.foreach(file, headers: false) do |row|
+      emails << row[0]
+    end
+
+    puts "Removing #{Decidim::User.where(email: emails).count} users..."
+
+    emails.each do |email|
+      user = Decidim::User.find_by(email:)
+      next unless user
+
+      puts "Deleting user: #{user.email}"
+      SilentDestroyAccount.call(
+        Decidim::DeleteAccountForm.from_params(
+          delete_reason: I18n.t("decidim.account.destroy.inactive_account_removal_reason", inactivity_period: Decidim.delete_inactive_users_after_days)
+        ).with_context(current_user: user)
+      )
+    end
+    puts "Users removed."
   end
 end
