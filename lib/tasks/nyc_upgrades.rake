@@ -2,6 +2,10 @@
 
 require_relative "../../app/models/application_record"
 
+def user_coauthorships(user)
+  Decidim::Coauthorship.where(author: user)
+end
+
 namespace :nyc do
   desc "Patch user groups emails"
   task :patch_user_groups_emails, [:file] => :environment do |_task, args|
@@ -32,9 +36,21 @@ namespace :nyc do
         group.update!(nickname: Decidim::User.nicknamize(group.name, group.organization))
       end
       if email
+        existing_user = Decidim::User.find_by(email: email)
+        if group.email != email && existing_user && user_coauthorships(existing_user).exists?
+          puts "User #{email} has coauthorships, moving #{user_coauthorships(existing_user).count} coauthorships to group #{group.id}..."
+          Decidim::Coauthorship.where(author: existing_user).update_all(decidim_author_id: group.id) # rubocop:disable Rails/SkipsModelValidations
+
+          puts "Coauthorships moved, skipping group processing, please delete USER first"
+          next
+        end
         puts "CHANGE TO #{email}"
-        group.skip_reconfirmation!
-        group.update!(email:) unless group.email == email
+        begin
+          group.skip_reconfirmation!
+          group.update!(email:) unless group.email == email
+        rescue StandardError => e
+          puts "ERROR: #{e.message}, SKIPPED"
+        end
       else
         puts "SKIP"
       end
@@ -106,6 +122,13 @@ namespace :nyc do
       next unless user
 
       puts "Deleting user: #{user.email}"
+      if user_coauthorships(user).any?
+        puts "ERROR: User #{user.email} HAS BEEN SKIPPED, User has proposals."
+        puts "Coauthorships: #{user_coauthorships(user).count}"
+        next
+      end
+
+      puts "Destroying user: #{user.email}"
       SilentDestroyAccount.call(
         Decidim::DeleteAccountForm.from_params(
           delete_reason: I18n.t("decidim.account.destroy.inactive_account_removal_reason", inactivity_period: Decidim.delete_inactive_users_after_days)
