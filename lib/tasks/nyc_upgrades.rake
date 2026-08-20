@@ -1,14 +1,10 @@
 # frozen_string_literal: true
 
-require_relative "../../app/models/application_record"
-
-def user_coauthorships(user)
-  Decidim::Coauthorship.where(author: user)
-end
-
 namespace :nyc do
   desc "Patch user groups emails"
   task :patch_user_groups_emails, [:file] => :environment do |_task, args|
+    require_relative "extra_classes"
+
     file = args[:file].to_s
     unless File.exist?(file)
       puts "File not found! [#{file}]"
@@ -36,37 +32,49 @@ namespace :nyc do
         group.update!(nickname: Decidim::User.nicknamize(group.name, group.organization))
       end
       if email
-        existing_user = Decidim::User.find_by(email: email)
-        if group.email != email && existing_user && user_coauthorships(existing_user).exists?
-          puts "User #{email} has coauthorships, moving #{user_coauthorships(existing_user).count} coauthorships to group #{group.id}..."
-          Decidim::Coauthorship.where(author: existing_user).update_all(decidim_author_id: group.id) # rubocop:disable Rails/SkipsModelValidations
-
-          puts "Coauthorships moved, skipping group processing, please delete USER first"
-          next
+        puts "ASSIGN GROUP MEMBERS COAUTHORSHIPS TO GROUP #{group.id}"
+        UserGroupMembership.where(group: group).find_each do |membership|
+          coauthorships = user_coauthorships(membership.user).where(decidim_user_group_id: group.id)
+          coauthorships.find_each do |coauthorship|
+            puts "Moving coauthorship #{coauthorship.id} from author #{coauthorship.decidim_author_id} to group #{coauthorship.decidim_user_group_id}"
+            coauthorship.update(decidim_author_id: coauthorship.decidim_user_group_id)
+          end
         end
-        puts "CHANGE TO #{email}"
+
+        existing_user = Decidim::User.find_by(email: email)
+        coauthorships = user_coauthorships(existing_user)
+        if existing_user != group && group.email != email && existing_user && coauthorships.exists?
+          puts "USER #{email} HAS COAUTHORSHIPS, moving #{coauthorships.count} coauthorships to group #{group.id}..."
+          Decidim::Coauthorship.where(decidim_author_id: existing_user.id).update_all(decidim_author_id: group.id) # rubocop:disable Rails/SkipsModelValidations
+
+          puts "#{coauthorships.count} coauthorships moved"
+
+          puts "REMOVE EXISTING USER..."
+          puts "Destroying user: #{existing_user.email}"
+          SilentDestroyAccount.call(
+            Decidim::DeleteAccountForm.from_params(
+              delete_reason: "Upgraded to user group #{group.id} (#{email})"
+            ).with_context(current_user: existing_user)
+          )
+        end
+
+        puts "CHANGE EMAIL FROM #{group.email} TO #{email}..."
         begin
           group.skip_reconfirmation!
-          group.update!(email:) unless group.email == email
+          group.update!(email: email) unless group.email == email
         rescue StandardError => e
           puts "ERROR: #{e.message}, SKIPPED"
         end
       else
-        puts "SKIP"
+        puts "GROUP #{group.id} SKIPPED (no email)"
       end
     end
   end
 
   desc "Remove user groups memberships"
   task remove_user_group_memberships: :environment do
-    class UserGroupMembership < ApplicationRecord
-      self.table_name = "decidim_user_group_memberships"
+    require_relative "extra_classes"
 
-      belongs_to :user, class_name: "Decidim::User", foreign_key: :decidim_user_id
-      belongs_to :group, class_name: "Decidim::User", foreign_key: :decidim_user_group_id
-
-      scope :member, -> { where(role: %w(creator admin member)) }
-    end
     puts "Removing #{UserGroupMembership.count} user group memberships..."
     UserGroupMembership.delete_all
     puts "User group memberships removed."
@@ -74,6 +82,8 @@ namespace :nyc do
 
   desc "Delete users"
   task :delete_users, [:file] => :environment do |_task, args|
+    require_relative "extra_classes"
+
     file = args[:file].to_s
     unless File.exist?(file)
       puts "File not found! [#{file}]"
@@ -85,29 +95,6 @@ namespace :nyc do
       puts "Example:"
       puts "email@example.com"
       abort
-    end
-
-    class SilentDestroyAccount < Decidim::DestroyAccount
-      def call
-        return broadcast(:invalid) unless @form.valid?
-
-        destroy_user_account!
-        destroy_user_identities
-        destroy_follows
-        destroy_user_versions
-        destroy_user_private_exports
-        destroy_user_access_grants
-        destroy_user_access_tokens
-        destroy_user_reminders
-        destroy_user_notifications
-        destroy_user_badges
-        destroy_user_likes
-        destroy_user_reports
-        destroy_participatory_space_private_user
-        delegate_destroy_to_participatory_spaces
-
-        broadcast(:ok)
-      end
     end
 
     emails = []
