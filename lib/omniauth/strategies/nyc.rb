@@ -19,7 +19,6 @@ module OmniAuth
              last_name: %w(sn),
              nickname: %w(sn),
              nycExtEmailValidationFlag: %w(nycExtEmailValidationFlag)
-      option :idp_cert_fingerprint_validator, ->(fingerprint) { fingerprint }
       option :force_authn, true
       option :security,
              authn_requests_signed: true, # Enable or not signature on AuthNRequest
@@ -28,8 +27,7 @@ module OmniAuth
              want_assertions_signed: false, # Enable or not the requirement of signed assertion
              metadata_signed: true, # Enable or not signature on Metadata
              digest_method: XMLSecurity::Document::SHA1,
-             signature_method: XMLSecurity::Document::RSA_SHA1,
-             embed_sign: false
+             signature_method: XMLSecurity::Document::RSA_SHA1
 
       info do
         found_attributes = options.attribute_statements.map do |key, values|
@@ -45,7 +43,8 @@ module OmniAuth
           hash_attributes["nickname"] = "#{hash_attributes["first_name"].split.first}#{hash_attributes["last_name"][0]}".downcase
         end
 
-        hash_attributes.except!("email") if hash_attributes["nycExtEmailValidationFlag"] == "False"
+        # Nil (not delete) — OmniAuth merges parent SAML info, which would re-add email.
+        hash_attributes["email"] = nil if hash_attributes["nycExtEmailValidationFlag"] == "False"
 
         hash_attributes
       end
@@ -54,9 +53,6 @@ module OmniAuth
         raise OmniAuth::Strategies::SAML::ValidationError, "SAML response missing" unless request.params["SAMLResponse"]
 
         with_settings do |settings|
-          # Call a fingerprint validation method if there's one
-          validate_fingerprint(settings) if options.idp_cert_fingerprint_validator
-
           handle_response(request.params["SAMLResponse"], options_for_response_object, settings) do
             super
           end
@@ -70,9 +66,9 @@ module OmniAuth
       end
 
       def handle_response(raw_response, opts, settings)
-        super(raw_response, opts, settings) do
+        super do
           if @response_object.success?
-            nyc_ext_email_validation_flag = find_attribute_by(options.attribute_statements["nycExtEmailValidationFlag"])
+            nyc_ext_email_validation_flag = find_attribute_by(options.attribute_statements[:nycExtEmailValidationFlag])
             Rails.logger.debug { "nycExtEmailValidationFlag --> #{nyc_ext_email_validation_flag}" }
             raise OmniAuth::Strategies::EmailNotValidatedError if nyc_ext_email_validation_flag == "False"
           end

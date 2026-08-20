@@ -6,7 +6,7 @@ up: build
 	@make setup-database
 
 build:
-	docker build . -t decidim-lite:1.0.0
+	docker build . -t decidim-nyc:0.31.5
 
 # Stops containers and remove volumes
 teardown:

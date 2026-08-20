@@ -88,5 +88,6 @@ Rails.application.configure do
     config.middleware.use Rack::Deflater
   end
 
-  config.deface.enabled = true
+  config.hosts << "www.participate.nyc.gov"
+  config.hosts << "participate-stg.nyc.gov"
 end

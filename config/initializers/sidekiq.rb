@@ -8,8 +8,6 @@ redis_h = {
   reconnect_attempts: 0
 }
 
-Rails.logger.warn "(decidim-app:debugger:initializer:sidekiq)>  Redis: #{redis_h.inspect}"
-
 Sidekiq.configure_client do |config|
   config.redis = redis_h
 end

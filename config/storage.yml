@@ -8,56 +8,52 @@ local:
 
 amazon:
   service: S3
-  public: <%= Rails.application.secrets.dig(:storage, :amazon, :public) %>
-  region: <%= Rails.application.secrets.dig(:storage, :amazon, :region) %>
-  bucket: <%= Rails.application.secrets.dig(:amazon, :bucket) %>
-  access_key_id: <%= Rails.application.secrets.dig(:storage, :amazon, :access_key_id) %>
-  secret_access_key: <%= Rails.application.secrets.dig(:storage, :amazon, :secret_access_key) %>
+  public: <%= Decidim::Env.new("AWS_S3_PUBLIC_ACCESS", "true").to_boolean_string %>
+  access_key_id: <%= Decidim::Env.new("AWS_ACCESS_KEY_ID").to_s %>
+  secret_access_key: <%= Decidim::Env.new("AWS_SECRET_ACCESS_KEY").to_s %>
+  bucket: <%= Decidim::Env.new("AWS_BUCKET").to_s %>
+  <%= "region: #{Decidim::Env.new("AWS_REGION").to_s}" if Decidim::Env.new("AWS_REGION").present? %>
+  <%= "endpoint: #{Decidim::Env.new("AWS_ENDPOINT").to_s}" if Decidim::Env.new("AWS_ENDPOINT").present? %>
   validate_params: false
 
 amazon_instance_profile:
   service: S3
-  region: <%= Rails.application.secrets.dig(:storage, :amazon_instance_profile, :region) %>
-  bucket: <%= Rails.application.secrets.dig(:storage, :amazon_instance_profile, :bucket) %>
-  # In production, the following configuration is set through instance profile
+  public: <%= Decidim::Env.new("AWS_IP_S3_PUBLIC_ACCESS", "false").to_boolean_string %>
+  <%= "access_key_id: #{Decidim::Env.new("AWS_IP_ACCESS_KEY_ID").to_s}" if Decidim::Env.new("AWS_IP_ACCESS_KEY_ID").present? %>
+  <%= "secret_access_key: #{Decidim::Env.new("AWS_IP_SECRET_ACCESS_KEY").to_s}" if Decidim::Env.new("AWS_IP_SECRET_ACCESS_KEY").present? %>
+  <%= "region: #{Decidim::Env.new("AWS_IP_REGION").to_s}" if Decidim::Env.new("AWS_IP_REGION").present? %>
+  <%= "endpoint: #{Decidim::Env.new("AWS_IP_ENDPOINT").to_s}" if Decidim::Env.new("AWS_IP_ENDPOINT").present? %>
+  bucket: <%= Decidim::Env.new("AWS_IP_BUCKET").to_s %>  # In production, the following configuration is set through instance profile
   # see config/initalizers/storage.rb for more details
-  # access_key_id: <%= Rails.application.secrets.dig(:storage, :amazon_instance_profile, :access_key_id) %>
-  # secret_access_key: <%= Rails.application.secrets.dig(:storage, :amazon_instance_profile, :secret_access_key) %>
   validate_params: false
 
-minio:
-  service: S3
-  access_key_id: <%= Rails.application.secrets.dig(:storage, :minio, :access_key_id) %>
-  secret_access_key: <%= Rails.application.secrets.dig(:storage, :minio, :secret_access_key) %>
-  bucket: <%= Rails.application.secrets.dig(:storage, :minio, :bucket) %>
-  endpoint: <%= Rails.application.secrets.dig(:storage, :minio, :endpoint) %>
-  region: <%= Rails.application.secrets.dig(:storage, :minio, :region) %>
-  force_path_style: true
-  validate_params: false
-
-azure:
-  service: AzureStorage
-  storage_account_name: <%= Rails.application.secrets.dig(:storage, :azure, :storage_account_name) %>
-  storage_access_key: <%= Rails.application.secrets.dig(:storage, :azure, :storage_access_key) %>
-  container: <%= Rails.application.secrets.dig(:storage, :azure, :container) %>
+# Rails core team removed support for Azure Storage; the official Azure Ruby gems
+# are unmaintained since 2024. Use https://github.com/testdouble/azure-blob if needed.
+# azure:
+#   service: AzureBlob
+#   public: <%= Decidim::Env.new("AZURE_PUBLIC", "true").to_boolean_string %>
+#   storage_account_name: <%= Decidim::Env.new("AZURE_STORAGE_ACCOUNT_NAME").to_s %>
+#   storage_access_key: <%= Decidim::Env.new("AZURE_STORAGE_ACCESS_KEY").to_s %>
+#   container: <%= Decidim::Env.new("AZURE_CONTAINER").to_s %>
 
 gcs:
   service: GCS
-  project: <%= Rails.application.secrets.dig(:storage, :gcs, :project) %>
-  bucket: <%= Rails.application.secrets.dig(:storage, :gcs, :bucket) %>
+  project: <%= Decidim::Env.new("GCS_PROJECT").to_s %>
+  bucket: <%= Decidim::Env.new("GCS_BUCKET").to_s %>
+  public: <%= Decidim::Env.new("GCS_PUBLIC", "true").to_boolean_string %>
   credentials:
-    type: <%= Rails.application.secrets.dig(:storage, :gcs, :type) %>
-    project_id: <%= Rails.application.secrets.dig(:storage, :gcs, :project_id) %>
-    private_key_id: <%= Rails.application.secrets.dig(:storage, :gcs, :private_key_id) %>
-    private_key: <%= Rails.application.secrets.dig(:storage, :gcs, :private_key) %>
-    client_email: <%= Rails.application.secrets.dig(:storage, :gcs, :client_email) %>
-    client_id: <%= Rails.application.secrets.dig(:storage, :gcs, :client_id) %>
-    auth_uri: <%= Rails.application.secrets.dig(:storage, :gcs, :auth_uri) %>
-    token_uri: <%= Rails.application.secrets.dig(:storage, :gcs, :token_uri) %>
-    auth_provider_x509_cert_url: <%= Rails.application.secrets.dig(:storage, :gcs, :auth_provider_x509_cert_url) %>
-    client_x509_cert_url: <%= Rails.application.secrets.dig(:storage, :gcs, :client_x509_cert_url) %>
+    type: <%= Decidim::Env.new("GCS_TYPE", "service_account").to_s %>
+    project_id: <%= Decidim::Env.new("GCS_PROJECT_ID").to_s %>
+    private_key_id: <%= Decidim::Env.new("GCS_PRIVATE_KEY_ID").to_s %>
+    private_key: <%= Decidim::Env.new("GCS_PRIVATE_KEY").to_s %>
+    client_email: <%= Decidim::Env.new("GCS_CLIENT_EMAIL").to_s %>
+    client_id: <%= Decidim::Env.new("GCS_CLIENT_ID").to_s %>
+    auth_uri: <%= Decidim::Env.new("GCS_AUTH_URI", "https://accounts.google.com/o/oauth2/auth").to_s %>
+    token_uri: <%= Decidim::Env.new("GCS_TOKEN_URI", "https://accounts.google.com/o/oauth2/token").to_s %>
+    auth_provider_x509_cert_url: <%= Decidim::Env.new("GCS_AUTH_PROVIDER_X509_CERT_URL", "https://www.googleapis.com/oauth2/v1/certs").to_s %>
+    client_x509_cert_url: <%= Decidim::Env.new("GCS_CLIENT_X509_CERT_URL").to_s %>
 
 # mirror:
 #   service: Mirror
 #   primary: local
-#   mirrors: [ s3, gcs, azure ]
+#   mirrors: [ amazon, gcs ]
