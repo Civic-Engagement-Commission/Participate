@@ -6,6 +6,13 @@ en:
         assembly:
           fields:
             promoted: Promoted
+    proposals:
+      admin:
+        components:
+          proposals:
+            settings:
+              global:
+                max_taxonomies_per_filter: Max number of taxonomies per filter
     system:
       organizations:
         omniauth_settings:
