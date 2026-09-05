@@ -6,13 +6,12 @@ en:
         assembly:
           fields:
             promoted: Promoted
-    proposals:
-      admin:
-        components:
-          proposals:
-            settings:
-              global:
-                max_taxonomies_per_filter: Max number of taxonomies per filter
+    components:
+      proposals:
+        settings:
+          global:
+            max_taxonomies_per_filter: Max number of taxonomies per filter
+            max_taxonomies_per_filter_help: If more than one, a multiselect will allow users to choose more than one taxonomy when creating or updating a proposal
     system:
       organizations:
         omniauth_settings:
