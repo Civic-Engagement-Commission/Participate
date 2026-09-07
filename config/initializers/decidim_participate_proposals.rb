@@ -13,4 +13,14 @@ Rails.application.config.to_prepare do
       )
     end
   end
+
+  [Decidim::Proposals::ProposalForm, Decidim::Proposals::Admin::ProposalBaseForm].each do |form_klass|
+    next if form_klass.include?(Decidim::Participate::TaxonomyMaxPerFilterValidatable)
+
+    form_klass.include(Decidim::Participate::TaxonomyMaxPerFilterValidatable)
+  end
+
+  unless Decidim::Proposals::ApplicationHelper.include?(Decidim::Proposals::TaxonomiesMultiselectHelper)
+    Decidim::Proposals::ApplicationHelper.include(Decidim::Proposals::TaxonomiesMultiselectHelper)
+  end
 end
