@@ -1,32 +1,47 @@
 ---
 en:
+  activemodel:
+    errors:
+      models:
+        proposal:
+          attributes:
+            taxonomies:
+              too_many: You can choose a maximum of %{count} taxonomies per filter.
   decidim:
     admin:
       models:
         assembly:
           fields:
             promoted: Promoted
+    components:
+      proposals:
+        settings:
+          global:
+            max_taxonomies_per_filter: Max number of taxonomies per filter
+            max_taxonomies_per_filter_help: If more than one, a multiselect will allow
+              users to choose more than one taxonomy when creating or updating a proposal
     system:
       organizations:
         omniauth_settings:
           nyc:
-            assertion_consumer_service_url: "Assertion Consumer Service URL"
-            authn_context: "Authn Context"
-            idp_cert_fingerprint_algorithm: "IDP CERT Fingerprint Algorithm"
-            idp_cert_fingerprint: "IDP CERT Fingerprint"
-            idp_sso_target_callback_origin: "IDP SSO Target Callback Origin"
-            idp_sso_target_url: "IDP SSO Target URL"
-            idp_slo_target_url: "IDP SLO Target URL"
-            provider_name: "NYC"
-            sign_in_button_text: "Sign in with NYC"
-            sign_in_button_url: "Sign in with NYC URL"
-            sign_up_button_text: "Sign up with NYC"
-            sign_up_button_url: "Sign up with NYC URL"
-            sign_up_button_sp_name: "Sign up with NYC SP Name"
-            sign_up_button_target: "Sign up with NYC Target"
-            sp_cert: "Software provider (this platform) certificate"
-            sp_entity_id: "Software provider (this platform) entity ID (as declared to the IDP)"
-            sp_key: "Software provider (this platform) private key"
+            assertion_consumer_service_url: Assertion Consumer Service URL
+            authn_context: Authn Context
+            idp_cert_fingerprint: IDP CERT Fingerprint
+            idp_cert_fingerprint_algorithm: IDP CERT Fingerprint Algorithm
+            idp_slo_target_url: IDP SLO Target URL
+            idp_sso_target_callback_origin: IDP SSO Target Callback Origin
+            idp_sso_target_url: IDP SSO Target URL
+            provider_name: NYC
+            sign_in_button_text: Sign in with NYC
+            sign_in_button_url: Sign in with NYC URL
+            sign_up_button_sp_name: Sign up with NYC SP Name
+            sign_up_button_target: Sign up with NYC Target
+            sign_up_button_text: Sign up with NYC
+            sign_up_button_url: Sign up with NYC URL
+            sp_cert: Software provider (this platform) certificate
+            sp_entity_id: Software provider (this platform) entity ID (as declared
+              to the IDP)
+            sp_key: Software provider (this platform) private key
   layouts:
     decidim:
       data_consent:
