@@ -33,7 +33,11 @@ describe "Account" do
 
     describe "update avatar" do
       it "can update avatar" do
-        dynamically_attach_file(:user_avatar, Decidim::Dev.asset("avatar.jpg"), remove_before: true)
+        dynamically_attach_file(:user_avatar, Decidim::Dev.asset("avatar.jpg"), remove_before: true) do
+          within ".upload-modal" do
+            expect(page).to have_css("[data-filename='avatar.jpg']", wait: 5)
+          end
+        end
 
         within "form.edit_user" do
           find("*[type=submit]").click
