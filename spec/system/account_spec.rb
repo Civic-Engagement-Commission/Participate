@@ -33,6 +33,9 @@ describe "Account" do
 
     describe "update avatar" do
       it "can update avatar" do
+        # Wait for the modal to preload the current avatar, otherwise opening it preloads it again
+        expect(page).to have_css("[data-dropzone-items] [data-filename='avatar.jpg']", visible: :all)
+
         dynamically_attach_file(:user_avatar, Decidim::Dev.asset("avatar.jpg"), remove_before: true)
 
         within "form.edit_user" do
