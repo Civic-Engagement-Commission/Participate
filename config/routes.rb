@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
 require "sidekiq/web"
-require "sidekiq-scheduler/web"
+require "sidekiq/cron/web"
 
 Rails.application.routes.draw do
-  if Rails.application.secrets.puma[:health_check][:enabled]
-    get "/stats", to: redirect { |_params, request| "http://#{request.host}:#{Rails.application.secrets.puma[:health_check][:port]}/stats?#{request.params.to_query}" }
-  end
+  # Rails 7.1+ built-in health check. Returns 200 if the app booted with no
+  # exceptions, 500 otherwise. Used by load balancers / uptime monitors.
+  get "up" => "rails/health#show", :as => :rails_health_check
 
-  authenticate :admin do
+  authenticate :user, ->(u) { u.admin? } do
     mount Sidekiq::Web => "/sidekiq"
   end
 
@@ -16,9 +16,9 @@ Rails.application.routes.draw do
     get "/admin_sign_in", to: "decidim/devise/sessions#new"
   end
 
-  get "/sign_in_redirect/:provider", to: "decidim/omniauth/switch#redirect"
+  get "/sign_in_redirect/:provider", to: "omniauth/switch#redirect"
 
-  mount LetterOpenerWeb::Engine, at: "/letter_opener" if Rails.env.development? || ENV.fetch("ENABLE_LETTER_OPENER", "0") == "1"
+  mount LetterOpenerWeb::Engine, at: "/letter_opener" if Rails.env.development?
 
   mount Decidim::Core::Engine => "/"
 end

@@ -38,16 +38,31 @@
 .env
 .envrc
 .rbenv-vars
+mise.toml
+
+# Others
+.vscode
+.byebug*
+*.gem
+*.sql
+.rubocop-http*
+/coverage
+backups/*
+!backups/.keep
 
 # Ignore the files and folders generated through Webpack
-public/decidim-packs
-public/packs-test
-public/sw.js*
-
+/public/packs
+/public/packs-test
+/public/decidim-packs
+/public/packs-test
+/public/sw.js*
+/public/sw.js.map*
+/app/views/static/api
 
 # Ignore node modules
 /node_modules
-
+/packages/*/node_modules
+npm_debug.log
 
 # Ignore Tailwind configuration
 tailwind.config.js
@@ -56,3 +71,7 @@ minio_data
 
 # Ignore byebug history file.
 .byebug_history
+
+.rspec-failures
+
+app/views/static/api/docs/

@@ -1,39 +1,25 @@
-# Decidim app by OSP
+# Decidim NYC
 
-![](./docs/decidim-logo-claim.svg)
+Free Open-Source participatory democracy, citizen participation and open government for cities and organizations
 
-[Decidim](https://github.com/decidim/decidim) is a digital platform for citizen participation. Related documentation can be found [here](https://docs.decidim.org)
+This is the open-source repository for Decidim NYC, based on [Decidim](https://github.com/decidim/decidim) `v0.31.5`.
 
-## [Open Source Politics](https://opensourcepolitics.eu/)
-![Open Source Politics](./docs/open-source-politics.svg)
+## Setting up the application
 
-This repository contains the code of the **decidim-lite** implemented for our customers.
+You will need to do some steps before having the app working properly once you have deployed it:
 
-It consists of the main application with modules developed by the community that we often use.
+1. Create a System Admin user: `bin/rails decidim_system:create_admin`
+1. Visit `<your app url>/system` and log in with your system admin credentials
+1. Create a new organization. Check the locales you want to use for that organization, and select a default locale.
+1. Set the correct default host for the organization, otherwise the app will not work properly. Note that you need to include any subdomain you might be using.
+1. Fill the rest of the form and submit it.
 
-It includes **official modules** supported by the community and **community-based modules** developed by us our [our partners](https://github.com/decidim-ice)
+You are good to go!
 
-### List of our modules
+## Local development
 
-You can find below an exhaustive list of modules with their repository links and latest version available :
-
-Here's the revised and improved formatting of the table:
-
-| Decidim Module                                                                                                          | Version | Brief Description                                                                                                                                                             |
-|-------------------------------------------------------------------------------------------------------------------------|---------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| decidim-core                                                                                                            | v0.29.1 | Core functionality for the Decidim platform.                                                                                                                                  |
-| decidim-conferences                                                                                                     | v0.29.1 | Module for managing conferences and events.                                                                                                                                   |
-| decidim-initiatives                                                                                                     | v0.29.1 | Module for managing citizen initiatives.                                                                                                                                      |
-| decidim-templates                                                                                                       | v0.29.1 | Module for using templates within the Decidim platform.       
-
-## 🚀 Getting started
-- Local development setup with Docker can be found [here](./docs/DOCKER.md)
-
-## 👋 Contributing
-- See our [contributing guide](./docs/CONTRIBUTING.md)
-
-## 🔒 Security
-Security is very important to us. If you have any issue regarding security, please disclose the information responsibly by sending an email to **security[at]opensourcepolitics[dot]eu** and not by creating a Github issue.
+The app runs on Docker. See [docs/DOCKER.md](docs/DOCKER.md).
 
 ## License
-The decidim-lite is licensed under the [AGPLv3](./LICENSE-AGPLV3.txt), same license as Decidim.
+
+This repository is a derivative of [Decidim](https://github.com/decidim/decidim), licensed under the [GNU Affero General Public License v3.0](LICENSE-AGPLv3.txt).
