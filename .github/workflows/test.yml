@@ -14,7 +14,7 @@ env:
   DATABASE_PASSWORD: postgres
   DATABASE_HOST: localhost
   RUBYOPT: "-W:no-deprecated"
-  CHROME_VERSION: 151.0.7922.138
+  CHROME_VERSION: 152.0.7977.0
 
 jobs:
   zeitwerk:
