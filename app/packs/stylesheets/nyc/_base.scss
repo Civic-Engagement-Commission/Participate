@@ -1,0 +1,50 @@
+// Site-wide NYC styles.
+
+html {
+  scroll-behavior: smooth;
+
+  --heading-color: #020203;
+  --paragraph-color: #474747;
+  --cec-dark-grey: #020203;
+  --cec-yellow: #f1cd1e;
+  --cec-green: #81c738;
+  --heading-large: 3.125rem;
+}
+
+a.login__omniauth-button.button--nyc #nyc-logo {
+  fill: currentColor;
+}
+
+.button__primary {
+  color: black;
+}
+
+.button__green {
+  background-color: var(--cec-green);
+  color: var(--paragraph-color);
+  padding: 0.65rem 1.5rem;
+  font-size: 20px;
+}
+
+header .admin-bar__container {
+  background-color: white;
+}
+
+.author__avatar-container .author__avatar,
+.profile__avatar-container .profile__avatar img {
+  object-fit: contain;
+}
+
+/* Process styles */
+
+.participatory-space__container [id^="hero-"] {
+  background-size: cover;
+  background-position: center;
+}
+
+/* Footer styles */
+
+.main-footer .h5,
+.main-footer .h4 {
+  color: white;
+}

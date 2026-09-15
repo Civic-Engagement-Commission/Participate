@@ -47,6 +47,7 @@ Rails.application.config.to_prepare do
   # (moved here from the former decidim_overrides.rb to keep overrides in one place).
   Decidim::Devise::OmniauthRegistrationsController.include(Decidim::Devise::OmniauthRegistrationsControllerOverride)
   Decidim::Proposals::Import::ProposalCreator.include(Decidim::Proposals::Import::ProposalCreatorOverride)
+  Decidim::ParticipatoryProcesses::ParticipatoryProcessesController.include(Decidim::ParticipatoryProcesses::ParticipatoryProcessesControllerOverride)
 end
 
 Decidim.configure do |config|

@@ -1,0 +1,98 @@
+// Homepage entrance animations.
+
+@keyframes fadeIn {
+  from {
+    transform: translateY(50px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+#about-tpm {
+  opacity: 0;
+  animation-name: fadeIn;
+  animation-duration: 1s;
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: forwards;
+  animation-range: entry 0% cover 40%;
+}
+
+#tpm-cards {
+  opacity: 0;
+  animation-name: fadeIn;
+  animation-delay: 1s;
+  animation-duration: 1s;
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: forwards;
+}
+
+#be-part-tpm {
+  opacity: 0;
+  animation-name: fadeIn;
+  animation-delay: 2s;
+  animation-duration: 1s;
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: forwards;
+}
+
+#ideas-to-life {
+  opacity: 0;
+  animation-name: fadeIn;
+  animation-delay: 3s;
+  animation-duration: 1s;
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: forwards;
+  animation-range: entry 0% cover 40%;
+  animation-iteration-count: 1;
+}
+
+#your-ideas {
+  opacity: 0;
+  animation-name: fadeIn;
+  animation-delay: 4s;
+  animation-duration: 1s;
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: forwards;
+}
+
+#about-cec {
+  opacity: 0;
+  animation-name: fadeIn;
+  animation-delay: 5s;
+  animation-duration: 1s;
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: forwards;
+}
+
+@keyframes jump {
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+#heart-svg {
+  animation-delay: 1.2s;
+  animation-name: jump;
+  animation-duration: 0.8s;
+}
+
+#bus {
+  animation-name: drivebus;
+  animation-duration: 1.2s;
+  animation-fill-mode: forwards;
+  transform: translateX(-50px);
+}
+
+@keyframes drivebus {
+  from {
+    transform: translateX(-50px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
