@@ -4,5 +4,5 @@
 // Load images
 require.context("../../images", true)
 
-import TaxonomyMultiselectController from "./participate/controllers/taxonomy_multiselect_controller"
+import TaxonomyMultiselectController from "./nyc/controllers/taxonomy_multiselect_controller"
 window.Stimulus?.register("taxonomy-multiselect", TaxonomyMultiselectController)

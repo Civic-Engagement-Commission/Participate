@@ -1,8 +1,3 @@
 <!-- replace "erb[loud]:contains('filter_taxonomy_items_select_field form, :taxonomies, filter')" -->
 
-<% max = [component_settings.max_taxonomies_per_filter.to_i, 1].max %>
-<% if max > 1 %>
-  <%= filter_taxonomy_items_multiselect_field(form, :taxonomies, filter, max) %>
-<% else %>
-  <%= filter_taxonomy_items_select_field form, :taxonomies, filter %>
-<% end %>
+<%= render partial: "/decidim/filter_taxonomy_multiselec/filter_taxonomy_items_multiselect_field", locals: { form: form, filter: filter } %>
