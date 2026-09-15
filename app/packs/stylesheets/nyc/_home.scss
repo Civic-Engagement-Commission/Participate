@@ -1,6 +1,7 @@
 // Homepage styles
 
-.home > .home__section {
+// Scoped to HTML blocks so standard Decidim blocks keep their own layout.
+.home > .home__section:where(#html-block-html) {
   max-width: none;
   padding: 0;
 }
@@ -9,7 +10,7 @@
   padding-top: 70px;
 }
 
-.home__section .with-margins {
+.home__section:where(#html-block-html) .with-margins {
   width: 100%;
   margin-right: auto;
   margin-left: auto;
@@ -18,31 +19,31 @@
 }
 
 @media (min-width: 768px) {
-  .home__section .with-margins {
+  .home__section:where(#html-block-html) .with-margins {
     padding-top: 3rem;
     padding-bottom: 3rem;
   }
 }
 
-.home__section .with-margins {
+.home__section:where(#html-block-html) .with-margins {
   padding-top: 2rem;
   padding-bottom: 2rem;
 }
 
 @media (min-width: 640px) {
-  .home__section .with-margins {
+  .home__section:where(#html-block-html) .with-margins {
     max-width: 640px;
   }
 }
 
 @media (min-width: 768px) {
-  .home__section .with-margins {
+  .home__section:where(#html-block-html) .with-margins {
     max-width: 768px;
   }
 }
 
 @media (min-width: 1024px) {
-  .home__section .with-margins {
+  .home__section:where(#html-block-html) .with-margins {
     max-width: 1024px;
     padding-right: 4rem;
     padding-left: 4rem;
@@ -50,13 +51,13 @@
 }
 
 @media (min-width: 1280px) {
-  .home__section .with-margins {
+  .home__section:where(#html-block-html) .with-margins {
     max-width: 1280px;
   }
 }
 
 @media (min-width: 1536px) {
-  .home__section .with-margins {
+  .home__section:where(#html-block-html) .with-margins {
     max-width: 1536px;
   }
 }
@@ -104,8 +105,7 @@ h2.heading-large {
   background-color: var(--cec-green);
   display: flex;
 
-  // Centered through the flex parent: `justify-self` on a block-level box is
-  // ignored by Safari and Firefox.
+  // `justify-self` on a block is Chrome-only, center via the flex parent.
   .with-margins {
     display: flex;
     justify-content: center;
@@ -245,9 +245,7 @@ h2.heading-large {
 
 /* About TPM */
 
-// Explicit containing block for the absolutely positioned bus and heart.
-// Without it only Chrome anchors them here (through the leftover transform of
-// the entrance animation); Safari and Firefox anchor them to the page.
+// Containing block for the absolutely positioned bus and heart.
 #about-tpm {
   position: relative;
 }
@@ -289,9 +287,7 @@ h2.heading-large {
   }
 }
 
-// `left` mirrors the horizontal padding of `.with-margins`: without it the
-// heart sits at its static position, which WebKit resolves differently on wide
-// screens.
+// `left` mirrors the `.with-margins` padding (Safari on wide screens).
 #heart-svg {
   position: absolute;
   bottom: 75px;
@@ -827,9 +823,7 @@ h2.heading-large {
 
 /* Rules that used to live in the Decidim Awesome custom styles */
 
-// The lines are drawn as backgrounds instead of `content: url()`, with a fixed
-// 5px height: at the natural ~4px WebKit drops the tapered ends of the stroke
-// and the line looks shorter than the container.
+// Fixed 5px height: below that Safari drops the tapered ends of the line.
 .blackline-container::after {
   content: "";
   position: relative;
