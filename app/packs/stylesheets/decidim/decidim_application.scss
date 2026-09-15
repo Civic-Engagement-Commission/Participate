@@ -7,6 +7,10 @@
 //
 // By default this is empty.
 
+@use "stylesheets/nyc/base";
+@use "stylesheets/nyc/home";
+@use "stylesheets/nyc/animations";
+
 .login__omniauth {
   @apply flex flex-col items-center justify-center;
 }
@@ -17,35 +21,37 @@
   > span {
     @apply block;
   }
-  svg, svg g {
+
+  svg,
+  svg g {
     @apply fill-current;
   }
 
   &:hover {
-    background: linear-gradient(0deg,#0000004d,#0000004d),rgb(var(--secondary-rgb));
+    background: linear-gradient(0deg, #0000004d, #0000004d),
+      rgb(var(--secondary-rgb));
     color: rgb(255 255 255 / var(--tw-text-opacity, 1));
-    svg, svg g {
+
+    svg,
+    svg g {
       fill: rgb(255 255 255 / var(--tw-text-opacity, 1));
     }
   }
 }
-
 
 header {
   .main-bar {
     &__logo {
       @apply col-span-2;
     }
-  
+
     &__lc-button {
       @apply text-secondary xl:col-start-7;
     }
   }
 }
 
-
 .language-chooser-bar {
-
   @apply container items-center py-5 h-24 relative z-40;
 
   .goog-te-gadget {
@@ -53,6 +59,7 @@ header {
 
     select {
       @apply block w-full xl:w-2/3 px-4 py-1.5 mx-auto font-sans text-md;
+
       color: var(--secondary);
     }
 
@@ -61,4 +68,3 @@ header {
     }
   }
 }
-
