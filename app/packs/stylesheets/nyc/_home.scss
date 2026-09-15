@@ -1,0 +1,981 @@
+// Homepage styles
+
+.home > .home__section {
+  max-width: none;
+  padding: 0;
+}
+
+.home-section {
+  padding-top: 70px;
+}
+
+.home__section .with-margins {
+  width: 100%;
+  margin-right: auto;
+  margin-left: auto;
+  padding-right: 1rem;
+  padding-left: 1rem;
+}
+
+@media (min-width: 768px) {
+  .home__section .with-margins {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
+}
+
+.home__section .with-margins {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+@media (min-width: 640px) {
+  .home__section .with-margins {
+    max-width: 640px;
+  }
+}
+
+@media (min-width: 768px) {
+  .home__section .with-margins {
+    max-width: 768px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .home__section .with-margins {
+    max-width: 1024px;
+    padding-right: 4rem;
+    padding-left: 4rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .home__section .with-margins {
+    max-width: 1280px;
+  }
+}
+
+@media (min-width: 1536px) {
+  .home__section .with-margins {
+    max-width: 1536px;
+  }
+}
+
+.home-section h2.home__section-title,
+h2 {
+  font-size: 22px;
+  color: var(--heading-color);
+  font-weight: 700;
+  line-height: 1.2rem;
+
+  @media (min-width: 1024px) {
+    font-size: 2.2rem;
+    line-height: 2.2rem;
+  }
+}
+
+h2.heading-large {
+  @media (min-width: 1024px) {
+    font-size: var(--heading-large);
+    line-height: 1;
+  }
+}
+
+.home-section h3 {
+  font-size: 20px;
+  color: var(--heading-color);
+  font-weight: 600;
+  padding-bottom: 0.625rem;
+}
+
+.home-section p {
+  font-size: 1rem;
+  color: var(--paragraph-color);
+}
+
+.home .button__primary {
+  background: var(--cec-yellow);
+  color: var(--cec-dark-grey);
+}
+
+/* Custom nav */
+
+#custom-nav {
+  background-color: var(--cec-green);
+  display: flex;
+
+  // Centered through the flex parent: `justify-self` on a block-level box is
+  // ignored by Safari and Firefox.
+  .with-margins {
+    display: flex;
+    justify-content: center;
+  }
+
+  ul {
+    display: flex;
+    line-height: 32px;
+    flex-wrap: wrap;
+  }
+
+  a {
+    color: var(--cec-dark-grey);
+    padding: 0 20px;
+    position: relative;
+  }
+
+  a::after {
+    content: "|";
+    position: absolute;
+    right: 0;
+  }
+
+  #nav-end::after {
+    content: " ";
+  }
+
+  .with-margins {
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
+}
+
+/* Hero */
+
+.custom-hero {
+  background-position-x: 90%;
+  background-blend-mode: lighten;
+  background-color: rgba(255, 255, 255, 0.5);
+  background-image: url("images/home-hero-banner.png");
+  background-size: auto 100%;
+  background-repeat: no-repeat;
+  max-width: none;
+  padding: 0;
+  height: 27.5rem;
+  display: flex;
+  flex-direction: column;
+
+  @media (min-width: 1024px) {
+    background-size: cover;
+    justify-content: flex-start;
+    background-blend-mode: normal;
+    background-position: bottom;
+  }
+}
+
+.custom-hero h1 {
+  color: var(--heading-color);
+  font-size: 30px;
+  line-height: 100%;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .custom-hero h1 {
+    font-size: 52px;
+  }
+}
+
+.custom-hero p {
+  color: var(--paragraph-color);
+  font-size: 18px;
+  margin-bottom: 0.625px;
+}
+
+.custom-hero__content.with-margins {
+  display: flex;
+  flex-direction: column;
+  border-radius: 0.25rem;
+  margin-top: 0.9375rem;
+}
+
+.custom-hero__text {
+  @media screen and (min-width: 768px) {
+    max-width: 700px;
+  }
+
+  @media (min-width: 1024px) {
+    width: 40%;
+    margin-right: 5%;
+  }
+}
+
+.custom-hero__ctas {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 1.5rem;
+}
+
+#hero-cta {
+  background: #f1cd1e;
+  color: #000;
+}
+
+#hero-cta {
+  font-size: 20px;
+  padding: 0.65rem 1.5rem;
+}
+
+#hero-cta.button:not([disabled]):not([class*="button__text"]):not(label):hover {
+  background: #cbae1a;
+}
+
+.hero-button__secondary,
+.hero-button__secondary.button:not([disabled]):not([class*="button__text"]):not(
+    label
+  ):hover {
+  border: 1px solid #f1cd1e;
+  color: #f1cd1e;
+}
+
+/* Menu */
+
+.home__menu-element--link {
+  color: black;
+}
+
+.home__menu-element:last-child::before,
+.home__menu-element::after {
+  background-color: black;
+}
+
+.home__menu-element--link:hover {
+  text-decoration-color: black;
+}
+
+/* About TPM */
+
+// Explicit containing block for the absolutely positioned bus and heart.
+// Without it only Chrome anchors them here (through the leftover transform of
+// the entrance animation); Safari and Firefox anchor them to the page.
+#about-tpm {
+  position: relative;
+}
+
+@keyframes slideBackground {
+  from {
+    background-position: calc(100% - 50px) calc(100% + 50px);
+  }
+
+  to {
+    background-position: calc(100%) calc(100% + 50px); /* Move left by the image width */
+  }
+}
+
+@media (min-width: 1024px) {
+  @keyframes slideBackground {
+    from {
+      background-position: calc(100% - 120px) calc(100% + 120px);
+    }
+
+    to {
+      background-position: calc(100%) calc(100% + 120px); /* Move left by the image width */
+    }
+  }
+}
+
+@media (min-width: 768px) {
+  #about-tpm {
+    animation: slideBackground 1s ease;
+    padding-bottom: 70px;
+    padding-top: 70px;
+    background-size: 160px auto;
+    background-repeat: no-repeat;
+
+    @media (min-width: 1024px) {
+      background-size: 360px auto;
+      background-position: right calc(100% + 120px);
+    }
+  }
+}
+
+// `left` mirrors the horizontal padding of `.with-margins`: without it the
+// heart sits at its static position, which WebKit resolves differently on wide
+// screens.
+#heart-svg {
+  position: absolute;
+  bottom: 75px;
+  left: 1rem;
+
+  @media (min-width: 1024px) {
+    left: 4rem;
+  }
+}
+
+#line-svg {
+  position: relative;
+  margin-top: 150px;
+}
+
+#bus {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  width: 158px;
+
+  @media (min-width: 1024px) {
+    position: absolute;
+    width: 360px;
+    bottom: -47px;
+    right: 60px;
+  }
+}
+
+.home__section-about-tpm {
+  @media (min-width: 1024px) {
+    max-width: 60%;
+  }
+}
+
+/* TPM Cards */
+
+.tpm-cards {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2.3rem 2rem;
+  margin-top: 4rem;
+
+  @media screen and (min-width: 768px) {
+    flex-flow: row wrap;
+    justify-content: center;
+    justify-self: center;
+    max-width: 800px;
+  }
+
+  @media (min-width: 1024px) {
+    max-width: 100%;
+  }
+
+  @media (min-width: 1280px) {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: 1fr;
+  }
+}
+
+.tpm-cards__card {
+  background-image: linear-gradient(
+    to bottom,
+    rgba(235, 249, 219, 1),
+    rgba(228, 249, 203, 1)
+  );
+  width: 290px;
+  display: inline-flex;
+  flex-direction: column;
+  border-radius: 16px;
+  position: relative;
+  height: 20.6rem;
+}
+
+.tpm-cards__card.current::before {
+  content: "We're Here";
+  position: absolute;
+  display: block;
+  right: 0;
+  min-width: 60px;
+  text-align: center;
+  top: -30px;
+  background: rgba(129, 199, 56, 1);
+  padding: 5px 15px 10px;
+  z-index: -1;
+  border-radius: 8px 8px 0 0;
+  font-weight: 600;
+  font-size: 16px;
+  color: #020203;
+  box-shadow: 0 6px 22.6px rgba(120, 188, 49, 0.6);
+}
+
+.tpm-cards__icon {
+  width: 70px;
+  float: left;
+  margin-right: 0.2rem;
+}
+
+.tpm-cards__photo {
+  border-radius: 8px 8px 80px;
+  object-fit: cover;
+  max-height: 180px;
+}
+
+.tpm-cards__img-text {
+  display: block;
+  overflow: hidden;
+  margin-bottom: 0.8rem;
+
+  h3 {
+    padding: 0.8rem 0 0;
+  }
+}
+
+.tpm-cards__cta-style {
+  border-radius: 6px;
+  background: var(--cec-yellow);
+  color: var(--paragraph-color);
+  padding: 0 0.375rem;
+  font-weight: 600;
+  position: absolute;
+  bottom: 0.75rem;
+  right: 0.75rem;
+  line-height: 1.6;
+  width: 80px;
+  text-align: center;
+
+  &:hover {
+    color: white;
+    background: linear-gradient(0deg, #0000004d, #0000004d),
+      rgb(var(--secondary-rgb));
+  }
+}
+
+.tpm-cards__text {
+  padding: 10px 15px 15px;
+  position: relative;
+  height: 8.5rem;
+
+  p {
+    margin: 0;
+  }
+
+  p:nth-of-type(1) {
+    font-weight: 500;
+  }
+
+  p:nth-of-type(2) {
+    margin-top: 0;
+  }
+}
+
+/* Be Part of TPM */
+
+#be-part-tpm {
+  height: 20rem;
+  background-image: url("images/home-lower-banner.png");
+  background-blend-mode: normal;
+  margin: 0;
+  max-width: none;
+  padding: 350px 0 30px;
+  margin-top: 4.375rem;
+  background-repeat: no-repeat;
+  background-size: cover;
+  position: relative;
+  background-position: top;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-end;
+
+  img {
+    display: none;
+  }
+
+  h2 {
+    color: var(--heading-color);
+    margin-bottom: 1.5rem;
+  }
+
+  @media (max-width: 1080px) {
+    .be-part-tpm__contents {
+      text-align: center;
+    }
+  }
+
+  p {
+    margin-bottom: 1.5rem;
+  }
+
+  .with-margins {
+    position: relative;
+  }
+
+  @media (min-width: 1080px) {
+    background-image: url("images/home-lower-banner.png");
+    background-size: cover;
+
+    img {
+      display: inline-flex;
+      position: absolute;
+      width: 400px;
+      right: 110px;
+      bottom: 10px;
+    }
+
+    .be-part-tpm__contents {
+      width: 60%;
+    }
+
+    padding-bottom: 0;
+  }
+}
+
+#be-part-tpm a:hover {
+  background: #cbae1a;
+  color: black;
+}
+
+#be-part-tpm a {
+  padding: 0.65rem 1.5rem;
+  font-size: 20px;
+}
+
+/* Your Ideas Come to Life */
+
+#your-ideas {
+  text-align: center;
+  padding-bottom: 70px;
+  padding-top: 0;
+
+  a {
+    padding: 0.65rem 1.5rem;
+    font-size: 20px;
+  }
+
+  h2,
+  p,
+  a {
+    margin-bottom: 1.5rem;
+    display: block;
+  }
+
+  a {
+    font-weight: 700;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .iframe-container {
+    display: block;
+    margin: auto;
+    width: 100%;
+    position: relative;
+    max-width: 530px;
+    aspect-ratio: 1.78;
+  }
+
+  iframe {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+
+  @media (min-width: 1024px) {
+    h2 {
+      font-size: 2.2rem;
+    }
+  }
+}
+
+/* Process Illustration */
+
+.home__section-process-illustration {
+  padding-top: 1rem;
+  gap: 2rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+  @media screen and (min-width: 768px) {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+  }
+}
+
+.process-illustration__step {
+  justify-self: center;
+  text-align: center;
+
+  h3 {
+    margin-top: 0.2rem;
+    font-size: 1.4rem;
+    line-height: 1.8rem;
+    font-weight: 600;
+  }
+
+  a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    row-gap: 1rem;
+  }
+}
+
+/* Videos and About CEC */
+
+#about-cec {
+  padding-top: 4rem;
+  padding-bottom: 8rem;
+}
+
+#about-cec a:hover {
+  background: #cbae1a;
+  color: black;
+}
+
+#about-cec a {
+  padding: 0.65rem 1.5rem;
+  font-size: 20px;
+}
+
+.svg-container {
+  display: flex;
+}
+
+#about-cec svg {
+  margin-bottom: 3rem;
+}
+
+.home__section-about-cec,
+.video-text__container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3rem;
+
+  @media screen and (min-width: 768px) {
+    flex-wrap: nowrap;
+  }
+
+  > * {
+    flex-basis: 100%;
+
+    @media screen and (min-width: 768px) {
+      flex-basis: 50%;
+    }
+  }
+
+  h3 {
+    font-size: 1.4rem;
+    line-height: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+  }
+
+  a.button {
+    margin-top: 1.5rem;
+    margin-right: 0.5rem;
+  }
+}
+
+.video-text__container {
+  justify-self: center;
+  padding: 2rem 1rem;
+
+  @media (min-width: 640px) {
+    width: 640px;
+  }
+
+  @media (min-width: 768px) {
+    width: 768px;
+    padding: 3rem 1rem;
+  }
+
+  @media (min-width: 1024px) {
+    width: 1024px;
+    padding: 3rem 4rem;
+  }
+
+  @media (min-width: 1280px) {
+    width: 1280px;
+  }
+
+  @media (min-width: 1536px) {
+    width: 1536px;
+  }
+}
+
+.home__section-video-text:nth-child(odd) {
+  background-color: rgba(129, 199, 56, 0.25);
+}
+
+.home__section-video-text:nth-child(odd) .video-text__container {
+  flex-direction: row-reverse;
+}
+
+.video-text__video {
+  background: grey;
+  width: 50%;
+  height: 0;
+  padding-bottom: 56.2%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+
+  @media (min-width: 768px) {
+    padding-bottom: 26.3%;
+  }
+
+  @media (min-width: 1536px) {
+    padding-bottom: 27.4%;
+  }
+}
+
+.video-text__video iframe {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+}
+
+.home__section-about-cec {
+  align-items: center;
+}
+
+#about-cec {
+  img {
+    max-width: 300px;
+
+    @media screen and (min-width: 1080px) {
+      max-width: 480px;
+    }
+  }
+}
+
+/* How to Vote */
+
+#how-to-vote {
+  ol {
+    color: var(--paragraph-color);
+    margin-top: 0.5rem;
+    padding-left: 0.3rem;
+  }
+
+  .how-to-vote__content {
+    @media screen and (min-width: 1080px) {
+      max-width: 50%;
+    }
+  }
+}
+
+/* Ideas Brought to Life */
+
+.home__section-ideas-to-life {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  justify-content: space-between;
+  flex-direction: column-reverse;
+  margin-top: 4.375rem;
+  border-radius: 27px 7px 58px 0;
+  overflow: hidden;
+  background: #eef9e3;
+  background: linear-gradient(
+    to bottom,
+    rgba(235, 249, 219, 1),
+    rgba(228, 249, 203, 1)
+  );
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+    text-align: left;
+    align-items: stretch;
+  }
+
+  .text-container {
+    padding: 2.5rem 0.5rem 1.75rem;
+
+    @media (min-width: 768px) {
+      padding: 4.75rem 1rem 4.75rem 3.35rem;
+      flex: 3;
+    }
+
+    h2 {
+      margin-bottom: 1rem;
+    }
+
+    p {
+      margin-bottom: 2rem;
+      color: var(--paragraph-color);
+    }
+  }
+
+  .image-container {
+    aspect-ratio: 2 / 1;
+    overflow: hidden;
+
+    @media (min-width: 768px) {
+      flex: 2;
+      display: flex;
+    }
+
+    img {
+      object-fit: cover;
+
+      @media (min-width: 768px) {
+        width: 100%;
+      }
+    }
+  }
+}
+
+#ideas-to-life a {
+  color: black;
+  font-size: 20px;
+  padding: 0.65rem 1.5rem;
+}
+
+#ideas-to-life a:hover {
+  background: #61ab15;
+  color: black;
+}
+
+#ideas-to-life {
+  padding: 1rem;
+}
+
+/* Rules that used to live in the Decidim Awesome custom styles */
+
+// The lines are drawn as backgrounds instead of `content: url()`, with a fixed
+// 5px height: at the natural ~4px WebKit drops the tapered ends of the stroke
+// and the line looks shorter than the container.
+.blackline-container::after {
+  content: "";
+  position: relative;
+  width: 100%;
+  height: 20px;
+  display: block;
+  background: url("images/home-line-black.svg") left bottom 4px / 100% 5px
+    no-repeat;
+}
+
+.blackline-container {
+  margin-top: 8rem;
+  display: block;
+  width: auto;
+}
+
+.greenline-container::after {
+  content: "";
+  width: 100%;
+  height: 20px;
+  display: block;
+  background: url("images/home-line-green.svg") left bottom 4px / 100% 5px
+    no-repeat;
+}
+
+.greenline-container {
+  margin-bottom: 3rem;
+  display: block;
+  width: auto;
+}
+
+#heart-svg::after {
+  content: url("images/home-heart.svg");
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 44px;
+  height: 53px;
+
+  @media (max-width: 1024px) {
+    width: 25px;
+    height: 31px;
+  }
+
+  @media (max-width: 768px) {
+    bottom: -35px;
+  }
+}
+
+#bus {
+  @media (max-width: 768px) {
+    position: absolute;
+    bottom: -15px;
+    right: 20px;
+    width: 158px;
+  }
+
+  @media (min-width: 768px) {
+    position: absolute;
+    bottom: 23px;
+    right: 20px;
+    width: 158px;
+  }
+
+  @media (min-width: 1024px) {
+    position: absolute;
+    width: 360px;
+    bottom: -43px;
+    right: 40px;
+  }
+}
+
+#about-cec {
+  padding-top: 1rem;
+  padding-bottom: 8rem;
+}
+
+#your-ideas {
+  text-align: center;
+  padding-bottom: 1rem;
+  padding-top: 1rem;
+}
+
+#ideas-to-life p {
+  width: 70%;
+  margin-right: 0;
+}
+
+.home__section-about-tpm {
+  @media (min-width: 1024px) {
+    max-width: 50%;
+  }
+}
+
+#be-part-tpm {
+  h2 {
+    margin-bottom: 1rem;
+  }
+}
+
+#be-part-tpm {
+  padding: 250px 0 30px;
+  margin-top: 0;
+}
+
+#tpm-cards-button {
+  display: flex;
+  justify-content: flex-end;
+}
+
+#card-cta {
+  background: #f1cd1e;
+  color: #000;
+  font-size: 16px;
+  padding: 0.4rem 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.tpm-cards__card {
+  height: 21rem;
+}
+
+#custom-nav {
+  .with-margins {
+    padding-top: 20px;
+    padding-bottom: 0;
+  }
+}
+
+#be-part-tpm {
+  @media (min-width: 1080px) {
+    background-image: url("images/home-nyc-map.png");
+    background-size: cover;
+    height: 100%;
+
+    .be-part-tpm__contents {
+      width: 60%;
+      margin-top: 2rem;
+    }
+
+    p {
+      width: 50%;
+    }
+  }
+}
+
+.tpm-cards__card.current {
+  filter: drop-shadow(0 6px 22.6px rgba(120, 188, 49, 0.6));
+}
