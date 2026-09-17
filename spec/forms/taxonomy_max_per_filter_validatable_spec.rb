@@ -19,7 +19,8 @@ module Decidim
       let(:max_taxonomies_per_filter) { 1 }
       let(:component) do
         create(:proposal_component, participatory_space:,
-                                    settings: { taxonomy_filters: [taxonomy_filter.id], max_taxonomies_per_filter: })
+                                    settings: { taxonomy_filters: [taxonomy_filter.id],
+                                                max_taxonomies_per_filter: { taxonomy_filter.id.to_s => max_taxonomies_per_filter }.to_json })
       end
       let(:author) { create(:user, organization:) }
       let(:taxonomies) { [taxonomy_item.id] }
