@@ -21,6 +21,9 @@ en:
             max_taxonomies_per_filter_help: If more than one, a multiselect will allow
               users to choose more than one taxonomy when creating or updating a proposal
             taxonomies_per_filter_element: HTML form element for taxonomies filters
+            taxonomies_per_filter_elements:
+              select: "Select / Multiselect"
+              checkbox: "Checkboxes / Radio buttons"
             taxonomies_per_filter_element_help: "Choose between selects and radio/checkboxes"
     system:
       organizations:

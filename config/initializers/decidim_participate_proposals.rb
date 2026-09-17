@@ -9,7 +9,7 @@ Rails.application.config.to_prepare do
         settings.attributes,
         :taxonomy_filters,
         :max_taxonomies_per_filter,
-        Decidim::SettingsManifest::Attribute.new(type: :text)
+        Decidim::SettingsManifest::Attribute.new(type: :string)
       )
     end
 
@@ -20,7 +20,7 @@ Rails.application.config.to_prepare do
         settings.attributes,
         :max_taxonomies_per_filter,
         :taxonomies_per_filter_element,
-        Decidim::SettingsManifest::Attribute.new(type: :text)
+        Decidim::SettingsManifest::Attribute.new(type: :string)
       )
     end
   end
