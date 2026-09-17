@@ -9,7 +9,18 @@ Rails.application.config.to_prepare do
         settings.attributes,
         :taxonomy_filters,
         :max_taxonomies_per_filter,
-        Decidim::SettingsManifest::Attribute.new(type: :integer, default: 1)
+        Decidim::SettingsManifest::Attribute.new(type: :text)
+      )
+    end
+
+    component.settings(:global) do |settings|
+      next if settings.attributes.has_key?(:taxonomies_per_filter_element)
+
+      Decidim::DecidimAwesome.hash_append!(
+        settings.attributes,
+        :max_taxonomies_per_filter,
+        :taxonomies_per_filter_element,
+        Decidim::SettingsManifest::Attribute.new(type: :text)
       )
     end
   end
@@ -23,4 +34,6 @@ Rails.application.config.to_prepare do
   unless Decidim::Proposals::ApplicationHelper.include?(Decidim::Proposals::TaxonomiesMultiselectHelper)
     Decidim::Proposals::ApplicationHelper.include(Decidim::Proposals::TaxonomiesMultiselectHelper)
   end
+
+  Decidim::Admin::SettingsHelper.prepend(Decidim::Nyc::SettingsHelperOverride) unless Decidim::Admin::SettingsHelper.include?(Decidim::Nyc::SettingsHelperOverride)
 end

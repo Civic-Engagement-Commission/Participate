@@ -10,9 +10,8 @@ module Decidim
       end
 
       def taxonomies_within_max_per_filter
-        max = [current_component.settings.max_taxonomies_per_filter.to_i, 1].max
-
         taxonomy_filters.each do |filter|
+          max = Decidim::Nyc::TaxonomyFilterSettings.max_for(current_component.settings, filter)
           selected_count = (compact_taxonomies & filter.filter_taxonomy_ids).size
           next if selected_count <= max
 
