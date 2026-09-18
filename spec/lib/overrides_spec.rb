@@ -18,7 +18,9 @@ checksums = [
   {
     package: "decidim-proposals",
     files: {
-      "/lib/decidim/proposals/import/proposal_creator.rb" => "02c7615192d42d6da3ed94d8c36754cc"
+      "/lib/decidim/proposals/import/proposal_creator.rb" => "02c7615192d42d6da3ed94d8c36754cc",
+      "/app/views/decidim/proposals/admin/proposals/_form.html.erb" => "4752eb6a8b403912c9f686999c1860c5",
+      "/app/views/decidim/proposals/proposals/_edit_form_fields.html.erb" => "93a1717d59b8a6c74c27654790d42ae0"
     }
   }
 ]
