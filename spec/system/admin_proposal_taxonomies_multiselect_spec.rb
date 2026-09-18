@@ -72,4 +72,52 @@ describe "Admin proposal taxonomies multiselect" do
     proposal = Decidim::Proposals::Proposal.last
     expect(proposal.taxonomies).to contain_exactly(taxonomy_item, second_taxonomy_item, second_other_taxonomy_item)
   end
+
+  context "when the taxonomy filter settings are misconfigured" do
+    let(:component) do
+      filter_item
+      other_filter_item
+
+      create(:proposal_component,
+             :with_creation_enabled,
+             manifest:,
+             participatory_space:,
+             settings: { taxonomy_filters: [taxonomy_filter.id],
+                         max_taxonomies_per_filter:,
+                         taxonomies_per_filter_element: })
+    end
+
+    shared_examples "falls back to the defaults values" do
+      it "renders a plain select with a single allowed taxonomy" do
+        expect(page).to have_no_content("no implicit conversion")
+        expect(page).to have_no_content("undefined method")
+
+        expect(page).to have_no_css("select#taxonomies-#{taxonomy_filter.id}[multiple]")
+
+        select decidim_sanitize_translated(taxonomy_item.name), from: "taxonomies-#{taxonomy_filter.id}"
+
+        fill_in_i18n :proposal_title, "#proposal-title-tabs", en: "More sidewalks and less roads"
+        fill_in_i18n_editor :proposal_body, "#proposal-body-tabs", en: "Cities need more people, not more cars"
+
+        click_on "Create"
+
+        expect(page).to have_admin_callout("Proposal successfully created.")
+        expect(Decidim::Proposals::Proposal.last.taxonomies).to contain_exactly(taxonomy_item)
+      end
+    end
+
+    context "when the settings value is invalid JSON" do
+      let(:max_taxonomies_per_filter) { "{not valid json" }
+      let(:taxonomies_per_filter_element) { "{not valid json" }
+
+      it_behaves_like "falls back to the defaults values"
+    end
+
+    context "when the settings value is valid JSON but not a hash" do
+      let(:max_taxonomies_per_filter) { "[]" }
+      let(:taxonomies_per_filter_element) { "[]" }
+
+      it_behaves_like "falls back to the defaults values"
+    end
+  end
 end

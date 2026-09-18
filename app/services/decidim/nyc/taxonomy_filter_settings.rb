@@ -22,7 +22,8 @@ module Decidim
       end
 
       def parse(raw_json)
-        JSON.parse(raw_json.presence || "{}")
+        result = JSON.parse(raw_json.presence || "{}")
+        result.is_a?(Hash) ? result : {}
       rescue JSON::ParserError
         {}
       end
