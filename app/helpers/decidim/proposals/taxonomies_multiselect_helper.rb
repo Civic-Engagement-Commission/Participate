@@ -20,8 +20,11 @@ module Decidim
           concat form.collection_radio_buttons(
             name, taxonomy_items_options_for_filter(filter), :last, :first,
             {},
-            { name: "#{form.object_name}[#{name}][]", id: "#{name}-#{filter.id}" }
-          ) { |b| b.label(class: "form__wrapper-checkbox-label") { b.radio_button + b.text } }
+            { name: "#{form.object_name}[#{name}][]" }
+          ) do |b|
+            item_id = "#{name}-#{filter.id}-#{b.value}"
+            b.label(for: item_id, class: "form__wrapper-checkbox-label") { b.radio_button(id: item_id) + b.text }
+          end
         end
       end
 
@@ -34,8 +37,11 @@ module Decidim
           concat form.collection_check_boxes(
             name, taxonomy_items_options_for_filter(filter), :last, :first,
             {},
-            { name: "#{form.object_name}[#{name}][]", id: "#{name}-#{filter.id}" }
-          ) { |b| b.label(class: "form__wrapper-checkbox-label") { b.check_box + b.text } }
+            { name: "#{form.object_name}[#{name}][]" }
+          ) do |b|
+            item_id = "#{name}-#{filter.id}-#{b.value}"
+            b.label(for: item_id, class: "form__wrapper-checkbox-label") { b.check_box(id: item_id) + b.text }
+          end
         end
       end
     end
