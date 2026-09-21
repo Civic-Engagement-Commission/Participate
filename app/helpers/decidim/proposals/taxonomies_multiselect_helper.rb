@@ -21,10 +21,10 @@ module Decidim
             name, taxonomy_items_options_for_filter(filter), :last, :first,
             {},
             { name: "#{form.object_name}[#{name}][]" }
-          ) do |b|
+          ) { |b|
             item_id = "#{name}-#{filter.id}-#{b.value}"
-            b.label(for: item_id, class: "form__wrapper-checkbox-label") { b.radio_button(id: item_id) + b.text }
-          end
+            content_tag(:div) { b.label(for: item_id) { b.radio_button(id: item_id) + b.text } }
+          }
         end
       end
 
@@ -38,10 +38,10 @@ module Decidim
             name, taxonomy_items_options_for_filter(filter), :last, :first,
             {},
             { name: "#{form.object_name}[#{name}][]" }
-          ) do |b|
+          ) { |b|
             item_id = "#{name}-#{filter.id}-#{b.value}"
-            b.label(for: item_id, class: "form__wrapper-checkbox-label") { b.check_box(id: item_id) + b.text }
-          end
+            content_tag(:div) { b.label(for: item_id) { b.check_box(id: item_id) + b.text } }
+          }
         end
       end
     end
