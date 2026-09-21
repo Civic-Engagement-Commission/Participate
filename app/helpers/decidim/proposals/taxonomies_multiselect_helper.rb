@@ -16,14 +16,14 @@ module Decidim
       def filter_taxonomy_items_radio_field(form, name, filter)
         label = decidim_sanitize_translated(filter.name)
         content_tag(:fieldset) do
-          concat content_tag(:legend, label)
+          concat content_tag(:legend, label, class: "font-semibold")
           concat form.collection_radio_buttons(
             name, taxonomy_items_options_for_filter(filter), :last, :first,
             {},
             { name: "#{form.object_name}[#{name}][]" }
           ) { |b|
             item_id = "#{name}-#{filter.id}-#{b.value}"
-            content_tag(:div) { b.label(for: item_id) { b.radio_button(id: item_id) + b.text } }
+            content_tag(:div) { b.label(for: item_id, class: "form__wrapper-checkbox-label") { b.radio_button(id: item_id) + b.text } }
           }
         end
       end
@@ -33,14 +33,14 @@ module Decidim
         content_tag(:fieldset, data: { controller: "taxonomy-checkbox-limit",
                                        "taxonomy-checkbox-limit-max-value": max,
                                        action: "change->taxonomy-checkbox-limit#update" }) do
-          concat content_tag(:legend, label)
+          concat content_tag(:legend, label, class: "font-semibold")
           concat form.collection_check_boxes(
             name, taxonomy_items_options_for_filter(filter), :last, :first,
             {},
             { name: "#{form.object_name}[#{name}][]" }
           ) { |b|
             item_id = "#{name}-#{filter.id}-#{b.value}"
-            content_tag(:div) { b.label(for: item_id) { b.check_box(id: item_id) + b.text } }
+            content_tag(:div) { b.label(for: item_id, class: "form__wrapper-checkbox-label") { b.check_box(id: item_id) + b.text } }
           }
         end
       end
