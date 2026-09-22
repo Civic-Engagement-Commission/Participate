@@ -9,7 +9,6 @@ export default class extends Controller {
 
   connect() {
     this.entries = this.parse(this.element.value);
-    console.log(this.element);
 
     this.wrapper = document.createElement("div");
     this.wrapper.classList.add("taxonomy-filter-json-editor");
