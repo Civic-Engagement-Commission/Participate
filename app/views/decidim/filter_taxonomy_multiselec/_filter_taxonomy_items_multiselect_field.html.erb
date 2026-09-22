@@ -1,0 +1,16 @@
+<% max = Decidim::Nyc::TaxonomyFilterSettings.max_for(component_settings, filter) %>
+<% element = Decidim::Nyc::TaxonomyFilterSettings.element_for(component_settings, filter) %>
+
+<% if element == "checkbox" %>
+  <% if max > 1 %>
+    <%= filter_taxonomy_items_checkboxes_field(form, :taxonomies, filter, max) %>
+  <% else %>
+    <%= filter_taxonomy_items_radio_field(form, :taxonomies, filter) %>
+  <% end %>
+<% else %>
+  <% if max > 1 %>
+    <%= filter_taxonomy_items_multiselect_field(form, :taxonomies, filter, max) %>
+  <% else %>
+    <%= filter_taxonomy_items_select_field form, :taxonomies, filter %>
+  <% end %>
+<% end %>
