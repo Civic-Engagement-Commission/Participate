@@ -1,0 +1,70 @@
+FROM ruby:3.3.11 AS builder
+
+RUN apt-get update && \
+    apt-get install --no-install-recommends -y \
+      ca-certificates \
+      curl \
+      gnupg && \
+    mkdir -p /etc/apt/keyrings && \
+    curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
+    apt-get update && \
+    apt-get install --no-install-recommends -y \
+      nodejs \
+      build-essential \
+      libpq-dev \
+      postgresql-client \
+      p7zip \
+      supervisor && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /decidim
+
+# Copy package dependencies files only to ensure maximum cache hit
+COPY ./package-lock.json /decidim/package-lock.json
+COPY ./package.json /decidim/package.json
+COPY ./packages /decidim/packages
+COPY ./Gemfile /decidim/Gemfile
+COPY ./Gemfile.lock /decidim/Gemfile.lock
+
+RUN gem install bundler:$(grep -A 1 'BUNDLED WITH' Gemfile.lock | tail -n 1 | xargs) && \
+    bundle install -j4 --retry 3 && \
+    npm install yarn -g && \
+    # Remove unneeded gems
+    bundle clean --force && \
+    # Remove unneeded files from installed gems (cache, *.o, *.c)
+    rm -rf /usr/local/bundle/cache && \
+    find /usr/local/bundle/ -name "*.c" -delete && \
+    find /usr/local/bundle/ -name "*.o" -delete && \
+    find /usr/local/bundle/ -name ".git" -exec rm -rf {} + && \
+    find /usr/local/bundle/ -name ".github" -exec rm -rf {} + && \
+    # Remove additional unneeded decidim files
+    find /usr/local/bundle/ -name "spec" -exec rm -rf {} + && \
+    find /usr/local/bundle/ -wholename "*/decidim-dev/lib/decidim/dev/assets/*" -exec rm -rf {} +
+
+RUN npm ci
+
+# copy the rest of files
+COPY ./app /decidim/app
+COPY ./bin /decidim/bin
+COPY ./config /decidim/config
+COPY ./db /decidim/db
+COPY ./lib /decidim/lib
+COPY ./public/*.* /decidim/public/
+COPY ./config.ru /decidim/config.ru
+COPY ./Rakefile /decidim/Rakefile
+COPY ./postcss.config.js /decidim/postcss.config.js
+
+ENV RAILS_SERVE_STATIC_FILES=true
+ENV RAILS_ENV=development
+
+ARG RUN_RAILS
+ARG RUN_SIDEKIQ
+
+WORKDIR /decidim
+COPY ./supervisord-develop.conf /etc/supervisord.conf
+COPY ./entrypoint-develop.sh /decidim/entrypoint-develop.sh
+
+EXPOSE 3000
+
+CMD ["/usr/bin/supervisord"]
