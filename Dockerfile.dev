@@ -65,6 +65,7 @@ ARG RUN_SIDEKIQ
 WORKDIR /decidim
 COPY ./supervisord-develop.conf /etc/supervisord.conf
 COPY ./entrypoint-develop.sh /decidim/entrypoint-develop.sh
+RUN chmod +x /decidim/entrypoint-develop.sh
 
 EXPOSE 3000
 
