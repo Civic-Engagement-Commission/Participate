@@ -22,7 +22,6 @@ services:
     command: [ "/usr/bin/supervisord" ]
     environment:
       - SECRET_KEY_BASE=development-secret
-      - DECIDIM_CORS_ENABLED=true
       - DATABASE_HOST=pg
       - DATABASE_USERNAME=postgres
       - DATABASE_PASSWORD=postgres

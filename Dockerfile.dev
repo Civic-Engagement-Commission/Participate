@@ -14,7 +14,8 @@ RUN apt-get update && \
       libpq-dev \
       postgresql-client \
       p7zip \
-      supervisor && \
+      supervisor \
+      vim && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
