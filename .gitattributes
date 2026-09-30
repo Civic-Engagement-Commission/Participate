@@ -7,4 +7,4 @@ db/schema.rb linguist-generated
 vendor/* linguist-vendored
 
 # Mark shell scripts as text files with LF line endings (stop Windows messing around in Docker).
-*.sh text eol=lf
+* text=auto eol=lf
