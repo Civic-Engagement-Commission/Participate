@@ -142,4 +142,50 @@ describe "Proposal taxonomies multiselect" do
       expect(page).to have_no_content(decidim_sanitize_translated(second_third_taxonomy_item.name))
     end
   end
+
+  context "when two filters both use radio buttons" do
+    let(:second_root_taxonomy) { create(:taxonomy, organization:) }
+    let(:second_taxonomy_item) { create(:taxonomy, parent: second_root_taxonomy, organization:) }
+    let(:second_taxonomy_filter) { create(:taxonomy_filter, root_taxonomy: second_root_taxonomy) }
+    let!(:second_filter_item) { create(:taxonomy_filter_item, taxonomy_filter: second_taxonomy_filter, taxonomy_item: second_taxonomy_item) }
+
+    let(:component) do
+      second_filter_item
+
+      create(:proposal_component,
+             :with_creation_enabled,
+             manifest:,
+             participatory_space: participatory_process,
+             settings: { taxonomy_filters: [taxonomy_filter.id, second_taxonomy_filter.id],
+                         max_taxonomies_per_filter: { taxonomy_filter.id.to_s => 1, second_taxonomy_filter.id.to_s => 1 }.to_json,
+                         taxonomies_per_filter_element: { taxonomy_filter.id.to_s => "checkbox", second_taxonomy_filter.id.to_s => "checkbox" }.to_json })
+    end
+
+    it "allows selecting one taxonomy per filter independently" do
+      first_fieldset = find("fieldset", text: decidim_sanitize_translated(taxonomy_filter.name))
+      second_fieldset = find("fieldset", text: decidim_sanitize_translated(second_taxonomy_filter.name))
+
+      within first_fieldset do
+        find("label", text: decidim_sanitize_translated(taxonomy_item.name), exact_text: true).click
+      end
+
+      within second_fieldset do
+        find("label", text: decidim_sanitize_translated(second_taxonomy_item.name), exact_text: true).click
+      end
+
+      expect(first_fieldset).to have_checked_field(type: "radio")
+      expect(second_fieldset).to have_checked_field(type: "radio")
+
+      within ".new_proposal" do
+        fill_in :proposal_title, with: "More sidewalks and less roads"
+        fill_in :proposal_body, with: "Cities need more people, not more cars"
+        find("*[type=submit]").click
+      end
+      click_on "Publish"
+
+      expect(page).to have_content("successfully")
+      expect(page).to have_content(decidim_sanitize_translated(taxonomy_item.name))
+      expect(page).to have_content(decidim_sanitize_translated(second_taxonomy_item.name))
+    end
+  end
 end
