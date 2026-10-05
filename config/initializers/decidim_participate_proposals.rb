@@ -26,9 +26,8 @@ Rails.application.config.to_prepare do
   end
 
   [Decidim::Proposals::ProposalForm, Decidim::Proposals::Admin::ProposalBaseForm].each do |form_klass|
-    next if form_klass.include?(Decidim::Nyc::TaxonomyMaxPerFilterValidatable)
-
-    form_klass.include(Decidim::Nyc::TaxonomyMaxPerFilterValidatable)
+    form_klass.include(Decidim::Nyc::TaxonomyPerFilterRadioAttributes) unless form_klass.include?(Decidim::Nyc::TaxonomyPerFilterRadioAttributes)
+    form_klass.include(Decidim::Nyc::TaxonomyMaxPerFilterValidatable) unless form_klass.include?(Decidim::Nyc::TaxonomyMaxPerFilterValidatable)
   end
 
   unless Decidim::Proposals::ApplicationHelper.include?(Decidim::Proposals::TaxonomiesMultiselectHelper)

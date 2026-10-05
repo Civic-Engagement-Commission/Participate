@@ -20,7 +20,7 @@ module Decidim
           concat form.collection_radio_buttons(
             name, taxonomy_items_options_for_filter(filter), :last, :first,
             {},
-            { name: "#{form.object_name}[#{name}][]" }
+            { name: "#{form.object_name}[taxonomies_by_filter][#{filter.id}]" }
           ) { |b|
             item_id = "#{name}-#{filter.id}-#{b.value}"
             content_tag(:div) { b.label(for: item_id, class: "form__wrapper-checkbox-label") { b.radio_button(id: item_id) + b.text } }
