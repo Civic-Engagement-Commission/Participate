@@ -12,6 +12,8 @@ gem "decidim", DECIDIM_VERSION
 # gem "decidim-conferences", DECIDIM_VERSION
 # gem "decidim-design", DECIDIM_VERSION
 # gem "decidim-initiatives", DECIDIM_VERSION
+gem "decidim-collaborative_texts", DECIDIM_VERSION
+gem "decidim-elections", DECIDIM_VERSION
 gem "decidim-templates", DECIDIM_VERSION
 
 # External Decidim modules

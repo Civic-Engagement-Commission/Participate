@@ -68,6 +68,8 @@ GIT
     decidim-budgets (0.31.7)
       decidim-comments (= 0.31.7)
       decidim-core (= 0.31.7)
+    decidim-collaborative_texts (0.31.7)
+      decidim-core (= 0.31.7)
     decidim-comments (0.31.7)
       decidim-core (= 0.31.7)
       redcarpet (~> 3.5, >= 3.5.1)
@@ -172,6 +174,10 @@ GIT
       w3c_rspec_validators (~> 0.3.0)
       webmock (~> 3.18)
       wisper-rspec (~> 1.0)
+    decidim-elections (0.31.7)
+      decidim-admin (= 0.31.7)
+      decidim-core (= 0.31.7)
+      decidim-forms (= 0.31.7)
     decidim-forms (0.31.7)
       decidim-core (= 0.31.7)
     decidim-generators (0.31.7)
@@ -1086,8 +1092,10 @@ DEPENDENCIES
   byebug (~> 11.0)
   dalli
   decidim!
+  decidim-collaborative_texts!
   decidim-decidim_awesome!
   decidim-dev!
+  decidim-elections!
   decidim-templates!
   decidim-term_customizer!
   deface
@@ -1174,11 +1182,13 @@ CHECKSUMS
   decidim-assemblies (0.31.7)
   decidim-blogs (0.31.7)
   decidim-budgets (0.31.7)
+  decidim-collaborative_texts (0.31.7)
   decidim-comments (0.31.7)
   decidim-core (0.31.7)
   decidim-debates (0.31.7)
   decidim-decidim_awesome (0.14.5)
   decidim-dev (0.31.7)
+  decidim-elections (0.31.7)
   decidim-forms (0.31.7)
   decidim-generators (0.31.7)
   decidim-meetings (0.31.7)
