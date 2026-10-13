@@ -1,5 +1,12 @@
 ---
 en:
+  activerecord:
+    errors:
+      models:
+        decidim/airtable/import_configuration:
+          attributes:
+            airtable_table_id:
+              already_configured_for_organization_and_base: "has already been configured for this organization and base"
   decidim:
     airtable:
       admin:
