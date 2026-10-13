@@ -13,26 +13,25 @@ module Decidim
         end
 
         def new
-          @import_configuration = Decidim::Airtable::ImportConfiguration.new(active: true)
+          @form = form(Decidim::Airtable::Admin::ImportConfigurationForm).instance
         end
 
         def create
-          @import_configuration = Decidim::Airtable::ImportConfiguration.new(import_configuration_params)
-          @import_configuration.organization = current_organization
+          @form = form(Decidim::Airtable::Admin::ImportConfigurationForm).from_params(params)
 
-          if @import_configuration.save
-            redirect_to imports_path, notice: t(".success")
-          else
-            flash.now[:alert] = t(".error")
-            render :new, status: :unprocessable_entity
+          Decidim::Airtable::Admin::CreateImportConfiguration.call(@form) do
+            on(:ok) do
+              redirect_to imports_path, notice: t(".success")
+            end
+
+            on(:invalid) do
+              flash.now[:alert] = t(".error")
+              render :new, status: :unprocessable_entity
+            end
           end
         end
 
         private
-
-        def import_configuration_params
-          params.require(:import_configuration).permit(:airtable_base_id, :airtable_table_id, :airtable_view_id, :active)
-        end
 
         def load_available_bases
           @available_bases = Decidim::Airtable::Api::Bases.new.all

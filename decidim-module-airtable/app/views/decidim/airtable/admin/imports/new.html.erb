@@ -8,16 +8,16 @@
 
 <div class="item__edit item__edit-1col">
   <div class="item__edit-form">
-    <%= form_with model: @import_configuration, url: imports_path, html: { class: "form form-defaults" } do |form| %>
+    <%= decidim_form_for @form, url: imports_path, html: { class: "form form-defaults" } do |form| %>
       <div class="card form__wrapper">
         <div class="card-section">
           <p><%= t(".placeholder_help") %></p>
 
-          <% if @import_configuration.errors.any? %>
+          <% if @form.errors.any? %>
             <div class="callout alert">
               <p><%= t(".validation_errors") %></p>
               <ul>
-                <% @import_configuration.errors.full_messages.each do |message| %>
+                <% @form.errors.full_messages.each do |message| %>
                   <li><%= message %></li>
                 <% end %>
               </ul>
@@ -29,7 +29,7 @@
 
             <% if @available_bases.any? %>
               <%= form.select :airtable_base_id,
-                              options_for_select(@available_bases.map { |base| [base[:name], base[:id]] }, @import_configuration.airtable_base_id),
+                              options_for_select(@available_bases.map { |base| [base[:name], base[:id]] }, @form.airtable_base_id),
                               { prompt: t(".airtable_base_prompt") } %>
             <% else %>
               <%= form.text_field :airtable_base_id %>
