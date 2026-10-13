@@ -187,5 +187,35 @@ describe "Proposal taxonomies multiselect" do
       expect(page).to have_content(decidim_sanitize_translated(taxonomy_item.name))
       expect(page).to have_content(decidim_sanitize_translated(second_taxonomy_item.name))
     end
+
+    it "shows each required taxonomy error only on its own filter" do
+      within ".new_proposal" do
+        fill_in :proposal_title, with: "More sidewalks and less roads"
+        fill_in :proposal_body, with: "Cities need more people, not more cars"
+        find("*[type=submit]").click
+      end
+
+      within "fieldset", text: decidim_sanitize_translated(taxonomy_filter.name) do
+        expect(page).to have_css(".form-error", exact_text: "Please choose at least one option for #{translated(taxonomy_filter.name)}.")
+      end
+
+      within "fieldset", text: decidim_sanitize_translated(second_taxonomy_filter.name) do
+        expect(page).to have_css(".form-error", exact_text: "Please choose at least one option for #{translated(second_taxonomy_filter.name)}.")
+      end
+    end
+  end
+
+  context "when a required filter uses a single select and is left empty" do
+    let(:max_taxonomies_per_filter) { 1 }
+
+    it "shows the required taxonomy error next to the select" do
+      within ".new_proposal" do
+        fill_in :proposal_title, with: "More sidewalks and less roads"
+        fill_in :proposal_body, with: "Cities need more people, not more cars"
+        find("*[type=submit]").click
+      end
+
+      expect(page).to have_css(".form-error", exact_text: "Please choose at least one option for #{translated(taxonomy_filter.name)}.", count: 1)
+    end
   end
 end

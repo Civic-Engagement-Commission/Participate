@@ -17,6 +17,7 @@ module Decidim
         label = decidim_sanitize_translated(filter.name)
         content_tag(:fieldset) do
           concat content_tag(:legend, label, class: "font-semibold")
+          concat form.error_for(Decidim::Nyc::TaxonomyFilterSettings.error_key(filter)).to_s
           concat form.collection_radio_buttons(
             name, taxonomy_items_options_for_filter(filter), :last, :first,
             {},
@@ -34,6 +35,7 @@ module Decidim
                                        "taxonomy-checkbox-limit-max-value": max,
                                        action: "change->taxonomy-checkbox-limit#update" }) do
           concat content_tag(:legend, label, class: "font-semibold")
+          concat form.error_for(Decidim::Nyc::TaxonomyFilterSettings.error_key(filter)).to_s
           concat form.collection_check_boxes(
             name, taxonomy_items_options_for_filter(filter), :last, :first,
             {},

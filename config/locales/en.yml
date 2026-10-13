@@ -6,6 +6,7 @@ en:
         proposal:
           attributes:
             taxonomies:
+              blank_for_filter: Please choose at least one option for %{filter}.
               too_many: You can choose a maximum of %{count} taxonomies per filter.
   decidim:
     admin:

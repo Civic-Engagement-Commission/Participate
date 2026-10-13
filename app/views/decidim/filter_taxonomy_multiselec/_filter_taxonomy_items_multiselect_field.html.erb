@@ -13,4 +13,5 @@
   <% else %>
     <%= filter_taxonomy_items_select_field form, :taxonomies, filter %>
   <% end %>
+  <%= form.error_for(Decidim::Nyc::TaxonomyFilterSettings.error_key(filter)) %>
 <% end %>
