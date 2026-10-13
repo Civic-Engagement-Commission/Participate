@@ -8,17 +8,20 @@ module Decidim
         before_action :import_configuration, only: [:edit, :update, :destroy]
 
         def index
+          enforce_permission_to :read, :imports
           @import_configurations = Decidim::Airtable::ImportConfiguration
                                    .where(organization: current_organization)
                                    .order(created_at: :desc)
         end
 
         def new
+          enforce_permission_to :create, :import
           @form = form(Decidim::Airtable::Admin::ImportConfigurationForm).instance
           prepare_new_form
         end
 
         def create
+          enforce_permission_to :create, :import
           @form = form(Decidim::Airtable::Admin::ImportConfigurationForm).from_params(params)
 
           Decidim::Airtable::Admin::CreateImportConfiguration.call(@form) do
@@ -35,12 +38,14 @@ module Decidim
         end
 
         def edit
+          enforce_permission_to :update, :import, import_configuration:
           @form = form(Decidim::Airtable::Admin::ImportConfigurationForm).from_model(import_configuration)
           prepare_edit_form
           render :new
         end
 
         def update
+          enforce_permission_to :update, :import, import_configuration:
           @form = form(Decidim::Airtable::Admin::ImportConfigurationForm).from_params(params)
           @form.id = import_configuration.id
 
@@ -58,6 +63,7 @@ module Decidim
         end
 
         def destroy
+          enforce_permission_to :destroy, :import, import_configuration:
           Decidim::Commands::DestroyResource.call(import_configuration, current_user) do
             on(:ok) do
               redirect_to imports_path, notice: t(".success")
@@ -66,6 +72,7 @@ module Decidim
         end
 
         def table_options
+          enforce_permission_to :read, :import
           tables = Decidim::Airtable::Api::Tables.new.for_base(params[:base_id])
           render json: tables.map { |table| { id: table[:id], name: table[:name] } }
         rescue Decidim::Airtable::Api::Error
@@ -73,6 +80,7 @@ module Decidim
         end
 
         def view_options
+          enforce_permission_to :read, :import
           views = Decidim::Airtable::Api::Views.new.for_base_and_table(params[:base_id], params[:table_id])
           render json: views
         rescue Decidim::Airtable::Api::Error
