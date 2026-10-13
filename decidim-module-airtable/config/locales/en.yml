@@ -1,0 +1,8 @@
+---
+en:
+  decidim:
+    airtable:
+      title: "Airtable"
+      description: "Airtable integration"
+      personal_token: "Personal token"
+      personal_token_description: "The personal token is used to authenticate with the Airtable API. You can create a personal token in your Airtable account settings."
