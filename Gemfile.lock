@@ -218,7 +218,10 @@ GIT
 PATH
   remote: decidim-module-airtable
   specs:
-    decidim-airtable (1.0)
+    decidim-airtable (0.1)
+      airrecord
+      decidim (~> 0.31.0)
+      decidim-proposals (~> 0.31.0)
 
 GEM
   remote: https://rubygems.org/
@@ -1099,7 +1102,6 @@ PLATFORMS
   x86_64-linux-musl
 
 DEPENDENCIES
-  airrecord
   aws-sdk-s3
   bootsnap (~> 1.4)
   brakeman (~> 6.1)
@@ -1195,7 +1197,7 @@ CHECKSUMS
   decidim (0.31.7)
   decidim-accountability (0.31.7)
   decidim-admin (0.31.7)
-  decidim-airtable (1.0)
+  decidim-airtable (0.1)
   decidim-api (0.31.7)
   decidim-assemblies (0.31.7)
   decidim-blogs (0.31.7)

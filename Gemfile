@@ -17,7 +17,6 @@ gem "decidim-elections", DECIDIM_VERSION
 gem "decidim-templates", DECIDIM_VERSION
 
 # External Decidim modules
-gem "airrecord"
 gem "bootsnap", "~> 1.4"
 gem "decidim-airtable", path: "decidim-module-airtable"
 
