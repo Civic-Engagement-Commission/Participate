@@ -5,10 +5,6 @@ module Decidim
     module Admin
       class ImportsController < Decidim::Airtable::Admin::ApplicationController
         def index; end
-
-        def show
-          @import_id = params[:id]
-        end
       end
     end
   end
