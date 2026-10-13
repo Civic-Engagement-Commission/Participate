@@ -37,8 +37,17 @@ module Decidim
             airtable_base_id: form.airtable_base_id,
             airtable_table_id: form.airtable_table_id,
             airtable_view_id: form.airtable_view_id,
+            settings: settings,
             active: form.active
           }
+        end
+
+        def settings
+          {
+            "airtable_base_name" => form.airtable_base_name,
+            "airtable_table_name" => form.airtable_table_name,
+            "airtable_view_name" => form.airtable_view_name
+          }.compact_blank
         end
       end
     end

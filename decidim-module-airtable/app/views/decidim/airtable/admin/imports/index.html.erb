@@ -21,15 +21,42 @@
 						<th><%= t(".table_id") %></th>
 						<th><%= t(".view_id") %></th>
 						<th><%= t(".status") %></th>
+						<th><%= t("decidim.admin.actions.actions") %></th>
 					</tr>
 				</thead>
 				<tbody>
 					<% @import_configurations.each do |configuration| %>
+						<% resource_name = configuration.settings&.dig("airtable_table_name").presence || configuration.airtable_table_id %>
 						<tr>
-							<td data-label="<%= t(".base_id") %>"><%= configuration.airtable_base_id %></td>
-							<td data-label="<%= t(".table_id") %>"><%= configuration.airtable_table_id %></td>
-							<td data-label="<%= t(".view_id") %>"><%= configuration.airtable_view_id.presence || "-" %></td>
+							<td data-label="<%= t(".base_id") %>"><%= configuration.settings&.dig("airtable_base_name").presence || configuration.airtable_base_id %></td>
+							<td data-label="<%= t(".table_id") %>"><%= configuration.settings&.dig("airtable_table_name").presence || configuration.airtable_table_id %></td>
+							<td data-label="<%= t(".view_id") %>"><%= configuration.settings&.dig("airtable_view_name").presence || configuration.airtable_view_id.presence || "-" %></td>
 							<td data-label="<%= t(".status") %>"><%= configuration.active? ? t(".status_active") : t(".status_inactive") %></td>
+							<td class="table-list__actions" data-label="<%= t("decidim.admin.actions.actions") %>">
+								<button type="button" data-controller="dropdown" data-target="actions-import-<%= configuration.id %>" aria-label="<%= t("decidim.admin.actions.actions_label", resource: resource_name) %>">
+									<%= icon "more-fill", class: "text-secondary" %>
+								</button>
+
+								<div class="inline-block relative">
+									<ul id="actions-import-<%= configuration.id %>" class="dropdown dropdown__action" aria-hidden="true">
+										<li class="dropdown__item">
+											<%= link_to edit_import_path(configuration), method: :get, class: "dropdown__button" do %>
+												<%= icon "pencil-line" %>
+												<%= t("actions.edit", scope: "decidim.admin") %>
+											<% end %>
+										</li>
+
+										<hr>
+
+										<li class="dropdown__item">
+											<%= link_to import_path(configuration), method: :delete, data: { confirm: t("actions.confirm_destroy", scope: "decidim.admin") }, class: "dropdown__button" do %>
+												<%= icon "delete-bin-line" %>
+												<%= t("actions.destroy", scope: "decidim.admin") %>
+											<% end %>
+										</li>
+									</ul>
+								</div>
+							</td>
 						</tr>
 					<% end %>
 				</tbody>

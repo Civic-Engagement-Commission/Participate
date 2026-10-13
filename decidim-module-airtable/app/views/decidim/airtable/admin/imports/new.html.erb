@@ -1,14 +1,19 @@
-<% add_decidim_page_title(t(".title")) %>
+<% page_title = @page_title || t(".title") %>
+<% submit_label = @submit_label || t(".submit") %>
+<% form_url = @form_url || imports_path %>
+<% form_method = @form_method || :post %>
+
+<% add_decidim_page_title(page_title) %>
 
 <div class="item_show__header">
   <h1 class="item_show__header-title">
-    <%= t(".title") %>
+    <%= page_title %>
   </h1>
 </div>
 
 <div class="item__edit item__edit-1col">
   <div class="item__edit-form">
-    <%= decidim_form_for @form, url: imports_path, html: { class: "form form-defaults" } do |form| %>
+    <%= decidim_form_for @form, url: form_url, method: form_method, html: { class: "form form-defaults" } do |form| %>
       <div class="card form__wrapper"
            data-behavior="airtable-import-form"
            data-table-options-url="<%= table_options_imports_path %>"
@@ -29,6 +34,9 @@
 
           <div class="row column">
             <%= form.label :airtable_base_id %>
+            <%= form.hidden_field :airtable_base_name, data: { behavior: "airtable-base-name-input" } %>
+            <%= form.hidden_field :airtable_table_name, data: { behavior: "airtable-table-name-input" } %>
+            <%= form.hidden_field :airtable_view_name, data: { behavior: "airtable-view-name-input" } %>
 
             <% if @available_bases.any? %>
               <%= form.select :airtable_base_id,
@@ -50,7 +58,7 @@
             <%= form.select :airtable_table_id,
                             options_for_select([], @form.airtable_table_id),
                             { prompt: t(".airtable_table_prompt") },
-                            data: { behavior: "airtable-table-input" } %>
+                            data: { behavior: "airtable-table-input", selected_value: @form.airtable_table_id } %>
             <p class="help-text" data-behavior="airtable-table-help"></p>
           </div>
 
@@ -59,7 +67,7 @@
             <%= form.select :airtable_view_id,
                             options_for_select([], @form.airtable_view_id),
                             { prompt: t(".airtable_view_prompt") },
-                            data: { behavior: "airtable-view-input" } %>
+                            data: { behavior: "airtable-view-input", selected_value: @form.airtable_view_id } %>
             <p class="help-text" data-behavior="airtable-view-help"></p>
           </div>
 
@@ -74,7 +82,7 @@
 
       <div class="item__edit-sticky">
         <div class="item__edit-sticky-container">
-          <%= form.submit t(".submit"), class: "button button__sm button__secondary" %>
+          <%= form.submit submit_label, class: "button button__sm button__secondary" %>
         </div>
       </div>
     <% end %>
@@ -93,6 +101,9 @@
     const tableRow = formContainer.querySelector('[data-behavior="airtable-table-row"]');
     const tableInput = formContainer.querySelector('[data-behavior="airtable-table-input"]');
     const tableHelp = formContainer.querySelector('[data-behavior="airtable-table-help"]');
+    const baseNameInput = formContainer.querySelector('[data-behavior="airtable-base-name-input"]');
+    const tableNameInput = formContainer.querySelector('[data-behavior="airtable-table-name-input"]');
+    const viewNameInput = formContainer.querySelector('[data-behavior="airtable-view-name-input"]');
 
     const viewRow = formContainer.querySelector('[data-behavior="airtable-view-row"]');
     const viewInput = formContainer.querySelector('[data-behavior="airtable-view-input"]');
@@ -125,6 +136,29 @@
       select.appendChild(prompt);
     };
 
+    const selectedOptionName = (select) => {
+      if (!select || !select.selectedOptions || select.selectedOptions.length === 0) return "";
+
+      const option = select.selectedOptions[0];
+      return option.value ? option.textContent.trim() : "";
+    };
+
+    const syncBaseName = () => {
+      if (baseInput.tagName === "SELECT") {
+        baseNameInput.value = selectedOptionName(baseInput);
+      } else {
+        baseNameInput.value = baseInput.value.trim();
+      }
+    };
+
+    const syncTableName = () => {
+      tableNameInput.value = selectedOptionName(tableInput);
+    };
+
+    const syncViewName = () => {
+      viewNameInput.value = selectedOptionName(viewInput);
+    };
+
     const fillSelect = (select, options, promptText) => {
       resetSelect(select, promptText);
 
@@ -148,9 +182,13 @@
 
     const loadTables = async () => {
       const baseId = baseInput.value.trim();
+      syncBaseName();
+
       resetSelect(tableInput, tablePrompt);
       resetSelect(viewInput, viewPrompt);
       viewInput.value = "";
+      tableNameInput.value = "";
+      viewNameInput.value = "";
       tableHelp.textContent = "";
       viewHelp.textContent = "";
 
@@ -167,6 +205,7 @@
       if (tableInput.dataset.selectedValue) {
         tableInput.value = tableInput.dataset.selectedValue;
       }
+      syncTableName();
 
       if (options.length === 0) {
         tableHelp.textContent = '<%= j t(".no_tables_found") %>';
@@ -182,7 +221,10 @@
     const loadViews = async () => {
       const baseId = baseInput.value.trim();
       const tableId = tableInput.value.trim();
+      syncTableName();
+
       resetSelect(viewInput, viewPrompt);
+      viewNameInput.value = "";
       viewHelp.textContent = "";
 
       if (!baseId || !tableId) {
@@ -198,20 +240,30 @@
       if (viewInput.dataset.selectedValue) {
         viewInput.value = viewInput.dataset.selectedValue;
       }
+      syncViewName();
 
       if (options.length === 0) {
         viewHelp.textContent = '<%= j t(".no_views_found") %>';
       }
     };
 
-    tableInput.dataset.selectedValue = tableInput.value;
-    viewInput.dataset.selectedValue = viewInput.value;
+    tableInput.dataset.selectedValue = tableInput.dataset.selectedValue || tableInput.value;
+    viewInput.dataset.selectedValue = viewInput.dataset.selectedValue || viewInput.value;
 
     hideDependentRows();
     baseInput.addEventListener("change", loadTables);
     baseInput.addEventListener("blur", loadTables);
-    tableInput.addEventListener("change", loadViews);
+    tableInput.addEventListener("change", () => {
+      syncTableName();
+      loadViews();
+    });
     tableInput.addEventListener("blur", loadViews);
+    viewInput.addEventListener("change", syncViewName);
+    viewInput.addEventListener("blur", syncViewName);
+
+    syncBaseName();
+    syncTableName();
+    syncViewName();
 
     if (baseInput.value.trim()) {
       loadTables();

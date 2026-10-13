@@ -16,6 +16,11 @@ en:
           create:
             success: "Configuration created successfully."
             error: "Could not create configuration. Please review the form fields."
+          update:
+            success: "Configuration updated successfully."
+            error: "Could not update configuration. Please review the form fields."
+          destroy:
+            success: "Configuration removed successfully."
           index:
             title: "Airtable Imports"
             placeholder_help: "Placeholder admin page for Airtable import configurations."
@@ -41,4 +46,7 @@ en:
             no_views_found: "No views were found for this table."
             active_label: "Active configuration"
             submit: "Create configuration"
+          edit:
+            title: "Edit Airtable Configuration"
+            submit: "Update configuration"
         not_ready_message: "Airtable module is not ready. Please set the personal token in the configuration."

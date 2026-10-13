@@ -7,8 +7,12 @@ module Decidim
         mimic :import_configuration
 
         attribute :airtable_base_id, String
+        attribute :airtable_base_name, String
         attribute :airtable_table_id, String
+        attribute :airtable_table_name, String
         attribute :airtable_view_id, String
+        attribute :airtable_view_name, String
+        attribute :id, Integer
         attribute :active, Boolean, default: true
         attribute :organization, Decidim::Organization
 
@@ -22,10 +26,12 @@ module Decidim
         def table_is_unique_for_organization_and_base
           return if organization.blank? || airtable_base_id.blank? || airtable_table_id.blank?
 
-          exists = Decidim::Airtable::ImportConfiguration
-                   .exists?(decidim_organization_id: organization.id,
-                            airtable_base_id: airtable_base_id,
-                            airtable_table_id: airtable_table_id)
+          query = Decidim::Airtable::ImportConfiguration
+                  .where(decidim_organization_id: organization.id,
+                         airtable_base_id: airtable_base_id,
+                         airtable_table_id: airtable_table_id)
+          query = query.where.not(id:) if id.present?
+          exists = query.exists?
 
           return unless exists
 

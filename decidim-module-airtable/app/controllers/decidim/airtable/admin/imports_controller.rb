@@ -4,7 +4,8 @@ module Decidim
   module Airtable
     module Admin
       class ImportsController < Decidim::Airtable::Admin::ApplicationController
-        before_action :load_available_bases, only: [:new, :create]
+        before_action :load_available_bases, only: [:new, :create, :edit, :update]
+        before_action :import_configuration, only: [:edit, :update, :destroy]
 
         def index
           @import_configurations = Decidim::Airtable::ImportConfiguration
@@ -14,6 +15,7 @@ module Decidim
 
         def new
           @form = form(Decidim::Airtable::Admin::ImportConfigurationForm).instance
+          prepare_new_form
         end
 
         def create
@@ -26,7 +28,39 @@ module Decidim
 
             on(:invalid) do
               flash.now[:alert] = t(".error")
+              prepare_new_form
               render :new, status: :unprocessable_entity
+            end
+          end
+        end
+
+        def edit
+          @form = form(Decidim::Airtable::Admin::ImportConfigurationForm).from_model(import_configuration)
+          prepare_edit_form
+          render :new
+        end
+
+        def update
+          @form = form(Decidim::Airtable::Admin::ImportConfigurationForm).from_params(params)
+          @form.id = import_configuration.id
+
+          Decidim::Airtable::Admin::UpdateImportConfiguration.call(@form, import_configuration) do
+            on(:ok) do
+              redirect_to imports_path, notice: t(".success")
+            end
+
+            on(:invalid) do
+              flash.now[:alert] = t(".error")
+              prepare_edit_form
+              render :new, status: :unprocessable_entity
+            end
+          end
+        end
+
+        def destroy
+          Decidim::Commands::DestroyResource.call(import_configuration, current_user) do
+            on(:ok) do
+              redirect_to imports_path, notice: t(".success")
             end
           end
         end
@@ -46,6 +80,26 @@ module Decidim
         end
 
         private
+
+        def import_configuration
+          @import_configuration ||= Decidim::Airtable::ImportConfiguration
+                                    .where(organization: current_organization)
+                                    .find(params[:id])
+        end
+
+        def prepare_new_form
+          @page_title = t("decidim.airtable.admin.imports.new.title")
+          @submit_label = t("decidim.airtable.admin.imports.new.submit")
+          @form_url = imports_path
+          @form_method = :post
+        end
+
+        def prepare_edit_form
+          @page_title = t("decidim.airtable.admin.imports.edit.title")
+          @submit_label = t("decidim.airtable.admin.imports.edit.submit")
+          @form_url = import_path(import_configuration)
+          @form_method = :patch
+        end
 
         def load_available_bases
           @available_bases = Decidim::Airtable::Api::Bases.new.all

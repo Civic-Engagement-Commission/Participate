@@ -9,7 +9,7 @@ module Decidim
       paths["lib/tasks"] = nil
 
       routes do
-        resources :imports, only: [:index, :new, :create, :show] do
+        resources :imports, only: [:index, :new, :create, :show, :edit, :update, :destroy] do
           collection do
             get :table_options
             get :view_options
