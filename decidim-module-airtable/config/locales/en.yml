@@ -2,7 +2,10 @@
 en:
   decidim:
     airtable:
-      title: "Airtable"
-      description: "Airtable integration"
-      personal_token: "Personal token"
-      personal_token_description: "The personal token is used to authenticate with the Airtable API. You can create a personal token in your Airtable account settings."
+      admin:
+        menu:
+          airtable: "Airtable"
+        imports:
+          index:
+            title: "Airtable Imports"
+        not_ready_message: "Airtable module is not ready. Please set the personal token in the configuration."
