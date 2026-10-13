@@ -31,6 +31,22 @@ module Decidim
           raise Error, e.message
         end
 
+        def list_base_tables(base_id)
+          raise Error, "Airtable personal token is missing" if @personal_token.blank?
+
+          escaped_base_id = airrecord_client.escape(base_id)
+          response = airrecord_client.connection.get("/v0/meta/bases/#{escaped_base_id}/tables")
+          parsed_response = airrecord_client.parse(response.body)
+
+          if response.success?
+            parsed_response
+          else
+            airrecord_client.handle_error(response.status, parsed_response)
+          end
+        rescue Airrecord::Error => e
+          raise Error, e.message
+        end
+
         private
 
         def airrecord_client

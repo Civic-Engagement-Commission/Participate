@@ -9,7 +9,12 @@ module Decidim
       paths["lib/tasks"] = nil
 
       routes do
-        resources :imports, only: [:index, :new, :create, :show]
+        resources :imports, only: [:index, :new, :create, :show] do
+          collection do
+            get :table_options
+            get :view_options
+          end
+        end
       end
 
       initializer "decidim_admin_airtable.mount_routes" do

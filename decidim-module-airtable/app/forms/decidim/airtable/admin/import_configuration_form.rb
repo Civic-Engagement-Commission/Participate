@@ -23,10 +23,9 @@ module Decidim
           return if organization.blank? || airtable_base_id.blank? || airtable_table_id.blank?
 
           exists = Decidim::Airtable::ImportConfiguration
-                   .where(decidim_organization_id: organization.id,
-                          airtable_base_id: airtable_base_id,
-                          airtable_table_id: airtable_table_id)
-                   .exists?
+                   .exists?(decidim_organization_id: organization.id,
+                            airtable_base_id: airtable_base_id,
+                            airtable_table_id: airtable_table_id)
 
           return unless exists
 
