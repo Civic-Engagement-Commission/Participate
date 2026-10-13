@@ -1,0 +1,70 @@
+<% add_decidim_page_title(t(".title")) %>
+
+<div class="item_show__header">
+  <h1 class="item_show__header-title">
+    <%= t(".title") %>
+  </h1>
+</div>
+
+<div class="item__edit item__edit-1col">
+  <div class="item__edit-form">
+    <%= form_with model: @import_configuration, url: imports_path, html: { class: "form form-defaults" } do |form| %>
+      <div class="card form__wrapper">
+        <div class="card-section">
+          <p><%= t(".placeholder_help") %></p>
+
+          <% if @import_configuration.errors.any? %>
+            <div class="callout alert">
+              <p><%= t(".validation_errors") %></p>
+              <ul>
+                <% @import_configuration.errors.full_messages.each do |message| %>
+                  <li><%= message %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+
+          <div class="row column">
+            <%= form.label :airtable_base_id %>
+
+            <% if @available_bases.any? %>
+              <%= form.select :airtable_base_id,
+                              options_for_select(@available_bases.map { |base| [base[:name], base[:id]] }, @import_configuration.airtable_base_id),
+                              { prompt: t(".airtable_base_prompt") } %>
+            <% else %>
+              <%= form.text_field :airtable_base_id %>
+              <p class="help-text"><%= t(".airtable_base_fallback") %></p>
+            <% end %>
+
+            <% if @bases_loading_error.present? %>
+              <p class="help-text"><%= @bases_loading_error %></p>
+            <% end %>
+          </div>
+
+          <div class="row column">
+            <%= form.label :airtable_table_id %>
+            <%= form.text_field :airtable_table_id %>
+          </div>
+
+          <div class="row column">
+            <%= form.label :airtable_view_id %>
+            <%= form.text_field :airtable_view_id %>
+          </div>
+
+          <div class="row column">
+            <%= form.label :active do %>
+              <%= form.check_box :active %>
+              <%= t(".active_label") %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <div class="item__edit-sticky">
+        <div class="item__edit-sticky-container">
+          <%= form.submit t(".submit"), class: "button button__sm button__secondary" %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

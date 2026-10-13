@@ -1,1 +1,43 @@
-<h1 class="h1"><%= t(".title") %></h1>
+<% add_decidim_page_title(t(".title")) %>
+
+<div class="card" id="airtable-import-configurations">
+	<div class="item_show__header">
+		<h1 class="item_show__header-title">
+			<%= t(".title") %>
+			<%= link_to t(".new_configuration"), new_import_path, class: "button button__sm button__secondary new" %>
+		</h1>
+	</div>
+
+	<div class="card-section">
+		<p><%= t(".placeholder_help") %></p>
+	</div>
+
+	<% if @import_configurations.any? %>
+		<div class="table-stacked">
+			<table class="table-list">
+				<thead>
+					<tr>
+						<th><%= t(".base_id") %></th>
+						<th><%= t(".table_id") %></th>
+						<th><%= t(".view_id") %></th>
+						<th><%= t(".status") %></th>
+					</tr>
+				</thead>
+				<tbody>
+					<% @import_configurations.each do |configuration| %>
+						<tr>
+							<td data-label="<%= t(".base_id") %>"><%= configuration.airtable_base_id %></td>
+							<td data-label="<%= t(".table_id") %>"><%= configuration.airtable_table_id %></td>
+							<td data-label="<%= t(".view_id") %>"><%= configuration.airtable_view_id.presence || "-" %></td>
+							<td data-label="<%= t(".status") %>"><%= configuration.active? ? t(".status_active") : t(".status_inactive") %></td>
+						</tr>
+					<% end %>
+				</tbody>
+			</table>
+		</div>
+	<% else %>
+		<div class="card-section">
+			<p><%= t(".empty") %></p>
+		</div>
+	<% end %>
+</div>

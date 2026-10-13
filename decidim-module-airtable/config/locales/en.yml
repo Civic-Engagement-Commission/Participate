@@ -13,6 +13,28 @@ en:
         menu:
           airtable: "Airtable"
         imports:
+          create:
+            success: "Configuration created successfully."
+            error: "Could not create configuration. Please review the form fields."
           index:
             title: "Airtable Imports"
+            placeholder_help: "Placeholder admin page for Airtable import configurations."
+            new_configuration: "Add configuration"
+            configurations_title: "Existing configurations"
+            base_id: "Base ID"
+            table_id: "Table ID"
+            view_id: "View ID"
+            status: "Status"
+            status_active: "Active"
+            status_inactive: "Inactive"
+            empty: "No import configurations yet."
+          new:
+            title: "New Airtable Configuration"
+            placeholder_help: "This is a placeholder form to register an Airtable table import configuration."
+            validation_errors: "Please fix the following errors:"
+            airtable_base_prompt: "Select a base"
+            airtable_base_fallback: "No bases were loaded from Airtable. You can still type a Base ID manually."
+            bases_loading_error: "Could not load Airtable bases from the API with the current token."
+            active_label: "Active configuration"
+            submit: "Create configuration"
         not_ready_message: "Airtable module is not ready. Please set the personal token in the configuration."

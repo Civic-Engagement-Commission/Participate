@@ -10,7 +10,7 @@ module Decidim
 
       scope :active, -> { where(active: true) }
 
-      validates :decidim_organization_id, :airtable_base_id, :airtable_table_id, presence: true
+      validates :airtable_base_id, :airtable_table_id, presence: true
       validates :airtable_table_id,
                 uniqueness: {
                   scope: [:decidim_organization_id, :airtable_base_id],
