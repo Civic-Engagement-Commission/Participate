@@ -43,11 +43,13 @@ module Decidim
         end
 
         def settings
-          {
-            "airtable_base_name" => form.airtable_base_name,
-            "airtable_table_name" => form.airtable_table_name,
-            "airtable_view_name" => form.airtable_view_name
-          }.compact_blank
+          (import_configuration.settings || {}).merge(
+            {
+              "airtable_base_name" => form.airtable_base_name,
+              "airtable_table_name" => form.airtable_table_name,
+              "airtable_view_name" => form.airtable_view_name
+            }.compact_blank
+          )
         end
       end
     end

@@ -40,6 +40,15 @@
 								<div class="inline-block relative">
 									<ul id="actions-import-<%= configuration.id %>" class="dropdown dropdown__action" aria-hidden="true">
 										<li class="dropdown__item">
+											<%= link_to configure_import_path(configuration), method: :get, class: "dropdown__button" do %>
+												<%= icon "settings-4-line" %>
+												<%= t(".configure") %>
+											<% end %>
+										</li>
+
+										<hr>
+
+										<li class="dropdown__item">
 											<%= link_to edit_import_path(configuration), method: :get, class: "dropdown__button" do %>
 												<%= icon "pencil-line" %>
 												<%= t("actions.edit", scope: "decidim.admin") %>

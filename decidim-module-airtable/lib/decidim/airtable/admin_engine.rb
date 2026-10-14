@@ -10,6 +10,11 @@ module Decidim
 
       routes do
         resources :imports, only: [:index, :new, :create, :show, :edit, :update, :destroy] do
+          member do
+            get :configure, to: "import_configurations#show"
+            patch :configure, to: "import_configurations#update"
+          end
+
           collection do
             get :table_options
             get :view_options

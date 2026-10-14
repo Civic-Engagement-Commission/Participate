@@ -14,7 +14,14 @@ module Decidim
             {
               id: table["id"],
               name: table["name"],
-              views: table.fetch("views", []).map { |view| { id: view["id"], name: view["name"] } }
+              fields: table.fetch("fields", []).map { |field| { id: field["id"], name: field["name"] } },
+              views: table.fetch("views", []).map do |view|
+                {
+                  id: view["id"],
+                  name: view["name"],
+                  visible_field_ids: view.fetch("visibleFieldIds", [])
+                }
+              end
             }
           end
         rescue KeyError
