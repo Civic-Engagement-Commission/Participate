@@ -83,17 +83,11 @@ module Decidim
         helper_method :proposal_field_options
 
         def proposal_field_options
-          [
-            [t("decidim.airtable.admin.import_configurations.show.proposal_fields.none"), ""],
-            [t("decidim.airtable.admin.import_configurations.show.proposal_fields.title"), "title"],
-            [t("decidim.airtable.admin.import_configurations.show.proposal_fields.body"), "body"],
-            [t("decidim.airtable.admin.import_configurations.show.proposal_fields.address"), "address"],
-            [t("decidim.airtable.admin.import_configurations.show.proposal_fields.latitude"), "latitude"],
-            [t("decidim.airtable.admin.import_configurations.show.proposal_fields.longitude"), "longitude"],
-            [t("decidim.airtable.admin.import_configurations.show.proposal_fields.reference"), "reference"],
-            [t("decidim.airtable.admin.import_configurations.show.proposal_fields.cost"), "cost"],
-            [t("decidim.airtable.admin.import_configurations.show.proposal_fields.state"), "state"]
-          ]
+          proposal_field_options_service.for_select
+        end
+
+        def proposal_field_options_service
+          @proposal_field_options_service ||= Decidim::Airtable::ProposalFieldOptions.new(current_organization)
         end
 
         helper_method :import_configuration

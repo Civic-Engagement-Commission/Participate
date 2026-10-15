@@ -57,6 +57,8 @@ en:
               reference: "Reference"
               cost: "Cost"
               state: "State"
+              custom_public: "Custom field (public): %{label}"
+              custom_private: "Custom field (private): %{label}"
           update:
             success: "Field mapping saved successfully."
             error: "Could not save field mapping. Please review the selected values."

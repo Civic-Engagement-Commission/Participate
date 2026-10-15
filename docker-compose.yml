@@ -35,6 +35,9 @@ services:
       - QUEUE_ADAPTER=sidekiq
       - SEED=true
       - ENABLE_RACK_ATTACK=0
+      # Docker Desktop on Windows may not forward bind-mount file events to Linux.
+      # Polling lets webpack detect changes under app/packs.
+      - WATCHPACK_POLLING=1000
     volumes:
       - ./app:/decidim/app
       - ./.bundle:/decidim/.bundle

@@ -33,9 +33,26 @@ module Decidim
         attr_reader :form, :import_configuration
 
         def settings
+          normalized_mappings = form.normalized_field_mappings
           (import_configuration.settings || {}).merge(
-            "proposal_field_mappings" => form.normalized_field_mappings
+            "proposal_field_mappings" => normalized_mappings,
+            "proposal_field_mappings_snapshot" => field_mappings_snapshot(normalized_mappings)
           )
+        end
+
+        def field_mappings_snapshot(mappings)
+          metadata_by_value = proposal_field_options.metadata_by_value
+
+          mappings.each_with_object({}) do |(airtable_field_id, mapped_value), output|
+            metadata = metadata_by_value[mapped_value]
+            next unless metadata
+
+            output[airtable_field_id.to_s] = metadata.stringify_keys.merge("value" => mapped_value)
+          end
+        end
+
+        def proposal_field_options
+          @proposal_field_options ||= Decidim::Airtable::ProposalFieldOptions.new(import_configuration.organization)
         end
       end
     end
