@@ -11,6 +11,7 @@ module Decidim
       routes do
         resources :imports, only: [:index, :new, :create, :show, :edit, :update, :destroy] do
           member do
+            post :run
             get :configure, to: "import_configurations#show"
             patch :configure, to: "import_configurations#update"
           end

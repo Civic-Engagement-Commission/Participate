@@ -5,7 +5,7 @@ module Decidim
     module Admin
       class ImportsController < Decidim::Airtable::Admin::ApplicationController
         before_action :load_available_bases, only: [:new, :create, :edit, :update]
-        before_action :import_configuration, only: [:edit, :update, :destroy]
+        before_action :import_configuration, only: [:edit, :update, :destroy, :run]
 
         def index
           enforce_permission_to :read, :imports
@@ -67,6 +67,20 @@ module Decidim
           Decidim::Commands::DestroyResource.call(import_configuration, current_user) do
             on(:ok) do
               redirect_to imports_path, notice: t(".success")
+            end
+          end
+        end
+
+        def run
+          enforce_permission_to :run, :import, import_configuration:
+
+          Decidim::Airtable::Admin::EnqueueImport.call(import_configuration, current_user) do
+            on(:ok) do
+              redirect_to imports_path, notice: t(".success")
+            end
+
+            on(:invalid) do
+              redirect_to imports_path, alert: t(".error")
             end
           end
         end

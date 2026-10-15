@@ -21,11 +21,16 @@ en:
             error: "Could not update configuration. Please review the form fields."
           destroy:
             success: "Configuration removed successfully."
+          run:
+            success: "Import job enqueued successfully."
+            error: "Could not enqueue import job. Please verify the configuration is active."
           index:
             title: "Airtable Imports"
             placeholder_help: "Placeholder admin page for Airtable import configurations."
             new_configuration: "Add configuration"
             configure: "Configure"
+            run_now: "Run now"
+            confirm_run: "Queue this import now?"
             configurations_title: "Existing configurations"
             base_id: "Base ID"
             table_id: "Table ID"

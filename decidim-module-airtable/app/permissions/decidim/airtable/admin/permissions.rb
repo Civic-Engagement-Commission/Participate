@@ -14,7 +14,7 @@ module Decidim
           when :imports
             allow! if [:index, :read].include?(permission_action.action)
           when :import
-            allow! if [:read, :create, :update, :destroy].include?(permission_action.action)
+            allow! if [:read, :create, :update, :destroy, :run].include?(permission_action.action)
           end
 
           permission_action

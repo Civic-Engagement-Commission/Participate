@@ -49,6 +49,15 @@
 										<hr>
 
 										<li class="dropdown__item">
+											<%= link_to run_import_path(configuration), method: :post, data: { confirm: t(".confirm_run") }, class: "dropdown__button" do %>
+												<%= icon "play-circle-line" %>
+												<%= t(".run_now") %>
+											<% end %>
+										</li>
+
+										<hr>
+
+										<li class="dropdown__item">
 											<%= link_to edit_import_path(configuration), method: :get, class: "dropdown__button" do %>
 												<%= icon "pencil-line" %>
 												<%= t("actions.edit", scope: "decidim.admin") %>
