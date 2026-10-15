@@ -81,9 +81,19 @@ module Decidim
         end
 
         helper_method :proposal_field_options
+        helper_method :proposal_field_option_groups
+        helper_method :proposal_field_none_option
 
         def proposal_field_options
           proposal_field_options_service.for_select
+        end
+
+        def proposal_field_option_groups
+          proposal_field_options_service.grouped_for_select
+        end
+
+        def proposal_field_none_option
+          proposal_field_options_service.none_option
         end
 
         def proposal_field_options_service

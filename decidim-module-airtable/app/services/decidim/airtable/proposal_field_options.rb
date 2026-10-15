@@ -24,6 +24,18 @@ module Decidim
         [none_option] + standard_options + custom_options
       end
 
+      def grouped_for_select
+        groups = []
+        groups << [I18n.t("decidim.airtable.admin.import_configurations.show.proposal_fields.groups.standard"), standard_options]
+        groups << [I18n.t("decidim.airtable.admin.import_configurations.show.proposal_fields.groups.awesome_custom"), custom_options] if custom_options.any?
+        groups.concat(other_groups)
+        groups
+      end
+
+      def none_option
+        [I18n.t("decidim.airtable.admin.import_configurations.show.proposal_fields.none"), ""]
+      end
+
       def metadata_by_value
         @metadata_by_value ||= begin
           standard = standard_metadata
@@ -38,12 +50,12 @@ module Decidim
 
       attr_reader :organization
 
-      def none_option
-        [I18n.t("decidim.airtable.admin.import_configurations.show.proposal_fields.none"), ""]
-      end
-
       def standard_options
         STANDARD_FIELDS.map { |value, i18n_key| [I18n.t(i18n_key), value] }
+      end
+
+      def other_groups
+        []
       end
 
       def standard_metadata
