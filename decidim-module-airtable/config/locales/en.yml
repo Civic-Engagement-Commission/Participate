@@ -76,6 +76,10 @@ en:
           update:
             success: "Field mapping saved successfully."
             error: "Could not save field mapping. Please review the selected values."
+            validation:
+              writeback_target_mapped_more_than_once: "%{target} can only be mapped once."
+              attachments_requires_file_field: "Airtable field '%{field}' must be an attachment field to map it as attachments."
+              published_at_requires_date_field: "Airtable field '%{field}' must be a date/datetime field to map it to Published at."
           new:
             title: "New Airtable Configuration"
             placeholder_help: "This is a placeholder form to register an Airtable table import configuration."

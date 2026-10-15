@@ -11,13 +11,19 @@ module Decidim
           enforce_permission_to :read, :import, import_configuration:
           @form = form(Decidim::Airtable::Admin::ImportMappingForm).from_params(
             id: import_configuration.id,
-            field_mappings: current_field_mappings
+            field_mappings: current_field_mappings,
+            airtable_fields: @airtable_fields
           )
         end
 
         def update
           enforce_permission_to :update, :import, import_configuration:
-          @form = form(Decidim::Airtable::Admin::ImportMappingForm).from_params(import_mapping_params.merge(id: import_configuration.id))
+          @form = form(Decidim::Airtable::Admin::ImportMappingForm).from_params(
+            import_mapping_params.merge(
+              id: import_configuration.id,
+              airtable_fields: @airtable_fields
+            )
+          )
 
           Decidim::Airtable::Admin::UpdateImportMapping.call(@form, import_configuration) do
             on(:ok) do

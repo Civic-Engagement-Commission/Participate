@@ -11,6 +11,17 @@
     <div class="card-section">
       <p><%= t(".placeholder") %></p>
 
+      <% if @form.errors.any? %>
+        <div class="callout alert">
+          <p><strong><%= t("decidim.airtable.admin.import_configurations.new.validation_errors") %></strong></p>
+          <ul>
+            <% @form.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
       <ul>
         <li><strong><%= t(".base") %>:</strong> <%= import_configuration.settings&.dig("airtable_base_name").presence || import_configuration.airtable_base_id %></li>
         <li><strong><%= t(".table") %>:</strong> <%= import_configuration.settings&.dig("airtable_table_name").presence || import_configuration.airtable_table_id %></li>
