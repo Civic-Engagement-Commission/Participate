@@ -4,6 +4,16 @@ module Decidim
   module Airtable
     class ProposalFieldOptions
       CUSTOM_VALUE_PREFIX = "awesome_custom"
+      ATTACHMENTS_VALUE = "attachments"
+      ATTACHMENT_AIRTABLE_FIELD_TYPES = %w(multipleAttachments attachment).freeze
+      WRITEBACK_OPTIONS = {
+        "writeback_proposal_id" => "decidim.airtable.admin.import_configurations.show.proposal_fields.writeback_proposal_id",
+        "writeback_proposal_url" => "decidim.airtable.admin.import_configurations.show.proposal_fields.writeback_proposal_url"
+      }.freeze
+      AUTHORS_LOOKUP_OPTIONS = {
+        "authors_by_nickname" => "decidim.airtable.admin.import_configurations.show.proposal_fields.authors_by_nickname",
+        "authors_by_email" => "decidim.airtable.admin.import_configurations.show.proposal_fields.authors_by_email"
+      }.freeze
 
       STANDARD_FIELDS = {
         "title" => "decidim.airtable.admin.import_configurations.show.proposal_fields.title",
@@ -13,22 +23,27 @@ module Decidim
         "longitude" => "decidim.airtable.admin.import_configurations.show.proposal_fields.longitude",
         "reference" => "decidim.airtable.admin.import_configurations.show.proposal_fields.reference",
         "cost" => "decidim.airtable.admin.import_configurations.show.proposal_fields.cost",
-        "state" => "decidim.airtable.admin.import_configurations.show.proposal_fields.state"
+        "state" => "decidim.airtable.admin.import_configurations.show.proposal_fields.state",
+        "published_at" => "decidim.airtable.admin.import_configurations.show.proposal_fields.published_at"
       }.freeze
 
       def initialize(organization)
         @organization = organization
       end
 
-      def for_select
-        [none_option] + standard_options + custom_options + taxonomy_options
+      def for_select(field: nil, selected_value: nil)
+        [none_option] + standard_options + authors_options + custom_options + taxonomy_options + writeback_options + attachment_options(field:, selected_value:)
       end
 
-      def grouped_for_select
+      def grouped_for_select(field: nil, selected_value: nil)
         groups = []
         groups << [I18n.t("decidim.airtable.admin.import_configurations.show.proposal_fields.groups.standard"), standard_options]
+        groups << [I18n.t("decidim.airtable.admin.import_configurations.show.proposal_fields.groups.authors"), authors_options]
         groups << [I18n.t("decidim.airtable.admin.import_configurations.show.proposal_fields.groups.awesome_custom"), custom_options] if custom_options.any?
         groups << [I18n.t("decidim.airtable.admin.import_configurations.show.proposal_fields.groups.taxonomies"), taxonomy_options] if taxonomy_options.any?
+        groups << [I18n.t("decidim.airtable.admin.import_configurations.show.proposal_fields.groups.writeback"), writeback_options]
+        attachments = attachment_options(field:, selected_value:)
+        groups << [I18n.t("decidim.airtable.admin.import_configurations.show.proposal_fields.groups.attachments"), attachments] if attachments.any?
         groups.concat(other_groups)
         groups
       end
@@ -51,7 +66,30 @@ module Decidim
               label: taxonomy_label_for(taxonomy)
             }
           end
-          standard.merge(custom).merge(taxonomies)
+          attachments = {
+            ATTACHMENTS_VALUE => {
+              kind: "attachments",
+              target: "attachments",
+              label: I18n.t("decidim.airtable.admin.import_configurations.show.proposal_fields.attachments")
+            }
+          }
+          authors = AUTHORS_LOOKUP_OPTIONS.keys.index_with do |value|
+            {
+              kind: "authors",
+              target: "authors",
+              lookup_by: value.delete_prefix("authors_by_"),
+              label: I18n.t(AUTHORS_LOOKUP_OPTIONS[value])
+            }
+          end
+          writeback = WRITEBACK_OPTIONS.keys.index_with do |value|
+            {
+              kind: "writeback",
+              target: "airtable",
+              attribute: value.delete_prefix("writeback_"),
+              label: I18n.t(WRITEBACK_OPTIONS[value])
+            }
+          end
+          standard.merge(authors).merge(custom).merge(taxonomies).merge(writeback).merge(attachments)
         end
       end
 
@@ -71,6 +109,24 @@ module Decidim
         root_taxonomies.map do |taxonomy|
           [taxonomy_option_label(taxonomy), taxonomy_value_for(taxonomy.id)]
         end
+      end
+
+      def authors_options
+        AUTHORS_LOOKUP_OPTIONS.map do |value, i18n_key|
+          [I18n.t(i18n_key), value]
+        end
+      end
+
+      def writeback_options
+        WRITEBACK_OPTIONS.map do |value, i18n_key|
+          [I18n.t(i18n_key), value]
+        end
+      end
+
+      def attachment_options(field:, selected_value:)
+        return [] unless attachment_mapping_available_for?(field, selected_value)
+
+        [[I18n.t("decidim.airtable.admin.import_configurations.show.proposal_fields.attachments"), ATTACHMENTS_VALUE]]
       end
 
       def standard_metadata
@@ -167,6 +223,13 @@ module Decidim
         Decidim::Taxonomy.for(organization).roots
       rescue StandardError
         Decidim::Taxonomy.none
+      end
+
+      def attachment_mapping_available_for?(field, selected_value)
+        return true if selected_value == ATTACHMENTS_VALUE
+        return false if field.blank?
+
+        ATTACHMENT_AIRTABLE_FIELD_TYPES.include?(field[:type].to_s)
       end
     end
   end

@@ -84,12 +84,12 @@ module Decidim
         helper_method :proposal_field_option_groups
         helper_method :proposal_field_none_option
 
-        def proposal_field_options
-          proposal_field_options_service.for_select
+        def proposal_field_options(field: nil, selected_value: nil)
+          proposal_field_options_service.for_select(field:, selected_value:)
         end
 
-        def proposal_field_option_groups
-          proposal_field_options_service.grouped_for_select
+        def proposal_field_option_groups(field = nil, selected_value = nil)
+          proposal_field_options_service.grouped_for_select(field:, selected_value:)
         end
 
         def proposal_field_none_option

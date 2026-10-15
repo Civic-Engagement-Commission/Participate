@@ -14,7 +14,13 @@ module Decidim
             {
               id: table["id"],
               name: table["name"],
-              fields: table.fetch("fields", []).map { |field| { id: field["id"], name: field["name"] } },
+              fields: table.fetch("fields", []).map do |field|
+                {
+                  id: field["id"],
+                  name: field["name"],
+                  type: field["type"]
+                }
+              end,
               views: table.fetch("views", []).map do |view|
                 {
                   id: view["id"],

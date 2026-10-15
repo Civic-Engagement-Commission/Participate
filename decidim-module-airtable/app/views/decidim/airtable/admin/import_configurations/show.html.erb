@@ -32,8 +32,9 @@
                 <tr>
                   <td data-label="<%= t(".airtable_field") %>"><%= field[:name] %></td>
                   <td data-label="<%= t(".proposal_field") %>">
+                    <% selected_value = mapped_fields[field[:id]] %>
                     <% options_html = content_tag(:option, proposal_field_none_option.first, value: proposal_field_none_option.last) %>
-                    <% options_html += grouped_options_for_select(proposal_field_option_groups, mapped_fields[field[:id]]) %>
+                    <% options_html += grouped_options_for_select(proposal_field_option_groups(field, selected_value), selected_value) %>
                     <%= select_tag "import_mapping_form[field_mappings][#{field[:id]}]",
                                    options_html,
                                    class: "w-full" %>
