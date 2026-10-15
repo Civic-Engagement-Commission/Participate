@@ -21,13 +21,14 @@ module Decidim
       end
 
       def for_select
-        [none_option] + standard_options + custom_options
+        [none_option] + standard_options + custom_options + taxonomy_options
       end
 
       def grouped_for_select
         groups = []
         groups << [I18n.t("decidim.airtable.admin.import_configurations.show.proposal_fields.groups.standard"), standard_options]
         groups << [I18n.t("decidim.airtable.admin.import_configurations.show.proposal_fields.groups.awesome_custom"), custom_options] if custom_options.any?
+        groups << [I18n.t("decidim.airtable.admin.import_configurations.show.proposal_fields.groups.taxonomies"), taxonomy_options] if taxonomy_options.any?
         groups.concat(other_groups)
         groups
       end
@@ -42,7 +43,15 @@ module Decidim
           custom = awesome_custom_fields.each_with_object({}) do |field, output|
             output[field[:value]] = field.except(:value).merge(kind: "awesome_custom")
           end
-          standard.merge(custom)
+          taxonomies = root_taxonomies.each_with_object({}) do |taxonomy, output|
+            output[taxonomy_value_for(taxonomy.id)] = {
+              kind: "taxonomy_root",
+              target: "taxonomy",
+              taxonomy_id: taxonomy.id,
+              label: taxonomy_label_for(taxonomy)
+            }
+          end
+          standard.merge(custom).merge(taxonomies)
         end
       end
 
@@ -56,6 +65,12 @@ module Decidim
 
       def other_groups
         []
+      end
+
+      def taxonomy_options
+        root_taxonomies.map do |taxonomy|
+          [taxonomy_option_label(taxonomy), taxonomy_value_for(taxonomy.id)]
+        end
       end
 
       def standard_metadata
@@ -127,6 +142,31 @@ module Decidim
 
       def custom_value_for(visibility, field_name)
         "#{CUSTOM_VALUE_PREFIX}:#{visibility}:#{field_name}"
+      end
+
+      def taxonomy_value_for(taxonomy_id)
+        "taxonomy_root:#{taxonomy_id}"
+      end
+
+      def taxonomy_option_label(taxonomy)
+        I18n.t(
+          "decidim.airtable.admin.import_configurations.show.proposal_fields.taxonomy",
+          name: taxonomy_label_for(taxonomy)
+        )
+      end
+
+      def taxonomy_label_for(taxonomy)
+        taxonomy.translated_name
+      rescue StandardError
+        taxonomy.name[I18n.locale.to_s].presence || taxonomy.name.values.first || taxonomy.id.to_s
+      end
+
+      def root_taxonomies
+        return Decidim::Taxonomy.none unless defined?(Decidim::Taxonomy)
+
+        Decidim::Taxonomy.for(organization).roots
+      rescue StandardError
+        Decidim::Taxonomy.none
       end
     end
   end

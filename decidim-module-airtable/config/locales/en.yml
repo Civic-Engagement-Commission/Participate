@@ -59,9 +59,11 @@ en:
               state: "State"
               custom_public: "Custom field (public): %{label}"
               custom_private: "Custom field (private): %{label}"
+              taxonomy: "Taxonomy: %{name}"
               groups:
                 standard: "Standard fields"
                 awesome_custom: "Awesome custom fields"
+                taxonomies: "Taxonomies (needs exact text match)"
           update:
             success: "Field mapping saved successfully."
             error: "Could not save field mapping. Please review the selected values."
