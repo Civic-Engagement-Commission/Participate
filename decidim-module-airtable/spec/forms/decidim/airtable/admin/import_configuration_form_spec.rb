@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "../../../../rails_helper"
+require "rails_helper"
 
 describe Decidim::Airtable::Admin::ImportConfigurationForm do
   subject(:form) { described_class.from_params(params).with_context(context) }

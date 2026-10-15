@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "rails_helper"
+require "rails_helper"
 
 describe "AirtableModule" do
   it "defines the Airtable module" do

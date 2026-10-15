@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "../../../../rails_helper"
+require "rails_helper"
 
 describe Decidim::Airtable::Admin::UpdateImportMapping do
   let(:organization) { create(:organization) }
