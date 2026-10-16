@@ -21,7 +21,7 @@ module Decidim
 
         return if taxonomies_by_filter.blank?
 
-        self.taxonomies = (taxonomies + taxonomies_by_filter.values.compact.map(&:to_i)).uniq
+        self.taxonomies = (taxonomies + taxonomies_by_filter.values.compact_blank.map(&:to_i)).uniq
       end
     end
   end

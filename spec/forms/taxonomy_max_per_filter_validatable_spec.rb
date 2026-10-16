@@ -49,9 +49,10 @@ module Decidim
       context "when selected taxonomies exceed the max per filter" do
         let(:taxonomies) { [taxonomy_item.id, other_taxonomy_item.id] }
 
-        it "adds a :too_many error on :taxonomies" do
+        it "adds a :too_many error on the filter error key" do
           expect(form).to be_invalid
-          expect(form.errors[:taxonomies]).to include("You can choose a maximum of #{max_taxonomies_per_filter} taxonomies per filter.")
+          expect(form.errors[:"taxonomies_#{taxonomy_filter.id}"]).to eq(["You can choose a maximum of #{max_taxonomies_per_filter} taxonomies per filter."])
+          expect(form.errors[:taxonomies]).to be_empty
         end
       end
 
