@@ -72,6 +72,17 @@
           </div>
 
           <div class="row column">
+            <%= form.label :decidim_component_id %>
+            <%= form.hidden_field :decidim_component_name, data: { behavior: "decidim-component-name-input" } %>
+            <%= form.hidden_field :decidim_participatory_space_name, data: { behavior: "decidim-space-name-input" } %>
+            <%= form.select :decidim_component_id,
+                            options_for_select(available_component_options, @form.decidim_component_id),
+                            { prompt: t(".target_component_prompt") },
+                            data: { behavior: "decidim-component-input" } %>
+            <p class="help-text"><%= t(".target_component_help") %></p>
+          </div>
+
+          <div class="row column">
             <%= form.label :active do %>
               <%= form.check_box :active %>
               <%= t(".active_label") %>
@@ -108,6 +119,9 @@
     const viewRow = formContainer.querySelector('[data-behavior="airtable-view-row"]');
     const viewInput = formContainer.querySelector('[data-behavior="airtable-view-input"]');
     const viewHelp = formContainer.querySelector('[data-behavior="airtable-view-help"]');
+    const componentInput = formContainer.querySelector('[data-behavior="decidim-component-input"]');
+    const componentNameInput = formContainer.querySelector('[data-behavior="decidim-component-name-input"]');
+    const spaceNameInput = formContainer.querySelector('[data-behavior="decidim-space-name-input"]');
 
     const tablePrompt = '<%= j t(".airtable_table_prompt") %>';
     const viewPrompt = '<%= j t(".airtable_view_prompt") %>';
@@ -157,6 +171,24 @@
 
     const syncViewName = () => {
       viewNameInput.value = selectedOptionName(viewInput);
+    };
+
+    const syncComponentTarget = () => {
+      if (!componentInput || !componentInput.selectedOptions || componentInput.selectedOptions.length === 0) {
+        componentNameInput.value = "";
+        spaceNameInput.value = "";
+        return;
+      }
+
+      const option = componentInput.selectedOptions[0];
+      if (!option.value) {
+        componentNameInput.value = "";
+        spaceNameInput.value = "";
+        return;
+      }
+
+      componentNameInput.value = option.dataset.componentName || option.textContent.trim();
+      spaceNameInput.value = option.dataset.spaceName || "";
     };
 
     const fillSelect = (select, options, promptText) => {
@@ -264,9 +296,15 @@
     syncBaseName();
     syncTableName();
     syncViewName();
+    syncComponentTarget();
 
     if (baseInput.value.trim()) {
       loadTables();
+    }
+
+    if (componentInput) {
+      componentInput.addEventListener("change", syncComponentTarget);
+      componentInput.addEventListener("blur", syncComponentTarget);
     }
   });
 </script>

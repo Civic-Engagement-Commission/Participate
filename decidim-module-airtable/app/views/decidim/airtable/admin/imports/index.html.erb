@@ -17,6 +17,8 @@
 			<table class="table-list">
 				<thead>
 					<tr>
+						<th><%= t(".target_space") %></th>
+						<th><%= t(".target_component") %></th>
 						<th><%= t(".base_id") %></th>
 						<th><%= t(".table_id") %></th>
 						<th><%= t(".view_id") %></th>
@@ -27,7 +29,11 @@
 				<tbody>
 					<% @import_configurations.each do |configuration| %>
 						<% resource_name = configuration.settings&.dig("airtable_table_name").presence || configuration.airtable_table_id %>
+						<% target_space = configuration.settings&.dig("decidim_participatory_space_name").presence || "-" %>
+						<% target_component = configuration.settings&.dig("decidim_component_name").presence || "-" %>
 						<tr>
+							<td data-label="<%= t(".target_space") %>"><%= target_space %></td>
+							<td data-label="<%= t(".target_component") %>"><%= target_component %></td>
 							<td data-label="<%= t(".base_id") %>"><%= configuration.settings&.dig("airtable_base_name").presence || configuration.airtable_base_id %></td>
 							<td data-label="<%= t(".table_id") %>"><%= configuration.settings&.dig("airtable_table_name").presence || configuration.airtable_table_id %></td>
 							<td data-label="<%= t(".view_id") %>"><%= configuration.settings&.dig("airtable_view_name").presence || configuration.airtable_view_id.presence || "-" %></td>
@@ -50,7 +56,7 @@
 
 										<li class="dropdown__item">
 											<%= link_to run_import_path(configuration), method: :post, data: { confirm: t(".confirm_run") }, class: "dropdown__button" do %>
-												<%= icon "play-circle-line" %>
+												<%= icon "play-fill" %>
 												<%= t(".run_now") %>
 											<% end %>
 										</li>

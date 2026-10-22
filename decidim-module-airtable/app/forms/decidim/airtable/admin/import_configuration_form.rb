@@ -12,12 +12,16 @@ module Decidim
         attribute :airtable_table_name, String
         attribute :airtable_view_id, String
         attribute :airtable_view_name, String
+        attribute :decidim_component_id, Integer
+        attribute :decidim_component_name, String
+        attribute :decidim_participatory_space_name, String
         attribute :id, Integer
         attribute :active, Boolean, default: true
         attribute :organization, Decidim::Organization
 
-        validates :airtable_base_id, :airtable_table_id, :organization, presence: true
+        validates :airtable_base_id, :airtable_table_id, :decidim_component_id, :organization, presence: true
         validate :table_is_unique_for_organization_and_base
+        validate :component_belongs_to_organization_and_is_proposals
 
         alias organization current_organization
 
@@ -36,6 +40,25 @@ module Decidim
           return unless exists
 
           errors.add(:airtable_table_id, :already_configured_for_organization_and_base)
+        end
+
+        def component_belongs_to_organization_and_is_proposals
+          return if organization.blank? || decidim_component_id.blank?
+
+          component = Decidim::Component.find_by(id: decidim_component_id)
+          if component.blank?
+            errors.add(:decidim_component_id, :invalid)
+            return
+          end
+
+          if component.manifest_name != "proposals"
+            errors.add(:decidim_component_id, :invalid)
+            return
+          end
+
+          return if component.participatory_space.respond_to?(:organization) && component.participatory_space.organization == organization
+
+          errors.add(:decidim_component_id, :invalid)
         end
       end
     end

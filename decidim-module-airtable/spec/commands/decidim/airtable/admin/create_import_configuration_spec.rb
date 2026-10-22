@@ -1,12 +1,14 @@
 # frozen_string_literal: true
 
-require "rails_helper"
+require_relative "../../../../rails_helper"
 
 describe Decidim::Airtable::Admin::CreateImportConfiguration do
   subject(:run_command) { described_class.call(form) }
 
   let(:organization) { create(:organization) }
   let(:user) { create(:user, :confirmed, :admin, organization:) }
+  let(:participatory_process) { create(:participatory_process, organization:) }
+  let(:component) { create(:component, participatory_space: participatory_process, manifest_name: "proposals") }
   let(:params) do
     {
       airtable_base_id: "appBase123",
@@ -15,6 +17,7 @@ describe Decidim::Airtable::Admin::CreateImportConfiguration do
       airtable_table_name: "Ideas",
       airtable_view_id: "viwOpen",
       airtable_view_name: "Open ideas",
+      decidim_component_id: component.id,
       active: true
     }
   end
@@ -42,7 +45,10 @@ describe Decidim::Airtable::Admin::CreateImportConfiguration do
     expect(result.settings).to include(
       "airtable_base_name" => "Community Ideas",
       "airtable_table_name" => "Ideas",
-      "airtable_view_name" => "Open ideas"
+      "airtable_view_name" => "Open ideas",
+      "decidim_component_id" => component.id,
+      "decidim_component_name" => component.name[organization.default_locale.to_s],
+      "decidim_participatory_space_name" => participatory_process.title[organization.default_locale.to_s]
     )
   end
 

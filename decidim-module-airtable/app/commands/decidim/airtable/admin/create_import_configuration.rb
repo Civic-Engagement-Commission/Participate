@@ -31,6 +31,8 @@ module Decidim
 
         attr_reader :form, :import_configuration
 
+        delegate :current_organization, to: :form
+
         def attributes
           {
             decidim_organization_id: form.organization.id,
@@ -46,8 +48,22 @@ module Decidim
           {
             "airtable_base_name" => form.airtable_base_name,
             "airtable_table_name" => form.airtable_table_name,
-            "airtable_view_name" => form.airtable_view_name
+            "airtable_view_name" => form.airtable_view_name,
+            "decidim_component_id" => selected_component&.id,
+            "decidim_component_name" => translated_name(selected_component&.name),
+            "decidim_participatory_space_name" => translated_name(selected_component&.participatory_space&.title)
           }.compact_blank
+        end
+
+        def selected_component
+          @selected_component ||= Decidim::Component.find_by(id: form.decidim_component_id)
+        end
+
+        def translated_name(value)
+          return "" if value.blank?
+          return value.to_s unless value.respond_to?(:[])
+
+          value[current_organization.default_locale.to_s].presence || value.values.first.to_s
         end
       end
     end
