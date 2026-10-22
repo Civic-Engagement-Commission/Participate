@@ -1,0 +1,124 @@
+---
+en:
+  activerecord:
+    errors:
+      models:
+        decidim/airtable/import_configuration:
+          attributes:
+            airtable_table_id:
+              already_configured_for_organization_and_base: "has already been configured for this organization and base"
+  decidim:
+    airtable:
+      admin:
+        menu:
+          airtable: "Airtable"
+        imports:
+          create:
+            success: "Configuration created successfully."
+            error: "Could not create configuration. Please review the form fields."
+          update:
+            success: "Configuration updated successfully."
+            error: "Could not update configuration. Please review the form fields."
+          destroy:
+            success: "Configuration removed successfully."
+          run:
+            success: "Import job enqueued successfully."
+            error: "Could not enqueue import job. Please verify the configuration is active."
+          index:
+            title: "Airtable Imports"
+            placeholder_help: "Placeholder admin page for Airtable import configurations."
+            new_configuration: "Add configuration"
+            configure: "Configure"
+            run_now: "Run now"
+            confirm_run: "Queue this import now?"
+            configurations_title: "Existing configurations"
+            target_space: "Target participatory space"
+            target_component: "Target component"
+            base_id: "Base ID"
+            table_id: "Table ID"
+            view_id: "View ID"
+            status: "Status"
+            status_active: "Active"
+            status_inactive: "Inactive"
+            empty: "No import configurations yet."
+          edit:
+            title: "Edit Airtable Configuration"
+            submit: "Update configuration"
+          new:
+            airtable_base_prompt: "Select a base"
+            airtable_table_prompt: "Select a table"
+            airtable_view_prompt: "Select a view"
+            component_option: "%{space} / %{component}"
+            component_prompt: "Select a proposals component"
+            target_component_prompt: "Select a proposals component"
+            target_component_help: "Imported proposals will be created in this component."
+            active_label: "Active configuration"
+            no_tables_found: "No tables were found for this base."
+            no_views_found: "No views were found for this table."
+            placeholder_help: "This is a placeholder form to edit an Airtable table import configuration."
+        import_configurations:
+          show:
+            title: "Import Configuration"
+            placeholder: "Placeholder page. This is where import behavior settings for this table will be configured."
+            base: "Base"
+            table: "Table"
+            view: "View"
+            airtable_field: "Airtable field"
+            proposal_field: "Proposal field"
+            no_fields: "No fields available for this table/view."
+            submit: "Save mapping"
+            fields_loading_error: "Could not load Airtable fields for this configuration."
+            back: "Back to imports"
+            proposal_fields:
+              none: "Do not map"
+              title: "Title"
+              body: "Body"
+              address: "Address"
+              latitude: "Latitude"
+              longitude: "Longitude"
+              reference: "Reference"
+              cost: "Cost"
+              state: "State"
+              published_at: "Published at"
+              authors_by_nickname: "Author by nickname"
+              authors_by_email: "Author by email"
+              writeback_proposal_id: "Write Decidim proposal ID"
+              writeback_proposal_url: "Write Decidim proposal URL"
+              custom_public: "Custom field (public): %{label}"
+              custom_private: "Custom field (private): %{label}"
+              taxonomy: "Taxonomy: %{name}"
+              attachments: "Attachments (embedded files/images)"
+              groups:
+                standard: "Standard fields"
+                authors: "Author"
+                awesome_custom: "Awesome custom fields"
+                taxonomies: "Taxonomies (needs exact text match)"
+                writeback: "Airtable writeback (Needs Airtable write permissions)"
+                attachments: "Attachments"
+          update:
+            success: "Field mapping saved successfully."
+            error: "Could not save field mapping. Please review the selected values."
+            validation:
+              writeback_target_mapped_more_than_once: "%{target} can only be mapped once."
+              attachments_requires_file_field: "Airtable field '%{field}' must be an attachment field to map it as attachments."
+              published_at_requires_date_field: "Airtable field '%{field}' must be a date/datetime field to map it to Published at."
+          new:
+            title: "New Airtable Configuration"
+            placeholder_help: "This is a placeholder form to register an Airtable table import configuration."
+            validation_errors: "Please fix the following errors:"
+            airtable_base_prompt: "Select a base"
+            airtable_table_prompt: "Select a table"
+            airtable_view_prompt: "Select a view"
+            target_component_prompt: "Select a proposals component"
+            target_component_help: "Imported proposals will be created in this component."
+            component_option: "%{space} / %{component}"
+            airtable_base_fallback: "No bases were loaded from Airtable. You can still type a Base ID manually."
+            bases_loading_error: "Could not load Airtable bases from the API with the current token."
+            no_tables_found: "No tables were found for this base."
+            no_views_found: "No views were found for this table."
+            active_label: "Active configuration"
+            submit: "Create configuration"
+          edit:
+            title: "Edit Airtable Configuration"
+            submit: "Update configuration"
+        not_ready_message: "Airtable module is not ready. Please set the personal token in the configuration."

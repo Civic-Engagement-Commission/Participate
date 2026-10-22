@@ -1,0 +1,310 @@
+<% page_title = @page_title || t(".title") %>
+<% submit_label = @submit_label || t(".submit") %>
+<% form_url = @form_url || imports_path %>
+<% form_method = @form_method || :post %>
+
+<% add_decidim_page_title(page_title) %>
+
+<div class="item_show__header">
+  <h1 class="item_show__header-title">
+    <%= page_title %>
+  </h1>
+</div>
+
+<div class="item__edit item__edit-1col">
+  <div class="item__edit-form">
+    <%= decidim_form_for @form, url: form_url, method: form_method, html: { class: "form form-defaults" } do |form| %>
+      <div class="card form__wrapper"
+           data-behavior="airtable-import-form"
+           data-table-options-url="<%= table_options_imports_path %>"
+           data-view-options-url="<%= view_options_imports_path %>">
+        <div class="card-section">
+          <p><%= t(".placeholder_help") %></p>
+
+          <% if @form.errors.any? %>
+            <div class="callout alert">
+              <p><%= t(".validation_errors") %></p>
+              <ul>
+                <% @form.errors.full_messages.each do |message| %>
+                  <li><%= message %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+
+          <div class="row column">
+            <%= form.label :airtable_base_id %>
+            <%= form.hidden_field :airtable_base_name, data: { behavior: "airtable-base-name-input" } %>
+            <%= form.hidden_field :airtable_table_name, data: { behavior: "airtable-table-name-input" } %>
+            <%= form.hidden_field :airtable_view_name, data: { behavior: "airtable-view-name-input" } %>
+
+            <% if @available_bases.any? %>
+              <%= form.select :airtable_base_id,
+                              options_for_select(@available_bases.map { |base| [base[:name], base[:id]] }, @form.airtable_base_id),
+                              { prompt: t(".airtable_base_prompt") },
+                              { data: { behavior: "airtable-base-input" } } %>
+            <% else %>
+              <%= form.text_field :airtable_base_id, data: { behavior: "airtable-base-input" } %>
+              <p class="help-text"><%= t(".airtable_base_fallback") %></p>
+            <% end %>
+
+            <% if @bases_loading_error.present? %>
+              <p class="help-text"><%= @bases_loading_error %></p>
+            <% end %>
+          </div>
+
+          <div class="row column" data-behavior="airtable-table-row">
+            <%= form.label :airtable_table_id %>
+            <%= form.select :airtable_table_id,
+                            options_for_select([], @form.airtable_table_id),
+                            { prompt: t(".airtable_table_prompt") },
+                            data: { behavior: "airtable-table-input", selected_value: @form.airtable_table_id } %>
+            <p class="help-text" data-behavior="airtable-table-help"></p>
+          </div>
+
+          <div class="row column" data-behavior="airtable-view-row">
+            <%= form.label :airtable_view_id %>
+            <%= form.select :airtable_view_id,
+                            options_for_select([], @form.airtable_view_id),
+                            { prompt: t(".airtable_view_prompt") },
+                            data: { behavior: "airtable-view-input", selected_value: @form.airtable_view_id } %>
+            <p class="help-text" data-behavior="airtable-view-help"></p>
+          </div>
+
+          <div class="row column">
+            <%= form.label :decidim_component_id %>
+            <%= form.hidden_field :decidim_component_name, data: { behavior: "decidim-component-name-input" } %>
+            <%= form.hidden_field :decidim_participatory_space_name, data: { behavior: "decidim-space-name-input" } %>
+            <%= form.select :decidim_component_id,
+                            options_for_select(available_component_options, @form.decidim_component_id),
+                            { prompt: t(".target_component_prompt") },
+                            data: { behavior: "decidim-component-input" } %>
+            <p class="help-text"><%= t(".target_component_help") %></p>
+          </div>
+
+          <div class="row column">
+            <%= form.label :active do %>
+              <%= form.check_box :active %>
+              <%= t(".active_label") %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <div class="item__edit-sticky">
+        <div class="item__edit-sticky-container">
+          <%= form.submit submit_label, class: "button button__sm button__secondary" %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const formContainer = document.querySelector('[data-behavior="airtable-import-form"]');
+    if (!formContainer) return;
+
+    const tableUrl = formContainer.dataset.tableOptionsUrl;
+    const viewUrl = formContainer.dataset.viewOptionsUrl;
+
+    const baseInput = formContainer.querySelector('[data-behavior="airtable-base-input"]');
+    const tableRow = formContainer.querySelector('[data-behavior="airtable-table-row"]');
+    const tableInput = formContainer.querySelector('[data-behavior="airtable-table-input"]');
+    const tableHelp = formContainer.querySelector('[data-behavior="airtable-table-help"]');
+    const baseNameInput = formContainer.querySelector('[data-behavior="airtable-base-name-input"]');
+    const tableNameInput = formContainer.querySelector('[data-behavior="airtable-table-name-input"]');
+    const viewNameInput = formContainer.querySelector('[data-behavior="airtable-view-name-input"]');
+
+    const viewRow = formContainer.querySelector('[data-behavior="airtable-view-row"]');
+    const viewInput = formContainer.querySelector('[data-behavior="airtable-view-input"]');
+    const viewHelp = formContainer.querySelector('[data-behavior="airtable-view-help"]');
+    const componentInput = formContainer.querySelector('[data-behavior="decidim-component-input"]');
+    const componentNameInput = formContainer.querySelector('[data-behavior="decidim-component-name-input"]');
+    const spaceNameInput = formContainer.querySelector('[data-behavior="decidim-space-name-input"]');
+
+    const tablePrompt = '<%= j t(".airtable_table_prompt") %>';
+    const viewPrompt = '<%= j t(".airtable_view_prompt") %>';
+
+    const hideDependentRows = () => {
+      tableRow.style.display = "none";
+      viewRow.style.display = "none";
+      tableHelp.textContent = "";
+      viewHelp.textContent = "";
+    };
+
+    const showTableRow = () => {
+      tableRow.style.display = "";
+    };
+
+    const showViewRow = () => {
+      viewRow.style.display = "";
+    };
+
+    const resetSelect = (select, promptText) => {
+      select.innerHTML = "";
+
+      const prompt = document.createElement("option");
+      prompt.value = "";
+      prompt.textContent = promptText;
+      select.appendChild(prompt);
+    };
+
+    const selectedOptionName = (select) => {
+      if (!select || !select.selectedOptions || select.selectedOptions.length === 0) return "";
+
+      const option = select.selectedOptions[0];
+      return option.value ? option.textContent.trim() : "";
+    };
+
+    const syncBaseName = () => {
+      if (baseInput.tagName === "SELECT") {
+        baseNameInput.value = selectedOptionName(baseInput);
+      } else {
+        baseNameInput.value = baseInput.value.trim();
+      }
+    };
+
+    const syncTableName = () => {
+      tableNameInput.value = selectedOptionName(tableInput);
+    };
+
+    const syncViewName = () => {
+      viewNameInput.value = selectedOptionName(viewInput);
+    };
+
+    const syncComponentTarget = () => {
+      if (!componentInput || !componentInput.selectedOptions || componentInput.selectedOptions.length === 0) {
+        componentNameInput.value = "";
+        spaceNameInput.value = "";
+        return;
+      }
+
+      const option = componentInput.selectedOptions[0];
+      if (!option.value) {
+        componentNameInput.value = "";
+        spaceNameInput.value = "";
+        return;
+      }
+
+      componentNameInput.value = option.dataset.componentName || option.textContent.trim();
+      spaceNameInput.value = option.dataset.spaceName || "";
+    };
+
+    const fillSelect = (select, options, promptText) => {
+      resetSelect(select, promptText);
+
+      options.forEach((option) => {
+        const element = document.createElement("option");
+        element.value = option.id;
+        element.textContent = option.name;
+        select.appendChild(element);
+      });
+    };
+
+    const fetchJson = async (url, params) => {
+      const query = new URLSearchParams(params);
+      const response = await fetch(`${url}?${query.toString()}`, {
+        headers: { "Accept": "application/json" }
+      });
+
+      if (!response.ok) return [];
+      return response.json();
+    };
+
+    const loadTables = async () => {
+      const baseId = baseInput.value.trim();
+      syncBaseName();
+
+      resetSelect(tableInput, tablePrompt);
+      resetSelect(viewInput, viewPrompt);
+      viewInput.value = "";
+      tableNameInput.value = "";
+      viewNameInput.value = "";
+      tableHelp.textContent = "";
+      viewHelp.textContent = "";
+
+      if (!baseId) {
+        tableInput.value = "";
+        hideDependentRows();
+        return;
+      }
+
+      showTableRow();
+      const options = await fetchJson(tableUrl, { base_id: baseId });
+      fillSelect(tableInput, options, tablePrompt);
+
+      if (tableInput.dataset.selectedValue) {
+        tableInput.value = tableInput.dataset.selectedValue;
+      }
+      syncTableName();
+
+      if (options.length === 0) {
+        tableHelp.textContent = '<%= j t(".no_tables_found") %>';
+      }
+
+      if (tableInput.value.trim()) {
+        await loadViews();
+      } else {
+        viewRow.style.display = "none";
+      }
+    };
+
+    const loadViews = async () => {
+      const baseId = baseInput.value.trim();
+      const tableId = tableInput.value.trim();
+      syncTableName();
+
+      resetSelect(viewInput, viewPrompt);
+      viewNameInput.value = "";
+      viewHelp.textContent = "";
+
+      if (!baseId || !tableId) {
+        viewInput.value = "";
+        viewRow.style.display = "none";
+        return;
+      }
+
+      showViewRow();
+      const options = await fetchJson(viewUrl, { base_id: baseId, table_id: tableId });
+      fillSelect(viewInput, options, viewPrompt);
+
+      if (viewInput.dataset.selectedValue) {
+        viewInput.value = viewInput.dataset.selectedValue;
+      }
+      syncViewName();
+
+      if (options.length === 0) {
+        viewHelp.textContent = '<%= j t(".no_views_found") %>';
+      }
+    };
+
+    tableInput.dataset.selectedValue = tableInput.dataset.selectedValue || tableInput.value;
+    viewInput.dataset.selectedValue = viewInput.dataset.selectedValue || viewInput.value;
+
+    hideDependentRows();
+    baseInput.addEventListener("change", loadTables);
+    baseInput.addEventListener("blur", loadTables);
+    tableInput.addEventListener("change", () => {
+      syncTableName();
+      loadViews();
+    });
+    tableInput.addEventListener("blur", loadViews);
+    viewInput.addEventListener("change", syncViewName);
+    viewInput.addEventListener("blur", syncViewName);
+
+    syncBaseName();
+    syncTableName();
+    syncViewName();
+    syncComponentTarget();
+
+    if (baseInput.value.trim()) {
+      loadTables();
+    }
+
+    if (componentInput) {
+      componentInput.addEventListener("change", syncComponentTarget);
+      componentInput.addEventListener("blur", syncComponentTarget);
+    }
+  });
+</script>
