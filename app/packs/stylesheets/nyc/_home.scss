@@ -99,46 +99,6 @@ h2.heading-large {
   color: var(--cec-dark-grey);
 }
 
-/* Custom nav */
-
-#custom-nav {
-  background-color: var(--cec-green);
-  display: flex;
-
-  // `justify-self` on a block is Chrome-only, center via the flex parent.
-  .with-margins {
-    display: flex;
-    justify-content: center;
-  }
-
-  ul {
-    display: flex;
-    line-height: 32px;
-    flex-wrap: wrap;
-  }
-
-  a {
-    color: var(--cec-dark-grey);
-    padding: 0 20px;
-    position: relative;
-  }
-
-  a::after {
-    content: "|";
-    position: absolute;
-    right: 0;
-  }
-
-  #nav-end::after {
-    content: " ";
-  }
-
-  .with-margins {
-    padding-top: 20px;
-    padding-bottom: 20px;
-  }
-}
-
 /* Hero */
 
 .custom-hero {
@@ -944,13 +904,6 @@ h2.heading-large {
 
 .tpm-cards__card {
   height: 21rem;
-}
-
-#custom-nav {
-  .with-margins {
-    padding-top: 20px;
-    padding-bottom: 0;
-  }
 }
 
 #be-part-tpm {
