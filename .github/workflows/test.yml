@@ -87,9 +87,10 @@ jobs:
       - name: Remove Chrome
         run: sudo apt remove google-chrome-stable
 
-      - uses: browser-actions/setup-chrome@v1
+      - uses: browser-actions/setup-chrome@v2
         with:
-          chrome-version: ${{ env.CHROME_VERSION }}
+          chrome-version: 155
+          install-chromedriver: true
 
       - uses: actions/setup-node@v4
         with:
