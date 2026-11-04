@@ -11,6 +11,7 @@
   <% if max > 1 %>
     <%= filter_taxonomy_items_multiselect_field(form, :taxonomies, filter, max) %>
   <% else %>
-    <%= filter_taxonomy_items_select_field form, :taxonomies, filter %>
+    <%= filter_taxonomy_items_select_field form, :taxonomies, filter, required: Decidim::Nyc::TaxonomyFilterSettings.required? %>
   <% end %>
+  <%= form.error_for(Decidim::Nyc::TaxonomyFilterSettings.error_key(filter)) %>
 <% end %>

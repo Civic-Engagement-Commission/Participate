@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_10_15_143000) do
+ActiveRecord::Schema[7.2].define(version: 2026_11_04_122024) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "ltree"
   enable_extension "pg_trgm"
@@ -464,6 +464,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_10_15_143000) do
     t.boolean "active", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.jsonb "settings", default: {}, null: false
     t.index ["active", "position"], name: "index_decidim_awesome_fuq_on_active_position"
     t.index ["decidim_component_id"], name: "index_decidim_awesome_fuq_on_component_id"
     t.index ["decidim_organization_id"], name: "index_decidim_awesome_fuq_on_organization_id"

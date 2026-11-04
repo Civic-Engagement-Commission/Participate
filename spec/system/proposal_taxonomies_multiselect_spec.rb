@@ -187,5 +187,109 @@ describe "Proposal taxonomies multiselect" do
       expect(page).to have_content(decidim_sanitize_translated(taxonomy_item.name))
       expect(page).to have_content(decidim_sanitize_translated(second_taxonomy_item.name))
     end
+
+    it "marks each radio filter as required" do
+      expect(page).to have_css("fieldset legend .label-required", count: 2)
+    end
+
+    it "shows each required taxonomy error only on its own filter" do
+      within ".new_proposal" do
+        fill_in :proposal_title, with: "More sidewalks and less roads"
+        fill_in :proposal_body, with: "Cities need more people, not more cars"
+        find("*[type=submit]").click
+      end
+
+      within "fieldset", text: decidim_sanitize_translated(taxonomy_filter.name) do
+        expect(page).to have_css(".form-error", exact_text: "Please choose at least one option for #{translated(taxonomy_filter.name)}.")
+      end
+
+      within "fieldset", text: decidim_sanitize_translated(second_taxonomy_filter.name) do
+        expect(page).to have_css(".form-error", exact_text: "Please choose at least one option for #{translated(second_taxonomy_filter.name)}.")
+      end
+    end
+
+    context "when taxonomies are not required" do
+      before do
+        allow(Decidim::Nyc::TaxonomyFilterSettings).to receive(:required?).and_return(false)
+        visit current_path
+      end
+
+      it "does not mark the filters as required and allows creating the proposal without taxonomies" do
+        expect(page).to have_no_css("fieldset legend .label-required")
+
+        within ".new_proposal" do
+          fill_in :proposal_title, with: "More sidewalks and less roads"
+          fill_in :proposal_body, with: "Cities need more people, not more cars"
+          find("*[type=submit]").click
+        end
+        click_on "Publish"
+
+        expect(page).to have_content("successfully")
+      end
+    end
+  end
+
+  context "when a required filter uses a checkbox element" do
+    let(:component) do
+      create(:proposal_component,
+             :with_creation_enabled,
+             manifest:,
+             participatory_space: participatory_process,
+             settings: { taxonomy_filters: [taxonomy_filter.id],
+                         max_taxonomies_per_filter: { taxonomy_filter.id.to_s => 2 }.to_json,
+                         taxonomies_per_filter_element: { taxonomy_filter.id.to_s => "checkbox" }.to_json })
+    end
+
+    it "marks the checkbox filter as required and shows the server error when left empty" do
+      expect(page).to have_css("fieldset[data-controller='taxonomy-checkbox-limit'] legend .label-required")
+
+      within ".new_proposal" do
+        fill_in :proposal_title, with: "More sidewalks and less roads"
+        fill_in :proposal_body, with: "Cities need more people, not more cars"
+        find("*[type=submit]").click
+      end
+
+      within "fieldset[data-controller='taxonomy-checkbox-limit']" do
+        expect(page).to have_css(".form-error", exact_text: "Please choose at least one option for #{translated(taxonomy_filter.name)}.")
+      end
+    end
+  end
+
+  context "when a required filter uses a single select and is left empty" do
+    let(:max_taxonomies_per_filter) { 1 }
+
+    it "marks the select as required and blocks the submission in the browser" do
+      select_field = find("select#taxonomies-#{taxonomy_filter.id}")
+      expect(select_field[:required]).to eq("true")
+      expect(page).to have_css("label .label-required", text: "*", minimum: 1)
+
+      within ".new_proposal" do
+        fill_in :proposal_title, with: "More sidewalks and less roads"
+        fill_in :proposal_body, with: "Cities need more people, not more cars"
+        find("*[type=submit]").click
+      end
+
+      expect(page).to have_css("select#taxonomies-#{taxonomy_filter.id}.is-invalid-input")
+      expect(page).to have_no_content("Please choose at least one option for")
+      expect(Decidim::Proposals::Proposal.count).to eq(0)
+    end
+  end
+
+  context "when a required filter uses a multiselect and is left empty" do
+    let(:max_taxonomies_per_filter) { 2 }
+
+    it "marks the multiselect as required and blocks the submission in the browser" do
+      expect(find("select#taxonomies-#{taxonomy_filter.id}", visible: :all)[:required]).to eq("true")
+
+      within ".new_proposal" do
+        fill_in :proposal_title, with: "More sidewalks and less roads"
+        fill_in :proposal_body, with: "Cities need more people, not more cars"
+        find("*[type=submit]").click
+      end
+
+      expect(page).to have_css("select#taxonomies-#{taxonomy_filter.id}.is-invalid-input", visible: :all)
+      expect(page).to have_no_content("Please choose at least one option for")
+      expect(Decidim::Proposals::Proposal.count).to eq(0)
+    end
   end
 end
