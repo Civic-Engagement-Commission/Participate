@@ -13,11 +13,11 @@ module Decidim
         current_user = Decidim::User.find_by(id: requested_by_user_id, organization: import_configuration.organization)
         return mark_failed(import_run, "Requesting admin no longer exists") if current_user.blank?
 
-        import_run&.update!(status: :running, started_at: Time.current)
+        return unless start_run(import_run)
 
         outcome = nil
         result = nil
-        Decidim::Airtable::RunImport.call(import_configuration:, current_user:) do
+        Decidim::Airtable::RunImport.call(import_configuration:, current_user:, import_run:) do
           on(:ok) do |payload|
             outcome = :ok
             result = payload
@@ -29,7 +29,7 @@ module Decidim
         end
 
         if outcome == :ok
-          import_run&.complete!(result || {})
+          finish_run(import_run, result || {})
         else
           import_run&.fail!((result || {}).fetch(:error, "Import could not be started").to_s)
         end
@@ -40,8 +40,41 @@ module Decidim
 
       private
 
+      def start_run(import_run)
+        return true unless import_run
+
+        should_run = false
+        import_run.with_lock do
+          if import_run.status_pending?
+            import_run.update!(status: :running, started_at: Time.current)
+            should_run = true
+          elsif import_run.status_running?
+            should_run = true
+          elsif import_run.status_cancelling?
+            import_run.cancel!
+          end
+        end
+        should_run
+      end
+
+      def finish_run(import_run, result)
+        return unless import_run
+
+        import_run.with_lock do
+          if import_run.status_cancelling? || result[:cancelled]
+            import_run.cancel!(result)
+          elsif import_run.status_running?
+            import_run.complete!(result)
+          end
+        end
+      end
+
       def mark_failed(import_run, message)
-        import_run&.fail!(message)
+        return unless import_run
+
+        import_run.with_lock do
+          import_run.fail!(message) if import_run.status_pending? || import_run.status_running? || import_run.status_cancelling?
+        end
       end
     end
   end

@@ -35,10 +35,27 @@ describe Decidim::Airtable::ImportRun do
   it "marks queued and running runs as active" do
     pending_run = import_configuration.import_runs.create!(status: :pending)
     running_run = import_configuration.import_runs.create!(status: :running)
+    cancelling_run = import_configuration.import_runs.create!(status: :cancelling)
     completed_run = import_configuration.import_runs.create!(status: :completed)
 
-    expect(described_class.active).to contain_exactly(pending_run, running_run)
+    expect(described_class.active).to contain_exactly(pending_run, running_run, cancelling_run)
     expect(completed_run).not_to be_status_pending
     expect(completed_run).not_to be_status_running
+  end
+
+  it "immediately cancels a queued run" do
+    run = import_configuration.import_runs.create!(status: :pending)
+
+    expect(run.request_cancel!).to be(true)
+    expect(run.reload).to be_status_cancelled
+    expect(run.completed_at).to be_present
+  end
+
+  it "requests cooperative cancellation for a running run" do
+    run = import_configuration.import_runs.create!(status: :running)
+
+    expect(run.request_cancel!).to be(true)
+    expect(run.reload).to be_status_cancelling
+    expect(run.completed_at).to be_nil
   end
 end

@@ -3,9 +3,10 @@
 module Decidim
   module Airtable
     class RunImport < Decidim::Command
-      def initialize(import_configuration:, current_user:)
+      def initialize(import_configuration:, current_user:, import_run: nil)
         @import_configuration = import_configuration
         @current_user = current_user
+        @import_run = import_run
       end
 
       def call
@@ -29,7 +30,7 @@ module Decidim
 
       private
 
-      attr_reader :import_configuration, :current_user
+      attr_reader :import_configuration, :current_user, :import_run
 
       def target_component
         component_id = import_configuration.settings&.dig("decidim_component_id")
@@ -52,6 +53,11 @@ module Decidim
         results = { created_count: 0, updated_count: 0, failed_count: 0, errors: [] }
 
         records.each do |record|
+          if cancellation_requested?
+            results[:cancelled] = true
+            break
+          end
+
           mapped_record = mapper.map(record)
 
           Decidim::Airtable::ProcessImportRow.call(import_configuration:, current_user:, mapped_record:) do
@@ -71,6 +77,10 @@ module Decidim
         end
 
         results
+      end
+
+      def cancellation_requested?
+        import_run&.reload&.status_cancelling?
       end
 
       def mapped_value(mapped_record, attribute)

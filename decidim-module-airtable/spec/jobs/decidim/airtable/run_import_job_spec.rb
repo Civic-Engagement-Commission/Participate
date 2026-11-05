@@ -12,7 +12,10 @@ describe Decidim::Airtable::RunImportJob do
       organization:,
       airtable_base_id: "appBase123",
       airtable_table_id: "tblIdeas123",
-      settings: { "decidim_component_id" => component.id },
+      settings: {
+        "decidim_component_id" => component.id,
+        "proposal_field_mappings" => { "fldTitle" => "title", "fldBody" => "body" }
+      },
       active: true
     )
   end
@@ -37,6 +40,29 @@ describe Decidim::Airtable::RunImportJob do
 
     expect(import_run.reload).to be_status_failed
     expect(import_run.last_error).to include("Requesting admin")
+  end
+
+  it "cancels after the current row and preserves partial results" do
+    records_api = instance_double(
+      Decidim::Airtable::Api::Records,
+      all: [
+        { id: "rec001", fields: { "fldTitle" => "First proposal", "fldBody" => "First body" } },
+        { id: "rec002", fields: { "fldTitle" => "Second proposal", "fldBody" => "Second body" } }
+      ]
+    )
+    allow(Decidim::Airtable::Api::Records).to receive(:new).and_return(records_api)
+    allow(Decidim::Airtable::ProcessImportRow).to receive(:call).and_wrap_original do |original, **params, &block|
+      result = original.call(**params, &block)
+      import_run.update!(status: :cancelling)
+      result
+    end
+
+    described_class.perform_now(import_configuration.id, current_user.id, import_run.id)
+
+    expect(Decidim::Airtable::ProcessImportRow).to have_received(:call).once
+    expect(import_run.reload).to be_status_cancelled
+    expect(import_run.created_count).to eq(1)
+    expect(import_run.fetched_count).to eq(2)
   end
 
   it "returns silently when configuration is missing" do

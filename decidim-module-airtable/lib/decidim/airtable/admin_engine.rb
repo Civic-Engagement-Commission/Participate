@@ -10,7 +10,11 @@ module Decidim
 
       routes do
         resources :imports, only: [:index, :new, :create, :edit, :update, :destroy] do
-          resources :runs, only: [:show], controller: "import_runs"
+          resources :runs, only: [:show], controller: "import_runs" do
+            member do
+              post :cancel
+            end
+          end
 
           member do
             post :run

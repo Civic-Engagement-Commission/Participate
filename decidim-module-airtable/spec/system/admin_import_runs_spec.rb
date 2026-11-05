@@ -55,4 +55,16 @@ describe "Admin Airtable import runs" do
 
     expect(page).to have_link("Completed with errors", href: "/admin/airtable/imports/#{import_configuration.id}/runs/#{import_run.id}")
   end
+
+  it "lets an admin stop a queued run" do
+    queued_run = import_configuration.import_runs.create!(requested_by: admin, status: :pending)
+
+    visit "/admin/airtable/imports/#{import_configuration.id}/runs/#{queued_run.id}"
+    accept_confirm do
+      click_button "Stop run"
+    end
+
+    expect(page).to have_content("Cancelled")
+    expect(queued_run.reload).to be_status_cancelled
+  end
 end

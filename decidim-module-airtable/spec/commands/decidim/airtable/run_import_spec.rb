@@ -93,6 +93,31 @@ describe Decidim::Airtable::RunImport do
     )
   end
 
+  it "stops before processing the next row after cancellation is requested" do
+    import_run = import_configuration.import_runs.create!(requested_by: current_user, status: :running)
+    allow(records_api).to receive(:all).and_return(
+      [
+        { id: "rec001", fields: { "fldTitle" => "First proposal", "fldBody" => "Body one" } },
+        { id: "rec002", fields: { "fldTitle" => "Second proposal", "fldBody" => "Body two" } }
+      ]
+    )
+    allow(Decidim::Airtable::ProcessImportRow).to receive(:call).and_wrap_original do |original, **params, &block|
+      result = original.call(**params, &block)
+      import_run.update!(status: :cancelling)
+      result
+    end
+
+    payload = nil
+    described_class.call(import_configuration:, current_user:, import_run:) do
+      on(:ok) { |result| payload = result }
+      on(:invalid) { |result| payload = result }
+    end
+
+    expect(Decidim::Airtable::ProcessImportRow).to have_received(:call).once
+    expect(payload).to include(created_count: 1, cancelled: true, fetched_count: 2)
+    expect(import_run.reload).to be_status_cancelling
+  end
+
   context "when configuration is inactive" do
     let(:active) { false }
 

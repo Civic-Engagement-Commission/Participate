@@ -18,12 +18,14 @@ module Decidim
       enum :status, {
         pending: "pending",
         running: "running",
+        cancelling: "cancelling",
+        cancelled: "cancelled",
         completed: "completed",
         completed_with_errors: "completed_with_errors",
         failed: "failed"
       }, prefix: true
 
-      scope :active, -> { where(status: %w(pending running)) }
+      scope :active, -> { where(status: %w(pending running cancelling)) }
       scope :latest_first, -> { order(created_at: :desc) }
 
       validates :status, presence: true
@@ -43,6 +45,34 @@ module Decidim
 
       def fail!(message)
         update!(status: :failed, last_error: message, completed_at: Time.current)
+      end
+
+      def request_cancel!
+        requested = false
+
+        with_lock do
+          if status_pending?
+            update!(status: :cancelled, completed_at: Time.current)
+            requested = true
+          elsif status_running?
+            update!(status: :cancelling)
+            requested = true
+          end
+        end
+
+        requested
+      end
+
+      def cancel!(result = {})
+        update!(
+          status: :cancelled,
+          fetched_count: result.fetch(:fetched_count, fetched_count),
+          created_count: result.fetch(:created_count, created_count),
+          updated_count: result.fetch(:updated_count, updated_count),
+          failed_count: result.fetch(:failed_count, failed_count),
+          error_details: result.fetch(:errors, error_details),
+          completed_at: Time.current
+        )
       end
     end
   end

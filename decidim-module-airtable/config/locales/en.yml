@@ -81,10 +81,17 @@ en:
             status_failed: Failed
             status_pending: Queued
             status_running: Running
+            status_cancelling: Stopping after the current row
+            status_cancelled: Cancelled
             title: Import run
             updated_count: Proposals updated
             proposal_label: "Proposal"
             reference_label: "Reference"
+            cancel_run: Stop run
+            confirm_cancel: Stop this import after the current row finishes?
+            cancel_requested: Stop requested. The current row will finish first.
+            cancel_unavailable: This run is no longer active.
+            cancellation_requested: Stop requested. Waiting for the current row to finish.
         imports:
           create:
             error: Could not create configuration. Please review the form fields.
