@@ -63,7 +63,7 @@
   <% if @import_run.error_details.present? %>
     <div class="card-section">
       <h2><%= t(".errors") %></h2>
-      <ul>
+      <ul style="font-family: monospace;">
         <% @import_run.error_details.each do |error| %>
           <li>
             <strong><%= error["airtable_record_id"] || error[:airtable_record_id] %></strong>:
