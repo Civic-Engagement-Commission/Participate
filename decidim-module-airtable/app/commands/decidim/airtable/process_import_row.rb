@@ -168,15 +168,91 @@ module Decidim
       end
 
       def apply_authors(proposal)
-        author_mappings.each do |mapping|
-          lookup_by = mapping.dig(:metadata, "lookup_by") || mapping.fetch(:mapping).delete_prefix("authors_by_")
-          author_values(mapping.fetch(:value)).each do |value|
-            author = find_author(lookup_by, value)
+        previous_author_ids = previously_imported_author_ids
+        return if previous_author_ids.empty? && author_mappings.empty? && !author_mapping_configured?
+
+        remove_imported_authors(proposal, previous_author_ids)
+        authors = mapped_authors
+
+        if authors.any?
+          remove_organization_author(proposal)
+        elsif proposal.authors.empty?
+          proposal.add_coauthor(import_configuration.organization)
+        end
+
+        @imported_author_ids = authors.each_with_object([]) do |author, imported_ids|
+          next if proposal.authored_by?(author)
+
+          proposal.add_coauthor(author)
+          imported_ids << author.id
+        end.uniq
+      end
+
+      def mapped_authors
+        author_mappings.flat_map do |mapping|
+          author_values(mapping.fetch(:value)).map do |value|
+            author = find_author(author_lookup_by(mapping), value)
             raise RowError, "Could not find a unique proposal author for '#{value}'" unless author
 
-            proposal.add_coauthor(author)
+            author
+          end
+        end.uniq(&:id)
+      end
+
+      def remove_organization_author(proposal)
+        proposal.coauthorships.to_a.each do |coauthorship|
+          next unless coauthorship.author == import_configuration.organization
+
+          if coauthorship.persisted?
+            coauthorship.destroy!
+          else
+            proposal.coauthorships.target.delete(coauthorship)
           end
         end
+
+        proposal.reload if proposal.persisted?
+        proposal.remove_instance_variable(:@authors) if proposal.instance_variable_defined?(:@authors)
+      end
+
+      def author_mapping_configured?
+        mappings = import_configuration.settings&.dig("proposal_field_mappings") || {}
+        mappings.values.any? { |value| value.to_s.start_with?("authors_by_") }
+      end
+
+      def previously_imported_author_ids
+        metadata = tracking_record&.metadata || {}
+        return normalized_author_ids(metadata["airtable_imported_author_ids"]) if metadata.has_key?("airtable_imported_author_ids")
+
+        legacy_imported_author_ids(metadata)
+      end
+
+      def normalized_author_ids(ids)
+        Array(ids).filter_map { |id| id.to_i if id.to_s.match?(/\A\d+\z/) }
+      end
+
+      def legacy_imported_author_ids(metadata)
+        Array(metadata["auxiliary_mappings"]).flat_map do |mapping|
+          mapping = mapping.with_indifferent_access
+          next [] unless mapping[:mapping].to_s.start_with?("authors_by_")
+
+          author_values(mapping[:value]).filter_map do |value|
+            find_author(author_lookup_by(mapping), value)&.id
+          end
+        end.flatten.uniq
+      end
+
+      def author_lookup_by(mapping)
+        mapping.dig(:metadata, "lookup_by") || mapping.fetch(:mapping).delete_prefix("authors_by_")
+      end
+
+      def remove_imported_authors(proposal, author_ids)
+        return if author_ids.empty? || proposal.new_record?
+
+        proposal.coauthorships.where(
+          decidim_author_type: Decidim::User.base_class.name,
+          decidim_author_id: author_ids
+        ).destroy_all
+        proposal.reload
       end
 
       def find_author(lookup_by, value)
@@ -185,7 +261,8 @@ module Decidim
         when "email"
           users.where("LOWER(email) = ?", value.to_s.downcase).first
         when "nickname"
-          users.where("LOWER(nickname) = ?", value.to_s.downcase).first
+          nickname = value.to_s.strip.delete_prefix("@").downcase
+          users.where("LOWER(nickname) = ?", nickname).first
         end
       end
 
@@ -367,7 +444,10 @@ module Decidim
           organization: import_configuration.organization,
           airtable_record_id: mapped_record.fetch(:airtable_record_id),
           row_checksum: mapped_record[:row_checksum],
-          metadata: { "auxiliary_mappings" => auxiliary_mappings },
+          metadata: {
+            "auxiliary_mappings" => auxiliary_mappings,
+            "airtable_imported_author_ids" => imported_author_ids_for_tracking
+          },
           proposal:,
           status:,
           last_error:
@@ -376,6 +456,10 @@ module Decidim
           on(:invalid) { |record| raise ActiveRecord::RecordInvalid, record }
         end
         result
+      end
+
+      def imported_author_ids_for_tracking
+        @imported_author_ids || previously_imported_author_ids
       end
     end
   end

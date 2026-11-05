@@ -154,8 +154,70 @@ describe Decidim::Airtable::ProcessImportRow do
     outcome, result = process_row(row)
 
     expect(outcome).to eq(:ok)
-    expect(result[:proposal].authors).to include(author, organization)
+    expect(result[:proposal].authors).to contain_exactly(author)
     expect(result[:proposal].taxonomies).to contain_exactly(taxonomy)
+  end
+
+  it "replaces imported authors when Airtable is corrected and preserves other authors" do
+    previous_author = create(:user, organization:, nickname: "previous-author")
+    corrected_author = create(:user, organization:, nickname: "corrected-author")
+    manual_author = create(:user, organization:, nickname: "manual-author")
+    initial_row = mapped_record.deep_merge(
+      auxiliary_mappings: [
+        {
+          mapping: "authors_by_nickname",
+          value: "previous-author",
+          metadata: { "kind" => "authors", "lookup_by" => "nickname" }
+        }
+      ]
+    )
+
+    _outcome, initial_result = process_row(initial_row)
+    proposal = initial_result[:proposal]
+    proposal.add_coauthor(manual_author)
+    corrected_row = mapped_record.deep_merge(
+      auxiliary_mappings: [
+        {
+          mapping: "authors_by_nickname",
+          value: "corrected-author",
+          metadata: { "kind" => "authors", "lookup_by" => "nickname" }
+        }
+      ]
+    )
+
+    outcome, result = process_row(corrected_row)
+
+    expect(outcome).to eq(:ok)
+    expect(result[:proposal]).to eq(proposal)
+    expect(proposal.reload.authors).to contain_exactly(corrected_author, manual_author)
+    expect(proposal.authors).not_to include(previous_author, organization)
+    expect(Decidim::Airtable::ImportRecord.find_by!(import_configuration:, airtable_record_id: "rec001").metadata["airtable_imported_author_ids"]).to eq([corrected_author.id])
+  end
+
+  it "keeps the organization as author when the configured author field is blank" do
+    outcome, result = process_row
+
+    expect(outcome).to eq(:ok)
+    expect(result[:proposal].authors).to contain_exactly(organization)
+  end
+
+  it "resolves nicknames both with and without a leading @" do
+    prefixed_author = create(:user, organization:, nickname: "parks-user")
+    plain_author = create(:user, organization:, nickname: "urban-user")
+    row = mapped_record.deep_merge(
+      auxiliary_mappings: [
+        {
+          mapping: "authors_by_nickname",
+          value: ["@parks-user", "urban-user"],
+          metadata: { "kind" => "authors", "lookup_by" => "nickname" }
+        }
+      ]
+    )
+
+    outcome, result = process_row(row)
+
+    expect(outcome).to eq(:ok)
+    expect(result[:proposal].authors).to contain_exactly(prefixed_author, plain_author)
   end
 
   it "applies mapped Awesome custom fields" do
