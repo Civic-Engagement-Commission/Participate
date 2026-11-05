@@ -17,18 +17,22 @@ module Decidim
 
         field_mappings.each do |airtable_field_id, mapped_value|
           value = fields[airtable_field_id]
-          next if value.nil? || value == ""
 
-          if Decidim::Airtable::ProposalFieldOptions::STANDARD_FIELDS.has_key?(mapped_value)
-            proposal_data[proposal_attribute(mapped_value)] = normalize_value(mapped_value, value)
-          else
+          if auxiliary_mapping?(mapped_value, value)
             auxiliary_mappings << {
               airtable_field_id: airtable_field_id,
               mapping: mapped_value,
               metadata: mapping_snapshot[airtable_field_id] || {},
               value: value
             }
+            next
           end
+
+          next if value.nil? || value == ""
+
+          next unless Decidim::Airtable::ProposalFieldOptions::STANDARD_FIELDS.has_key?(mapped_value)
+
+          proposal_data[proposal_attribute(mapped_value)] = normalize_value(mapped_value, value)
         end
 
         {
@@ -50,6 +54,13 @@ module Decidim
 
       def mapping_snapshot
         import_configuration.settings&.dig("proposal_field_mappings_snapshot") || {}
+      end
+
+      def auxiliary_mapping?(mapped_value, value)
+        return true if mapped_value == "attachments" || mapped_value.start_with?("taxonomy_root:", "awesome_custom:", "writeback_")
+        return false if mapped_value.start_with?("authors_by_") && value.blank?
+
+        !Decidim::Airtable::ProposalFieldOptions::STANDARD_FIELDS.has_key?(mapped_value)
       end
 
       def proposal_attribute(mapped_value)

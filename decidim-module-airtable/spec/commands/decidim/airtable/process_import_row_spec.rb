@@ -30,11 +30,11 @@ describe Decidim::Airtable::ProcessImportRow do
     }
   end
 
-  def process_row(record = mapped_record)
+  def process_row(record = mapped_record, **dependencies)
     outcome = nil
     result = nil
 
-    described_class.call(import_configuration:, current_user:, mapped_record: record) do
+    described_class.call(import_configuration:, current_user:, mapped_record: record, **dependencies) do
       on(:ok) do |value|
         outcome = :ok
         result = value
@@ -103,10 +103,92 @@ describe Decidim::Airtable::ProcessImportRow do
     expect(result[:proposal].taxonomies).to contain_exactly(taxonomy)
   end
 
+  it "applies mapped Awesome custom fields" do
+    mapping = {
+      mapping: "awesome_custom:public:project_name",
+      value: "Community garden",
+      metadata: { "kind" => "awesome_custom", "name" => "project_name", "visibility" => "public" }
+    }
+    mapped_custom_record = mapped_record.deep_merge(auxiliary_mappings: [mapping])
+    updater = instance_double(Decidim::Airtable::ProposalCustomFieldsUpdater)
+    allow(Decidim::Airtable::ProposalCustomFieldsUpdater).to receive(:new).and_return(updater)
+    allow(updater).to receive(:apply)
+
+    outcome, result = process_row(mapped_custom_record)
+
+    expect(outcome).to eq(:ok)
+    expect(updater).to have_received(:apply).with(result[:proposal], [mapping])
+  end
+
+  it "creates and replaces Airtable attachments without duplicating them" do
+    attachment_mapping = {
+      airtable_field_id: "fldAttachment",
+      mapping: "attachments",
+      metadata: { "kind" => "attachments" },
+      value: [{ "url" => "https://v5.airtableusercontent.com/file", "filename" => "idea.txt", "type" => "text/plain" }]
+    }
+    row = mapped_record.deep_merge(auxiliary_mappings: [attachment_mapping])
+    proposal = nil
+
+    2.times do
+      tempfile = Tempfile.new(["airtable-attachment", ".txt"])
+      tempfile.write("attachment content")
+      tempfile.rewind
+      downloader = instance_double(Decidim::Airtable::AttachmentDownloader)
+      allow(downloader).to receive(:download).and_return(io: tempfile, content_type: "text/plain")
+
+      outcome, result = process_row(row, attachment_downloader: downloader)
+      expect(outcome).to eq(:ok), result.inspect
+      proposal = result[:proposal]
+    end
+
+    expect(proposal.attachments.count).to eq(1)
+    attachment = proposal.attachments.first
+    expect(attachment.file.filename.to_s).to eq("idea.txt")
+    expect(attachment.file.blob.metadata["airtable_import"]).to include(
+      "configuration_id" => import_configuration.id.to_s,
+      "record_id" => "rec001",
+      "field_id" => "fldAttachment"
+    )
+  end
+
+  it "writes the proposal ID back to its mapped Airtable field" do
+    writeback_mappings = [
+      {
+        airtable_field_id: "fldProposalId",
+        mapping: "writeback_proposal_id",
+        metadata: { "kind" => "writeback", "attribute" => "proposal_id" },
+        value: ""
+      },
+      {
+        airtable_field_id: "fldProposalUrl",
+        mapping: "writeback_proposal_url",
+        metadata: { "kind" => "writeback", "attribute" => "proposal_url" },
+        value: ""
+      }
+    ]
+    row = mapped_record.deep_merge(auxiliary_mappings: writeback_mappings)
+    airtable_client = instance_double(Decidim::Airtable::Api::Client)
+    allow(airtable_client).to receive(:update_record)
+
+    outcome, result = process_row(row, airtable_client:)
+
+    expect(outcome).to eq(:ok)
+    expect(airtable_client).to have_received(:update_record).with(
+      base_id: "appBase123",
+      table_id: "tblIdeas123",
+      record_id: "rec001",
+      fields: {
+        "fldProposalId" => result[:proposal].id.to_s,
+        "fldProposalUrl" => Decidim::ResourceLocatorPresenter.new(result[:proposal]).url
+      }
+    )
+  end
+
   it "records a failed status for unsupported mappings without creating a proposal" do
     unsupported_record = mapped_record.deep_merge(
       auxiliary_mappings: [
-        { mapping: "attachments", value: [{ "url" => "https://example.org/file.pdf" }], metadata: {} }
+        { mapping: "unsupported_target", value: "ignored", metadata: {} }
       ]
     )
 
@@ -118,6 +200,6 @@ describe Decidim::Airtable::ProcessImportRow do
 
     tracking = Decidim::Airtable::ImportRecord.find_by!(import_configuration:, airtable_record_id: "rec001")
     expect(tracking.status).to eq("failed")
-    expect(tracking.last_error).to match(/attachments/)
+    expect(tracking.last_error).to match(/unsupported_target/)
   end
 end

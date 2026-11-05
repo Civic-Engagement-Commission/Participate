@@ -5,10 +5,12 @@ module Decidim
     class ProcessImportRow < Decidim::Command
       class RowError < StandardError; end
 
-      def initialize(import_configuration:, current_user:, mapped_record:)
+      def initialize(import_configuration:, current_user:, mapped_record:, attachment_downloader: Decidim::Airtable::AttachmentDownloader.new, airtable_client: Decidim::Airtable::Api::Client.new)
         @import_configuration = import_configuration
         @current_user = current_user
         @mapped_record = mapped_record
+        @attachment_downloader = attachment_downloader
+        @airtable_client = airtable_client
       end
 
       def call
@@ -25,16 +27,21 @@ module Decidim
           proposal = proposal ? update_proposal(proposal) : create_proposal
           sync_tracking!(proposal)
         end
+        writeback!(proposal)
 
         broadcast(:ok, proposal:, operation:)
-      rescue ActiveRecord::RecordInvalid, RowError => e
+      rescue ActiveRecord::RecordInvalid,
+             RowError,
+             Decidim::Airtable::Api::Error,
+             Decidim::Airtable::AttachmentDownloader::Error,
+             Decidim::Airtable::ProposalCustomFieldsUpdater::Error => e
         sync_failure!(e.message)
         broadcast(:invalid, error: e.message)
       end
 
       private
 
-      attr_reader :import_configuration, :current_user, :mapped_record
+      attr_reader :import_configuration, :current_user, :mapped_record, :attachment_downloader, :airtable_client
 
       def importing_user_valid?
         current_user.present? && current_user.organization == import_configuration.organization
@@ -68,6 +75,7 @@ module Decidim
         proposal = creator.produce
         apply_proposal_data(proposal, creating: true)
         creator.finish!
+        apply_attachments(proposal)
         proposal
       end
 
@@ -77,6 +85,8 @@ module Decidim
           proposal.save!
           proposal
         end
+        apply_attachments(proposal)
+        proposal
       end
 
       def creator_context
@@ -90,6 +100,7 @@ module Decidim
 
       def apply_proposal_data(proposal, creating:)
         proposal.assign_attributes(proposal_attributes(proposal, creating:))
+        apply_custom_fields(proposal)
         apply_taxonomies(proposal, creating:)
         apply_state(proposal)
         apply_authors(proposal)
@@ -183,7 +194,10 @@ module Decidim
       end
 
       def taxonomy_values(value)
-        value.is_a?(Array) ? value.compact_blank : [value]
+        return [] if value.blank?
+        return value.compact_blank if value.is_a?(Array)
+
+        [value]
       end
 
       def auxiliary_mappings
@@ -196,8 +210,101 @@ module Decidim
 
       def unsupported_mappings
         auxiliary_mappings.reject do |mapping|
-          mapping.fetch(:mapping).start_with?("taxonomy_root:", "authors_by_")
+          mapping.fetch(:mapping).start_with?("taxonomy_root:", "authors_by_", "awesome_custom:") ||
+            mapping.fetch(:mapping) == "attachments" ||
+            mapping.fetch(:mapping).start_with?("writeback_")
         end
+      end
+
+      def apply_custom_fields(proposal)
+        mappings = auxiliary_mappings.select { |mapping| mapping.fetch(:mapping).start_with?("awesome_custom:") }
+        return if mappings.empty?
+
+        Decidim::Airtable::ProposalCustomFieldsUpdater.new(
+          organization: import_configuration.organization,
+          component:,
+          current_user:
+        ).apply(proposal, mappings)
+      end
+
+      def apply_attachments(proposal)
+        attachment_mappings.each do |mapping|
+          source_field_id = mapping.fetch(:airtable_field_id)
+          remove_previous_airtable_attachments(proposal, source_field_id)
+
+          Array(mapping.fetch(:value)).each do |file_data|
+            attach_airtable_file(proposal, source_field_id, file_data)
+          end
+        end
+      end
+
+      def attachment_mappings
+        auxiliary_mappings.select { |mapping| mapping.fetch(:mapping) == "attachments" }
+      end
+
+      def remove_previous_airtable_attachments(proposal, source_field_id)
+        proposal.attachments.with_attached_file.each do |attachment|
+          next unless attachment.file.attached?
+
+          metadata = attachment.file.blob.metadata["airtable_import"] || {}
+          next unless metadata["configuration_id"].to_s == import_configuration.id.to_s
+          next unless metadata["record_id"] == mapped_record.fetch(:airtable_record_id)
+          next unless metadata["field_id"] == source_field_id
+
+          attachment.destroy!
+        end
+      end
+
+      def attach_airtable_file(proposal, source_field_id, file_data)
+        url = file_data["url"] || file_data[:url]
+        raise RowError, "Airtable attachment is missing its download URL" if url.blank?
+
+        downloaded = attachment_downloader.download(url)
+        filename = attachment_filename(file_data, url)
+        content_type = downloaded[:content_type].to_s.split(";").first.presence || file_data["type"] || "application/octet-stream"
+        attachment = Decidim::Attachment.new(
+          attached_to: proposal,
+          title: { import_configuration.organization.default_locale => filename },
+          content_type:
+        )
+        attachment.file.attach(io: downloaded.fetch(:io), filename:, content_type:)
+        attachment.save!
+        attachment.file.blob.update!(
+          metadata: attachment.file.blob.metadata.merge(
+            "airtable_import" => {
+              "configuration_id" => import_configuration.id.to_s,
+              "record_id" => mapped_record.fetch(:airtable_record_id),
+              "field_id" => source_field_id
+            }
+          )
+        )
+      ensure
+        downloaded&.dig(:io)&.close!
+      end
+
+      def attachment_filename(file_data, url)
+        value = file_data["filename"] || file_data[:filename]
+        value = File.basename(URI.parse(url).path) if value.blank?
+        File.basename(value.presence || "airtable-attachment")
+      end
+
+      def writeback!(proposal)
+        fields = auxiliary_mappings.each_with_object({}) do |mapping, result|
+          case mapping.fetch(:mapping)
+          when "writeback_proposal_id"
+            result[mapping.fetch(:airtable_field_id)] = proposal.id.to_s
+          when "writeback_proposal_url"
+            result[mapping.fetch(:airtable_field_id)] = Decidim::ResourceLocatorPresenter.new(proposal).url
+          end
+        end
+        return if fields.empty?
+
+        airtable_client.update_record(
+          base_id: import_configuration.airtable_base_id,
+          table_id: import_configuration.airtable_table_id,
+          record_id: mapped_record.fetch(:airtable_record_id),
+          fields:
+        )
       end
 
       def sync_tracking!(proposal)
