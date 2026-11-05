@@ -62,6 +62,14 @@ describe Decidim::Airtable::ProcessImportRow do
     expect(tracking.row_checksum).to eq("checksum-1")
   end
 
+  it "accepts string-keyed mapped rows when locating their tracking record" do
+    outcome, result = process_row(mapped_record.deep_stringify_keys)
+
+    expect(outcome).to eq(:ok)
+    expect(result[:proposal]).to be_persisted
+    expect(Decidim::Airtable::ImportRecord.find_by!(import_configuration:, airtable_record_id: "rec001").proposal).to eq(result[:proposal])
+  end
+
   it "updates the tracked proposal instead of creating a duplicate" do
     _outcome, first_result = process_row
     updated_record = mapped_record.deep_merge(proposal_data: { :"title/en" => "Updated proposal" })

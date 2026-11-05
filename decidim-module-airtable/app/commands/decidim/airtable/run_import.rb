@@ -20,11 +20,9 @@ module Decidim
           table_id: import_configuration.airtable_table_id,
           view_id: import_configuration.airtable_view_id
         )
-        mapped_records = records.map do |record|
-          proposal_data_mapper(component).map(record)
-        end
 
-        broadcast(:ok, process_mapped_records(mapped_records).merge(fetched_count: records.length, mapped_count: mapped_records.length))
+        result = process_records(records, proposal_data_mapper(component))
+        broadcast(:ok, result.merge(fetched_count: records.length, mapped_count: records.length))
       rescue Decidim::Airtable::Api::Error, ArgumentError, TypeError => e
         broadcast(:invalid, error: e.message)
       end
@@ -50,10 +48,12 @@ module Decidim
         )
       end
 
-      def process_mapped_records(mapped_records)
+      def process_records(records, mapper)
         results = { created_count: 0, updated_count: 0, failed_count: 0, errors: [] }
 
-        mapped_records.each do |mapped_record|
+        records.each do |record|
+          mapped_record = mapper.map(record)
+
           Decidim::Airtable::ProcessImportRow.call(import_configuration:, current_user:, mapped_record:) do
             on(:ok) do |result|
               results[:"#{result[:operation]}_count"] += 1

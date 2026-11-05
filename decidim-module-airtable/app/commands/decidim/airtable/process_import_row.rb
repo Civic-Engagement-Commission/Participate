@@ -8,13 +8,14 @@ module Decidim
       def initialize(import_configuration:, current_user:, mapped_record:, attachment_downloader: Decidim::Airtable::AttachmentDownloader.new, airtable_client: Decidim::Airtable::Api::Client.new)
         @import_configuration = import_configuration
         @current_user = current_user
-        @mapped_record = mapped_record
+        @mapped_record = mapped_record.with_indifferent_access
         @attachment_downloader = attachment_downloader
         @airtable_client = airtable_client
       end
 
       def call
         raise RowError, "An importing user is required" unless importing_user_valid?
+        raise RowError, "Airtable row is missing its mapped record ID" if mapped_record[:airtable_record_id].blank?
 
         raise_unsupported_mappings!
 
@@ -32,6 +33,7 @@ module Decidim
         broadcast(:ok, proposal:, operation:)
       rescue ActiveRecord::RecordInvalid,
              RowError,
+             KeyError,
              Decidim::Airtable::Api::Error,
              Decidim::Airtable::AttachmentDownloader::Error,
              Decidim::Airtable::ProposalCustomFieldsUpdater::Error => e
@@ -319,8 +321,10 @@ module Decidim
       end
 
       def sync_failure!(error)
+        return if mapped_record[:airtable_record_id].blank?
+
         sync_tracking(status: "failed", proposal: tracking_record&.proposal, last_error: error)
-      rescue ActiveRecord::RecordInvalid
+      rescue ActiveRecord::RecordInvalid, KeyError
         nil
       end
 
