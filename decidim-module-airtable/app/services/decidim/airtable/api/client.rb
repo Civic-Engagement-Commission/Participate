@@ -5,8 +5,6 @@ require "airrecord"
 module Decidim
   module Airtable
     module Api
-      class Error < StandardError; end
-
       class Client
         BASES_PATH = "/v0/meta/bases"
 

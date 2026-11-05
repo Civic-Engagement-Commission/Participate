@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "digest"
+
 module Decidim
   module Airtable
     class ProposalDataMapper
@@ -32,6 +34,7 @@ module Decidim
         {
           airtable_record_id: record.fetch(:id),
           airtable_created_at: record[:created_at],
+          row_checksum: Digest::SHA256.hexdigest(JSON.generate(fields.sort.to_h)),
           proposal_data: proposal_data,
           auxiliary_mappings: auxiliary_mappings
         }

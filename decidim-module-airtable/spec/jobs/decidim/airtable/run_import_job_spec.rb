@@ -4,6 +4,7 @@ require_relative "../../../rails_helper"
 
 describe Decidim::Airtable::RunImportJob do
   let(:organization) { create(:organization) }
+  let(:current_user) { create(:user, :confirmed, :admin, organization:) }
   let(:import_configuration) do
     Decidim::Airtable::ImportConfiguration.create!(
       organization:,
@@ -15,9 +16,9 @@ describe Decidim::Airtable::RunImportJob do
   end
 
   it "calls the run import command with the configuration" do
-    expect(Decidim::Airtable::RunImport).to receive(:call).with(import_configuration:)
+    expect(Decidim::Airtable::RunImport).to receive(:call).with(import_configuration:, current_user:)
 
-    described_class.perform_now(import_configuration.id)
+    described_class.perform_now(import_configuration.id, current_user.id)
   end
 
   it "returns silently when configuration is missing" do

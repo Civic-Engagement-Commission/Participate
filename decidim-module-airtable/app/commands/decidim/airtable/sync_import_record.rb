@@ -11,6 +11,8 @@ module Decidim
         @external_identifier = params[:external_identifier]
         @row_checksum = params[:row_checksum]
         @metadata = params[:metadata] || {}
+        @status = params[:status] || "synced"
+        @last_error = params[:last_error]
       end
 
       def call
@@ -25,7 +27,7 @@ module Decidim
 
       private
 
-      attr_reader :import_configuration, :organization, :airtable_record_id, :proposal, :external_identifier, :row_checksum, :metadata
+      attr_reader :import_configuration, :organization, :airtable_record_id, :proposal, :external_identifier, :row_checksum, :metadata, :status, :last_error
 
       def find_or_initialize_record
         record = record_by_airtable_id
@@ -66,8 +68,8 @@ module Decidim
           external_identifier: external_identifier.presence,
           row_checksum: row_checksum.presence,
           metadata:,
-          status: "synced",
-          last_error: nil,
+          status:,
+          last_error:,
           last_synced_at: Time.current
         }
       end

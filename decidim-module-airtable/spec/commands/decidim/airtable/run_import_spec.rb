@@ -1,11 +1,13 @@
 # frozen_string_literal: true
 
 require_relative "../../../rails_helper"
+require "decidim/proposals/test/factories"
 
 describe Decidim::Airtable::RunImport do
   let(:organization) { create(:organization) }
+  let(:current_user) { create(:user, :confirmed, :admin, organization:) }
   let(:participatory_process) { create(:participatory_process, organization:) }
-  let(:component) { create(:component, participatory_space: participatory_process, manifest_name: "proposals") }
+  let(:component) { create(:proposal_component, participatory_space: participatory_process) }
   let(:records_api) { instance_double(Decidim::Airtable::Api::Records) }
   let(:import_configuration) do
     Decidim::Airtable::ImportConfiguration.create!(
@@ -15,7 +17,7 @@ describe Decidim::Airtable::RunImport do
       airtable_view_id: "viwOpen",
       settings: {
         "decidim_component_id" => component.id,
-        "proposal_field_mappings" => { "fldTitle" => "title" }
+        "proposal_field_mappings" => { "fldTitle" => "title", "fldBody" => "body" }
       },
       active:
     )
@@ -27,7 +29,7 @@ describe Decidim::Airtable::RunImport do
     allow(records_api).to receive(:all).and_return([
                                                      {
                                                        id: "rec001",
-                                                       fields: { "fldTitle" => "Community garden" },
+                                                       fields: { "fldTitle" => "Community garden", "fldBody" => "A shared garden." },
                                                        created_at: "2026-11-05T12:00:00.000Z"
                                                      }
                                                    ])
@@ -41,13 +43,13 @@ describe Decidim::Airtable::RunImport do
       [
         {
           id: "rec001",
-          fields: { "fldTitle" => "Community garden" },
+          fields: { "fldTitle" => "Community garden", "fldBody" => "A shared garden." },
           created_at: "2026-11-05T12:00:00.000Z"
         }
       ]
     )
 
-    described_class.call(import_configuration:) do
+    described_class.call(import_configuration:, current_user:) do
       on(:ok) do |result|
         state = :ok
         payload = result
@@ -58,11 +60,8 @@ describe Decidim::Airtable::RunImport do
     expect(records_api).to have_received(:all).with(base_id: "appBase123", table_id: "tblIdeas123", view_id: "viwOpen")
     expect(state).to eq(:ok)
     expect(payload[:fetched_count]).to eq(1)
-    expect(payload[:mapped_count]).to eq(1)
-    expect(payload[:mapped_records].first).to include(
-      airtable_record_id: "rec001",
-      proposal_data: include(:component => component, :"title/en" => "Community garden")
-    )
+    expect(payload).to include(fetched_count: 1, mapped_count: 1, created_count: 1, updated_count: 0, failed_count: 0)
+    expect(Decidim::Proposals::Proposal.last.title["en"]).to eq("Community garden")
   end
 
   context "when configuration is inactive" do
@@ -71,7 +70,7 @@ describe Decidim::Airtable::RunImport do
     it "broadcasts invalid" do
       state = nil
 
-      described_class.call(import_configuration:) do
+      described_class.call(import_configuration:, current_user:) do
         on(:ok) { state = :ok }
         on(:invalid) { state = :invalid }
       end
@@ -95,7 +94,7 @@ describe Decidim::Airtable::RunImport do
       expect(records_api).not_to receive(:all)
 
       state = nil
-      described_class.call(import_configuration:) do
+      described_class.call(import_configuration:, current_user:) do
         on(:ok) { state = :ok }
         on(:invalid) { state = :invalid }
       end
