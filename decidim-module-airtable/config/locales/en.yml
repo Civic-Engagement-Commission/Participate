@@ -105,6 +105,8 @@ en:
             status_running: Running
             title: Import run
             updated_count: Proposals updated
+            proposal_label: "Proposal"
+            reference_label: "Reference"
         imports:
           create:
             error: Could not create configuration. Please review the form fields.

@@ -66,7 +66,16 @@
       <ul style="font-family: monospace;">
         <% @import_run.error_details.each do |error| %>
           <li>
-            <strong><%= error["airtable_record_id"] || error[:airtable_record_id] %></strong>:
+            <strong><%= error["airtable_record_id"] || error[:airtable_record_id] %></strong>
+            <% proposal_title = error["proposal_title"] || error[:proposal_title] %>
+            <% proposal_reference = error["proposal_reference"] || error[:proposal_reference] %>
+            <% if proposal_title.present? %>
+              <span><%= t(".proposal_label") %>: <%= proposal_title %></span>
+            <% end %>
+            <% if proposal_reference.present? %>
+              <span><%= t(".reference_label") %>: <%= proposal_reference %></span>
+            <% end %>
+            :
             <%= error["error"] || error[:error] %>
           </li>
         <% end %>

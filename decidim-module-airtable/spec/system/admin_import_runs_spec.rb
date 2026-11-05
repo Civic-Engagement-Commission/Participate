@@ -22,7 +22,14 @@ describe "Admin Airtable import runs" do
       created_count: 1,
       updated_count: 1,
       failed_count: 1,
-      error_details: [{ "airtable_record_id" => "rec-failed", "error" => "Invalid title" }]
+      error_details: [
+        {
+          "airtable_record_id" => "rec-failed",
+          "proposal_title" => "Broken park proposal",
+          "proposal_reference" => "PR-27",
+          "error" => "Invalid title"
+        }
+      ]
     )
   end
 
@@ -38,6 +45,8 @@ describe "Admin Airtable import runs" do
     expect(page).to have_content("Rows fetched")
     expect(page).to have_content("3")
     expect(page).to have_content("rec-failed")
+    expect(page).to have_content("Broken park proposal")
+    expect(page).to have_content("PR-27")
     expect(page).to have_content("Invalid title")
   end
 

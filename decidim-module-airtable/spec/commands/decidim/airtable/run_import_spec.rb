@@ -64,6 +64,35 @@ describe Decidim::Airtable::RunImport do
     expect(Decidim::Proposals::Proposal.last.title["en"]).to eq("Community garden")
   end
 
+  it "includes the mapped proposal title and reference in row error details" do
+    allow(records_api).to receive(:all).and_return(
+      [
+        {
+          id: "rec-invalid",
+          fields: { "fldTitle" => "A row needing attention", "fldBody" => "" },
+          created_at: "2026-11-05T12:00:00.000Z"
+        }
+      ]
+    )
+    import_configuration.update!(settings: import_configuration.settings.merge("proposal_field_mappings" => {
+                                                                                 "fldTitle" => "title",
+                                                                                 "fldBody" => "body",
+                                                                                 "fldReference" => "reference"
+                                                                               }))
+
+    result = nil
+    described_class.call(import_configuration:, current_user:) do
+      on(:ok) { |payload| result = payload }
+      on(:invalid) { |payload| result = payload }
+    end
+
+    expect(result[:failed_count]).to eq(1)
+    expect(result[:errors].first).to include(
+      airtable_record_id: "rec-invalid",
+      proposal_title: "A row needing attention"
+    )
+  end
+
   context "when configuration is inactive" do
     let(:active) { false }
 

@@ -60,12 +60,22 @@ module Decidim
             end
             on(:invalid) do |result|
               results[:failed_count] += 1
-              results[:errors] << { airtable_record_id: mapped_record[:airtable_record_id], error: result[:error] }
+              results[:errors] << {
+                airtable_record_id: mapped_record[:airtable_record_id],
+                proposal_title: mapped_value(mapped_record, :title),
+                proposal_reference: mapped_record.dig(:proposal_data, :reference),
+                error: result[:error]
+              }
             end
           end
         end
 
         results
+      end
+
+      def mapped_value(mapped_record, attribute)
+        locale = import_configuration.organization.default_locale
+        mapped_record.dig(:proposal_data, :"#{attribute}/#{locale}")
       end
     end
   end
