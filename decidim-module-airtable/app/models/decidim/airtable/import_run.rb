@@ -63,6 +63,23 @@ module Decidim
         requested
       end
 
+      def force_reset!
+        reset = false
+
+        with_lock do
+          next unless status_pending? || status_running? || status_cancelling?
+
+          update!(
+            status: :cancelled,
+            last_error: "Run status force-reset by an administrator. The worker is not terminated.",
+            completed_at: Time.current
+          )
+          reset = true
+        end
+
+        reset
+      end
+
       def cancel!(result = {})
         update!(
           status: :cancelled,

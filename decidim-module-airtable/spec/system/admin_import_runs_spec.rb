@@ -82,4 +82,17 @@ describe "Admin Airtable import runs" do
     expect(page).to have_content("Cancelled")
     expect(queued_run.reload).to be_status_cancelled
   end
+
+  it "lets an admin force-reset an active run status" do
+    running_run = import_configuration.import_runs.create!(requested_by: admin, status: :running)
+
+    visit "/admin/airtable/imports/#{import_configuration.id}/runs/#{running_run.id}"
+    accept_confirm do
+      click_button "Force reset status"
+    end
+
+    expect(page).to have_content("Cancelled")
+    expect(running_run.reload).to be_status_cancelled
+    expect(running_run.last_error).to include("worker is not terminated")
+  end
 end

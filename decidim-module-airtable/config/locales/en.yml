@@ -83,6 +83,10 @@ en:
             status_running: Running
             status_cancelling: Stopping after the current row
             status_cancelled: Cancelled
+            force_reset_run: Force reset status
+            confirm_force_reset: This only resets the run status. It does not terminate the worker. Use only if the worker has stopped.
+            force_reset_success: Run status force-reset. Verify the worker has stopped before starting another run.
+            force_reset_unavailable: This run is no longer active.
             title: Import run
             updated_count: Proposals updated
             proposal_label: "Proposal"

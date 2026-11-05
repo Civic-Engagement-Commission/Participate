@@ -61,10 +61,12 @@ module Decidim
         return unless import_run
 
         import_run.with_lock do
-          if import_run.status_cancelling? || result[:cancelled]
-            import_run.cancel!(result)
-          elsif import_run.status_running?
-            import_run.complete!(result)
+          unless import_run.status_cancelled?
+            if import_run.status_cancelling? || result[:cancelled]
+              import_run.cancel!(result)
+            elsif import_run.status_running?
+              import_run.complete!(result)
+            end
           end
         end
       end

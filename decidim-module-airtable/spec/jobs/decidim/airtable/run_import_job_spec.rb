@@ -42,6 +42,16 @@ describe Decidim::Airtable::RunImportJob do
     expect(import_run.last_error).to include("Requesting admin")
   end
 
+  it "does not start or overwrite a force-reset run" do
+    import_run.update!(status: :cancelled, last_error: "Force reset by an administrator")
+    expect(Decidim::Airtable::RunImport).not_to receive(:call)
+
+    described_class.perform_now(import_configuration.id, current_user.id, import_run.id)
+
+    expect(import_run.reload).to be_status_cancelled
+    expect(import_run.last_error).to include("Force reset")
+  end
+
   it "cancels after the current row and preserves partial results" do
     records_api = instance_double(
       Decidim::Airtable::Api::Records,

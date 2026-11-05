@@ -80,7 +80,8 @@ module Decidim
       end
 
       def cancellation_requested?
-        import_run&.reload&.status_cancelling?
+        run = import_run&.reload
+        run.present? && (run.status_cancelling? || run.status_cancelled?)
       end
 
       def mapped_value(mapped_record, attribute)

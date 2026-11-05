@@ -58,4 +58,20 @@ describe Decidim::Airtable::ImportRun do
     expect(run.reload).to be_status_cancelling
     expect(run.completed_at).to be_nil
   end
+
+  it "force-resets an active run to cancelled with an explanatory note" do
+    run = import_configuration.import_runs.create!(status: :cancelling)
+
+    expect(run.force_reset!).to be(true)
+    expect(run.reload).to be_status_cancelled
+    expect(run.last_error).to include("worker is not terminated")
+    expect(run.completed_at).to be_present
+  end
+
+  it "does not reset a terminal run" do
+    run = import_configuration.import_runs.create!(status: :completed)
+
+    expect(run.force_reset!).to be(false)
+    expect(run.reload).to be_status_completed
+  end
 end

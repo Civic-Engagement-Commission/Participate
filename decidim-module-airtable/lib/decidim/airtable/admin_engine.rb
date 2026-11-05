@@ -13,6 +13,7 @@ module Decidim
           resources :runs, only: [:show], controller: "import_runs" do
             member do
               post :cancel
+              post :force_reset
             end
           end
 

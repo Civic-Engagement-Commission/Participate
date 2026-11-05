@@ -24,6 +24,21 @@ module Decidim
           end
         end
 
+        def force_reset
+          load_import_run
+          enforce_permission_to :force_reset, :import_runs, import_configuration:
+
+          Decidim::Airtable::Admin::ForceResetImportRun.call(import_run:, organization: current_organization) do
+            on(:ok) do
+              redirect_to import_run_path(import_configuration, import_run), notice: t(".force_reset_success")
+            end
+
+            on(:invalid) do
+              redirect_to import_run_path(import_configuration, import_run), alert: t(".force_reset_unavailable")
+            end
+          end
+        end
+
         private
 
         attr_reader :import_configuration, :import_run
