@@ -56,6 +56,21 @@ describe "Admin Airtable import runs" do
     expect(page).to have_link("Completed with errors", href: "/admin/airtable/imports/#{import_configuration.id}/runs/#{import_run.id}")
   end
 
+  it "restores the Run confirmation after the page is shown again" do
+    visit "/admin/airtable/imports"
+    selector = "a[data-airtable-run-confirm='Queue this import now?']"
+
+    expect(page).to have_css(selector, visible: :all)
+
+    page.execute_script(<<~JAVASCRIPT)
+      const link = document.querySelector("#{selector}");
+      link.removeAttribute("data-confirm");
+      window.dispatchEvent(new Event("pageshow"));
+    JAVASCRIPT
+
+    expect(page).to have_css("#{selector}[data-confirm='Queue this import now?']", visible: :all)
+  end
+
   it "lets an admin stop a queued run" do
     queued_run = import_configuration.import_runs.create!(requested_by: admin, status: :pending)
 

@@ -64,6 +64,23 @@ describe Decidim::Airtable::RunImport do
     expect(Decidim::Proposals::Proposal.last.title["en"]).to eq("Community garden")
   end
 
+  it "updates the existing proposal title when the same Airtable row changes" do
+    allow(records_api).to receive(:all).and_return(
+      [{ id: "rec001", fields: { "fldTitle" => "Original title", "fldBody" => "A shared garden." } }],
+      [{ id: "rec001", fields: { "fldTitle" => "Corrected title", "fldBody" => "A shared garden." } }]
+    )
+
+    2.times do
+      described_class.call(import_configuration:, current_user:) do
+        on(:invalid) { |result| raise result[:error].to_s }
+      end
+    end
+
+    expect(Decidim::Proposals::Proposal.count).to eq(1)
+    expect(Decidim::Proposals::Proposal.last.title["en"]).to eq("Corrected title")
+    expect(Decidim::Airtable::ImportRecord.where(import_configuration:, airtable_record_id: "rec001").count).to eq(1)
+  end
+
   it "includes the mapped proposal title and reference in row error details" do
     allow(records_api).to receive(:all).and_return(
       [

@@ -64,7 +64,7 @@
 										<hr>
 
 										<li class="dropdown__item">
-											<%= link_to run_import_path(configuration), method: :post, data: { confirm: t(".confirm_run") }, class: "dropdown__button" do %>
+											<%= link_to run_import_path(configuration), method: :post, data: { confirm: t(".confirm_run"), airtable_run_confirm: t(".confirm_run") }, class: "dropdown__button" do %>
 												<%= icon "play-fill" %>
 												<%= t(".run_now") %>
 											<% end %>
@@ -101,3 +101,14 @@
 		</div>
 	<% end %>
 </div>
+
+<script>
+	const restoreAirtableRunConfirm = () => {
+		document.querySelectorAll("[data-airtable-run-confirm]").forEach((element) => {
+			element.setAttribute("data-confirm", element.dataset.airtableRunConfirm);
+		});
+	};
+
+	window.addEventListener("pageshow", restoreAirtableRunConfirm);
+	document.addEventListener("turbo:load", restoreAirtableRunConfirm);
+</script>

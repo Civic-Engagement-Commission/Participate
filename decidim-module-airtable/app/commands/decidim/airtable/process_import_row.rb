@@ -200,6 +200,7 @@ module Decidim
       end
 
       def remove_organization_author(proposal)
+        removed = false
         proposal.coauthorships.to_a.each do |coauthorship|
           next unless coauthorship.author == import_configuration.organization
 
@@ -208,10 +209,10 @@ module Decidim
           else
             proposal.coauthorships.target.delete(coauthorship)
           end
+          removed = true
         end
 
-        proposal.reload if proposal.persisted?
-        proposal.remove_instance_variable(:@authors) if proposal.instance_variable_defined?(:@authors)
+        reset_author_associations(proposal) if removed
       end
 
       def author_mapping_configured?
@@ -248,11 +249,16 @@ module Decidim
       def remove_imported_authors(proposal, author_ids)
         return if author_ids.empty? || proposal.new_record?
 
-        proposal.coauthorships.where(
+        removed = proposal.coauthorships.where(
           decidim_author_type: Decidim::User.base_class.name,
           decidim_author_id: author_ids
         ).destroy_all
-        proposal.reload
+        reset_author_associations(proposal) if removed.any?
+      end
+
+      def reset_author_associations(proposal)
+        proposal.association(:coauthorships).reset
+        proposal.remove_instance_variable(:@authors) if proposal.instance_variable_defined?(:@authors)
       end
 
       def find_author(lookup_by, value)

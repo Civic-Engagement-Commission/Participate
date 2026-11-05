@@ -176,6 +176,7 @@ describe Decidim::Airtable::ProcessImportRow do
     proposal = initial_result[:proposal]
     proposal.add_coauthor(manual_author)
     corrected_row = mapped_record.deep_merge(
+      proposal_data: { :"title/en" => "Corrected proposal title" },
       auxiliary_mappings: [
         {
           mapping: "authors_by_nickname",
@@ -189,6 +190,7 @@ describe Decidim::Airtable::ProcessImportRow do
 
     expect(outcome).to eq(:ok)
     expect(result[:proposal]).to eq(proposal)
+    expect(proposal.reload.title["en"]).to eq("Corrected proposal title")
     expect(proposal.reload.authors).to contain_exactly(corrected_author, manual_author)
     expect(proposal.authors).not_to include(previous_author, organization)
     expect(Decidim::Airtable::ImportRecord.find_by!(import_configuration:, airtable_record_id: "rec001").metadata["airtable_imported_author_ids"]).to eq([corrected_author.id])
