@@ -143,7 +143,7 @@ describe Decidim::Airtable::ProcessImportRow do
       tempfile.write("attachment content")
       tempfile.rewind
       downloader = instance_double(Decidim::Airtable::AttachmentDownloader)
-      allow(downloader).to receive(:download).and_return(io: tempfile, content_type: "text/plain")
+      allow(downloader).to receive(:download).and_return(io: tempfile, content_type: "application/octet-stream")
 
       outcome, result = process_row(row, attachment_downloader: downloader)
       expect(outcome).to eq(:ok), result.inspect
@@ -153,6 +153,8 @@ describe Decidim::Airtable::ProcessImportRow do
     expect(proposal.attachments.count).to eq(1)
     attachment = proposal.attachments.first
     expect(attachment.file.filename.to_s).to eq("idea.txt")
+    expect(attachment.content_type).to eq("text/plain")
+    expect(attachment.file.download).to eq("attachment content")
     expect(attachment.file.blob.metadata["airtable_import"]).to include(
       "configuration_id" => import_configuration.id.to_s,
       "record_id" => "rec001",

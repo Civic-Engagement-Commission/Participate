@@ -263,23 +263,30 @@ module Decidim
 
         downloaded = attachment_downloader.download(url)
         filename = attachment_filename(file_data, url)
-        content_type = downloaded[:content_type].to_s.split(";").first.presence || file_data["type"] || "application/octet-stream"
-        attachment = Decidim::Attachment.new(
-          attached_to: proposal,
-          title: { import_configuration.organization.default_locale => filename },
-          content_type:
-        )
-        attachment.file.attach(io: downloaded.fetch(:io), filename:, content_type:)
-        attachment.save!
-        attachment.file.blob.update!(
-          metadata: attachment.file.blob.metadata.merge(
+        content_type = attachment_content_type(downloaded, file_data)
+        blob = ActiveStorage::Blob.create_and_upload!(
+          io: downloaded.fetch(:io),
+          filename:,
+          content_type:,
+          identify: false,
+          metadata: {
             "airtable_import" => {
               "configuration_id" => import_configuration.id.to_s,
               "record_id" => mapped_record.fetch(:airtable_record_id),
               "field_id" => source_field_id
             }
-          )
+          }
         )
+        attachment = Decidim::Attachment.new(
+          attached_to: proposal,
+          title: { import_configuration.organization.default_locale => filename },
+          content_type:
+        )
+        attachment.file.attach(blob)
+        attachment.save!
+      rescue StandardError
+        blob&.purge
+        raise
       ensure
         downloaded&.dig(:io)&.close!
       end
@@ -288,6 +295,14 @@ module Decidim
         value = file_data["filename"] || file_data[:filename]
         value = File.basename(URI.parse(url).path) if value.blank?
         File.basename(value.presence || "airtable-attachment")
+      end
+
+      def attachment_content_type(downloaded, file_data)
+        response_type = downloaded[:content_type].to_s.split(";").first.presence
+        airtable_type = file_data["type"] || file_data[:type]
+        return airtable_type if response_type.blank? || response_type == "application/octet-stream"
+
+        response_type
       end
 
       def writeback!(proposal)
