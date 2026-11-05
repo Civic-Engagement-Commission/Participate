@@ -47,6 +47,26 @@ module Decidim
           raise Error, e.message
         end
 
+        def list_records(base_id:, table_id:, view_id:, offset: nil)
+          raise Error, "Airtable personal token is missing" if @personal_token.blank?
+
+          path = "/v0/#{airrecord_client.escape(base_id)}/#{airrecord_client.escape(table_id)}/listRecords"
+          params = { "returnFieldsByFieldId" => true }
+          params["view"] = view_id if view_id.present?
+          params["offset"] = offset if offset.present?
+
+          response = airrecord_client.connection.post(path, params.to_json, { "Content-Type" => "application/json" })
+          parsed_response = airrecord_client.parse(response.body)
+
+          if response.success?
+            parsed_response
+          else
+            airrecord_client.handle_error(response.status, parsed_response)
+          end
+        rescue Airrecord::Error => e
+          raise Error, e.message
+        end
+
         private
 
         def airrecord_client
