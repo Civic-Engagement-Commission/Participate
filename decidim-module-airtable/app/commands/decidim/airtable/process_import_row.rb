@@ -66,10 +66,27 @@ module Decidim
 
       def existing_proposal
         proposal = tracking_record&.proposal
+        proposal ||= proposal_from_writeback_id
+        proposal ||= proposal_from_reference
         return unless proposal
-        raise RowError, "Tracked proposal does not belong to the configured component" unless proposal.component == component
+        raise RowError, "Existing proposal does not belong to the configured component" unless proposal.component == component
 
         proposal
+      end
+
+      def proposal_from_writeback_id
+        mapping = auxiliary_mappings.find { |item| item.fetch(:mapping) == "writeback_proposal_id" }
+        proposal_id = mapping&.fetch(:value)
+        return if proposal_id.blank? || !proposal_id.to_s.match?(/\A\d+\z/)
+
+        Decidim::Proposals::Proposal.find_by(id: proposal_id)
+      end
+
+      def proposal_from_reference
+        reference = proposal_data[:reference]
+        return if reference.blank?
+
+        Decidim::Proposals::Proposal.find_by(component:, reference:)
       end
 
       def create_proposal
@@ -309,7 +326,7 @@ module Decidim
         fields = auxiliary_mappings.each_with_object({}) do |mapping, result|
           case mapping.fetch(:mapping)
           when "writeback_proposal_id"
-            result[mapping.fetch(:airtable_field_id)] = proposal.id.to_s
+            result[mapping.fetch(:airtable_field_id)] = proposal.id
           when "writeback_proposal_url"
             result[mapping.fetch(:airtable_field_id)] = Decidim::ResourceLocatorPresenter.new(proposal).url
           end

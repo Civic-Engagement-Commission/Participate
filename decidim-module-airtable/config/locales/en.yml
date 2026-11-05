@@ -12,28 +12,6 @@ en:
     airtable:
       admin:
         import_configurations:
-          edit:
-            submit: Update configuration
-            title: Edit Airtable Configuration
-          new:
-            active_label: Active configuration
-            airtable_base_fallback: No bases were loaded from Airtable. You can still
-              type a Base ID manually.
-            airtable_base_prompt: Select a base
-            airtable_table_prompt: Select a table
-            airtable_view_prompt: Select a view
-            bases_loading_error: Could not load Airtable bases from the API with the
-              current token.
-            component_option: "%{space} / %{component}"
-            no_tables_found: No tables were found for this base.
-            no_views_found: No views were found for this table.
-            placeholder_help: This is a placeholder form to register an Airtable table
-              import configuration.
-            submit: Create configuration
-            target_component_help: Imported proposals will be created in this component.
-            target_component_prompt: Select a proposals component
-            title: New Airtable Configuration
-            validation_errors: 'Please fix the following errors:'
           show:
             airtable_field: Airtable field
             back: Back to imports
@@ -136,19 +114,28 @@ en:
             title: Airtable Imports
             view_id: View ID
             view_run: View run
+          edit:
+            submit: Update configuration
+            title: Edit Airtable Configuration
           new:
             active_label: Active configuration
+            airtable_base_fallback: No bases were loaded from Airtable. You can still
+              type a Base ID manually.
             airtable_base_prompt: Select a base
             airtable_table_prompt: Select a table
             airtable_view_prompt: Select a view
+            bases_loading_error: Could not load Airtable bases from the API with the
+              current token.
             component_option: "%{space} / %{component}"
-            component_prompt: Select a proposals component
             no_tables_found: No tables were found for this base.
             no_views_found: No views were found for this table.
-            placeholder_help: This is a placeholder form to edit an Airtable table
+            placeholder_help: This is a placeholder form to register an Airtable table
               import configuration.
+            submit: Create configuration
             target_component_help: Imported proposals will be created in this component.
             target_component_prompt: Select a proposals component
+            title: New Airtable Configuration
+            validation_errors: 'Please fix the following errors:'
           run:
             error: Could not queue the import. Check that the configuration is active
               and no run is already in progress.

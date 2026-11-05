@@ -85,6 +85,53 @@ describe Decidim::Airtable::ProcessImportRow do
     expect(Decidim::Airtable::ImportRecord.where(import_configuration:, airtable_record_id: "rec001").count).to eq(1)
   end
 
+  it "links an untracked Airtable row to the proposal ID already written back to Airtable" do
+    proposal = create(
+      :proposal,
+      component:,
+      title: { en: "Old title" },
+      body: { en: "Old body" }
+    )
+    row = mapped_record.deep_merge(
+      auxiliary_mappings: [
+        {
+          airtable_field_id: "fldProposalId",
+          mapping: "writeback_proposal_id",
+          metadata: { "kind" => "writeback", "attribute" => "proposal_id" },
+          value: proposal.id.to_s
+        }
+      ]
+    )
+    airtable_client = instance_double(Decidim::Airtable::Api::Client)
+    allow(airtable_client).to receive(:update_record)
+
+    outcome, result = process_row(row, airtable_client:)
+
+    expect(outcome).to eq(:ok)
+    expect(result[:operation]).to eq(:updated)
+    expect(result[:proposal]).to eq(proposal)
+    expect(proposal.reload.title["en"]).to eq("Imported proposal")
+    expect(Decidim::Airtable::ImportRecord.find_by!(import_configuration:, airtable_record_id: "rec001").proposal).to eq(proposal)
+  end
+
+  it "links an untracked Airtable row to an existing proposal by mapped reference" do
+    proposal = create(
+      :proposal,
+      component:,
+      reference: "NYC-EXT-100",
+      title: { en: "Old title" },
+      body: { en: "Old body" }
+    )
+    row = mapped_record.deep_merge(proposal_data: { reference: "NYC-EXT-100" })
+
+    outcome, result = process_row(row)
+
+    expect(outcome).to eq(:ok)
+    expect(result[:operation]).to eq(:updated)
+    expect(result[:proposal]).to eq(proposal)
+    expect(Decidim::Airtable::ImportRecord.find_by!(import_configuration:, airtable_record_id: "rec001").proposal).to eq(proposal)
+  end
+
   it "resolves mapped authors and taxonomy values" do
     author = create(:user, organization:, email: "coauthor@example.org")
     root_taxonomy = create(:taxonomy, organization:, name: { en: "Topic" })
@@ -189,10 +236,45 @@ describe Decidim::Airtable::ProcessImportRow do
       table_id: "tblIdeas123",
       record_id: "rec001",
       fields: {
-        "fldProposalId" => result[:proposal].id.to_s,
+        "fldProposalId" => result[:proposal].id,
         "fldProposalUrl" => Decidim::ResourceLocatorPresenter.new(result[:proposal]).url
       }
     )
+  end
+
+  it "updates the same proposal on retry after Airtable rejects the write-back" do
+    writeback_mapping = {
+      airtable_field_id: "fldProposalId",
+      mapping: "writeback_proposal_id",
+      metadata: { "kind" => "writeback", "attribute" => "proposal_id" },
+      value: ""
+    }
+    row = mapped_record.deep_merge(auxiliary_mappings: [writeback_mapping])
+    airtable_client = instance_double(Decidim::Airtable::Api::Client)
+    allow(airtable_client).to receive(:update_record).and_raise(Decidim::Airtable::Api::Error, "write-back rejected")
+
+    expect do
+      outcome, result = process_row(row, airtable_client:)
+      expect(outcome).to eq(:invalid)
+      expect(result[:error]).to eq("write-back rejected")
+    end.to change(Decidim::Proposals::Proposal, :count).by(1)
+
+    tracking = Decidim::Airtable::ImportRecord.find_by!(import_configuration:, airtable_record_id: "rec001")
+    original_proposal = tracking.proposal
+    expect(tracking).to be_status_failed
+    expect(original_proposal).to be_persisted
+
+    allow(airtable_client).to receive(:update_record)
+
+    expect do
+      outcome, result = process_row(row, airtable_client:)
+      expect(outcome).to eq(:ok)
+      expect(result[:operation]).to eq(:updated)
+      expect(result[:proposal]).to eq(original_proposal)
+    end.not_to change(Decidim::Proposals::Proposal, :count)
+
+    expect(tracking.reload).to be_status_synced
+    expect(tracking.proposal).to eq(original_proposal)
   end
 
   it "records a failed status for unsupported mappings without creating a proposal" do
