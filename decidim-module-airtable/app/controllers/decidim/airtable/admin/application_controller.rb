@@ -10,6 +10,8 @@ module Decidim
                              ::Decidim::Airtable::Admin::Permissions,
                              ::Decidim::Admin::Permissions)
 
+        protected
+
         def permission_class_chain
           ::Decidim.permissions_registry.chain_for(::Decidim::Airtable::Admin::ApplicationController)
         end
