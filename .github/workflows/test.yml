@@ -14,7 +14,6 @@ env:
   DATABASE_PASSWORD: postgres
   DATABASE_HOST: localhost
   RUBYOPT: "-W:no-deprecated"
-  CHROME_VERSION: 154.0.8037.0
 
 jobs:
   zeitwerk:
@@ -78,18 +77,12 @@ jobs:
           fetch-depth: 1
 
       - name: Install additional tools
-        run: sudo apt-get update && sudo apt-get install -y libu2f-udev imagemagick
+        run: sudo apt-get update && sudo apt-get install -y imagemagick
 
-      - uses: nanasess/setup-chromedriver@v2
+      - uses: browser-actions/setup-chrome@v2
         with:
-          chromedriver-version: ${{ env.CHROME_VERSION }}
-
-      - name: Remove Chrome
-        run: sudo apt remove google-chrome-stable
-
-      - uses: browser-actions/setup-chrome@v1
-        with:
-          chrome-version: ${{ env.CHROME_VERSION }}
+          chrome-version: 155
+          install-chromedriver: true
 
       - uses: actions/setup-node@v4
         with:
