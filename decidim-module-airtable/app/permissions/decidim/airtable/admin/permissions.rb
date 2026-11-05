@@ -13,6 +13,8 @@ module Decidim
           case permission_action.subject
           when :imports
             allow! if [:index, :read].include?(permission_action.action)
+          when :import_runs
+            allow! if [:show, :read].include?(permission_action.action)
           when :import
             allow! if [:read, :create, :update, :destroy, :run].include?(permission_action.action)
           end

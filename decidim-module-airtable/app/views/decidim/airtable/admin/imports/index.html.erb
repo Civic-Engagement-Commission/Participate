@@ -23,6 +23,7 @@
 						<th><%= t(".table_id") %></th>
 						<th><%= t(".view_id") %></th>
 						<th><%= t(".status") %></th>
+						<th><%= t(".latest_run") %></th>
 						<th><%= t("decidim.admin.actions.actions") %></th>
 					</tr>
 				</thead>
@@ -31,6 +32,7 @@
 						<% resource_name = configuration.settings&.dig("airtable_table_name").presence || configuration.airtable_table_id %>
 						<% target_space = configuration.settings&.dig("decidim_participatory_space_name").presence || "-" %>
 						<% target_component = configuration.settings&.dig("decidim_component_name").presence || "-" %>
+						<% latest_run = @latest_import_runs[configuration.id] %>
 						<tr>
 							<td data-label="<%= t(".target_space") %>"><%= target_space %></td>
 							<td data-label="<%= t(".target_component") %>"><%= target_component %></td>
@@ -38,6 +40,13 @@
 							<td data-label="<%= t(".table_id") %>"><%= configuration.settings&.dig("airtable_table_name").presence || configuration.airtable_table_id %></td>
 							<td data-label="<%= t(".view_id") %>"><%= configuration.settings&.dig("airtable_view_name").presence || configuration.airtable_view_id.presence || "-" %></td>
 							<td data-label="<%= t(".status") %>"><%= configuration.active? ? t(".status_active") : t(".status_inactive") %></td>
+							<td data-label="<%= t(".latest_run") %>">
+								<% if latest_run %>
+									<%= link_to t("decidim.airtable.admin.import_runs.show.status_#{latest_run.status}"), import_run_path(configuration, latest_run) %>
+								<% else %>
+									<%= t(".no_runs") %>
+								<% end %>
+							</td>
 							<td class="table-list__actions" data-label="<%= t("decidim.admin.actions.actions") %>">
 								<button type="button" data-controller="dropdown" data-target="actions-import-<%= configuration.id %>" aria-label="<%= t("decidim.admin.actions.actions_label", resource: resource_name) %>">
 									<%= icon "more-fill", class: "text-secondary" %>

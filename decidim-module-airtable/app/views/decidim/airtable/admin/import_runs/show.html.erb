@@ -1,0 +1,82 @@
+<% add_decidim_page_title(t(".title")) %>
+
+<div class="item_show__header">
+  <h1 class="item_show__header-title"><%= t(".title") %></h1>
+</div>
+
+<% if @import_run.status_pending? || @import_run.status_running? %>
+  <p><%= t(".auto_refresh") %></p>
+  <script>
+    window.setTimeout(() => window.location.reload(), 5000);
+  </script>
+<% end %>
+
+<div class="card" id="airtable-import-run-<%= @import_run.id %>">
+  <div class="card-section">
+    <dl class="definition-data">
+      <dt><%= t(".configuration") %></dt>
+      <dd><%= @import_configuration.settings&.dig("airtable_table_name").presence || @import_configuration.airtable_table_id %></dd>
+
+      <dt><%= t(".status") %></dt>
+      <dd id="import-run-status"><%= t(".status_#{@import_run.status}") %></dd>
+
+      <dt><%= t(".requested_by") %></dt>
+      <dd><%= @import_run.requested_by&.name || "-" %></dd>
+
+      <dt><%= t(".created_at") %></dt>
+      <dd><%= l(@import_run.created_at, format: :long) %></dd>
+
+      <% if @import_run.started_at.present? %>
+        <dt><%= t(".started_at") %></dt>
+        <dd><%= l(@import_run.started_at, format: :long) %></dd>
+      <% end %>
+
+      <% if @import_run.completed_at.present? %>
+        <dt><%= t(".completed_at") %></dt>
+        <dd><%= l(@import_run.completed_at, format: :long) %></dd>
+      <% end %>
+    </dl>
+  </div>
+
+  <% if @import_run.started_at.present? || @import_run.completed_at.present? || @import_run.status_completed? || @import_run.status_completed_with_errors? || @import_run.status_failed? %>
+    <div class="card-section">
+      <dl class="definition-data">
+        <dt><%= t(".fetched_count") %></dt>
+        <dd><%= @import_run.fetched_count %></dd>
+        <dt><%= t(".created_count") %></dt>
+        <dd><%= @import_run.created_count %></dd>
+        <dt><%= t(".updated_count") %></dt>
+        <dd><%= @import_run.updated_count %></dd>
+        <dt><%= t(".failed_count") %></dt>
+        <dd><%= @import_run.failed_count %></dd>
+      </dl>
+    </div>
+  <% end %>
+
+  <% if @import_run.last_error.present? %>
+    <div class="card-section">
+      <h2><%= t(".error") %></h2>
+      <p class="callout alert"><%= @import_run.last_error %></p>
+    </div>
+  <% end %>
+
+  <% if @import_run.error_details.present? %>
+    <div class="card-section">
+      <h2><%= t(".errors") %></h2>
+      <ul>
+        <% @import_run.error_details.each do |error| %>
+          <li>
+            <strong><%= error["airtable_record_id"] || error[:airtable_record_id] %></strong>:
+            <%= error["error"] || error[:error] %>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+</div>
+
+<div class="item__edit-sticky">
+  <div class="item__edit-sticky-container">
+    <%= link_to t(".back"), imports_path, class: "button button__sm button__secondary" %>
+  </div>
+</div>

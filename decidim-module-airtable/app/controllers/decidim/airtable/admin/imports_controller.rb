@@ -14,7 +14,12 @@ module Decidim
           enforce_permission_to :read, :imports
           @import_configurations = Decidim::Airtable::ImportConfiguration
                                    .where(organization: current_organization)
+                                   .includes(:import_runs)
                                    .order(created_at: :desc)
+          @latest_import_runs = @import_configurations.each_with_object({}) do |configuration, result|
+            latest_run = configuration.import_runs.max_by(&:created_at)
+            result[configuration.id] = latest_run if latest_run
+          end
         end
 
         def new
@@ -81,8 +86,8 @@ module Decidim
           enforce_permission_to :run, :import, import_configuration:
 
           Decidim::Airtable::Admin::EnqueueImport.call(import_configuration, current_user) do
-            on(:ok) do
-              redirect_to imports_path, notice: t(".success")
+            on(:ok) do |import_run|
+              redirect_to import_run_path(import_configuration, import_run), notice: t(".success")
             end
 
             on(:invalid) do
@@ -138,15 +143,9 @@ module Decidim
         end
 
         def load_available_components
-          components = Decidim::Component
-                       .where(manifest_name: "proposals")
-                       .includes(:participatory_space)
-
-          @available_components = components.select do |component|
-            component.participatory_space.respond_to?(:organization) &&
-              component.participatory_space.organization == current_organization
+          @available_components = current_organization.participatory_spaces.flat_map do |space|
+            space.components.where(manifest_name: "proposals").to_a
           end
-
           @available_components.sort_by! { |component| [translated_component_space(component), translated_component_name(component)] }
         end
 

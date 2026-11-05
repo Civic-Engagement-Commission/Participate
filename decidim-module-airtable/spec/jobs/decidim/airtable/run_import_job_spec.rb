@@ -1,24 +1,42 @@
 # frozen_string_literal: true
 
 require_relative "../../../rails_helper"
+require "decidim/proposals/test/factories"
 
 describe Decidim::Airtable::RunImportJob do
   let(:organization) { create(:organization) }
   let(:current_user) { create(:user, :confirmed, :admin, organization:) }
+  let(:component) { create(:proposal_component, participatory_space: create(:participatory_process, organization:)) }
   let(:import_configuration) do
     Decidim::Airtable::ImportConfiguration.create!(
       organization:,
       airtable_base_id: "appBase123",
       airtable_table_id: "tblIdeas123",
-      settings: {},
+      settings: { "decidim_component_id" => component.id },
       active: true
     )
   end
+  let!(:import_run) do
+    import_configuration.import_runs.create!(requested_by: current_user, status: :pending)
+  end
 
-  it "calls the run import command with the configuration" do
-    expect(Decidim::Airtable::RunImport).to receive(:call).with(import_configuration:, current_user:)
+  it "tracks the run lifecycle and saves the command result" do
+    records_api = instance_double(Decidim::Airtable::Api::Records, all: [])
+    allow(Decidim::Airtable::Api::Records).to receive(:new).and_return(records_api)
 
-    described_class.perform_now(import_configuration.id, current_user.id)
+    described_class.perform_now(import_configuration.id, current_user.id, import_run.id)
+
+    expect(import_run.reload).to be_status_completed
+    expect(import_run.started_at).to be_present
+    expect(import_run.completed_at).to be_present
+    expect(import_run.fetched_count).to eq(0)
+  end
+
+  it "marks the run failed when the requester is no longer available" do
+    described_class.perform_now(import_configuration.id, -1, import_run.id)
+
+    expect(import_run.reload).to be_status_failed
+    expect(import_run.last_error).to include("Requesting admin")
   end
 
   it "returns silently when configuration is missing" do

@@ -9,7 +9,9 @@ module Decidim
       paths["lib/tasks"] = nil
 
       routes do
-        resources :imports, only: [:index, :new, :create, :show, :edit, :update, :destroy] do
+        resources :imports, only: [:index, :new, :create, :edit, :update, :destroy] do
+          resources :runs, only: [:show], controller: "import_runs"
+
           member do
             post :run
             get :configure, to: "import_configurations#show"

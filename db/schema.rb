@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_11_04_122024) do
+ActiveRecord::Schema[7.2].define(version: 2026_11_05_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "ltree"
   enable_extension "pg_trgm"
@@ -174,6 +174,26 @@ ActiveRecord::Schema[7.2].define(version: 2026_11_04_122024) do
     t.index ["decidim_airtable_import_configuration_id"], name: "index_airtable_import_records_on_configuration_id"
     t.index ["decidim_organization_id"], name: "index_airtable_import_records_on_organization_id"
     t.index ["decidim_proposal_id"], name: "index_airtable_import_records_on_proposal_id"
+  end
+
+  create_table "decidim_airtable_import_runs", force: :cascade do |t|
+    t.bigint "decidim_airtable_import_configuration_id", null: false
+    t.bigint "decidim_user_id"
+    t.string "status", default: "pending", null: false
+    t.string "job_id"
+    t.integer "fetched_count", default: 0, null: false
+    t.integer "created_count", default: 0, null: false
+    t.integer "updated_count", default: 0, null: false
+    t.integer "failed_count", default: 0, null: false
+    t.jsonb "error_details", default: [], null: false
+    t.text "last_error"
+    t.datetime "started_at"
+    t.datetime "completed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["decidim_airtable_import_configuration_id", "created_at"], name: "index_airtable_import_runs_on_configuration_and_created_at"
+    t.index ["decidim_airtable_import_configuration_id"], name: "index_airtable_import_runs_on_configuration_id"
+    t.index ["decidim_user_id"], name: "index_airtable_import_runs_on_requested_by_id"
   end
 
   create_table "decidim_amendments", force: :cascade do |t|
@@ -767,58 +787,6 @@ ActiveRecord::Schema[7.2].define(version: 2026_11_04_122024) do
     t.index ["decidim_user_group_id"], name: "index_decidim_debates_debates_on_decidim_user_group_id"
     t.index ["deleted_at"], name: "index_decidim_debates_debates_on_deleted_at"
     t.index ["likes_count"], name: "index_decidim_debates_debates_on_likes_count"
-  end
-
-  create_table "decidim_dev_coauthorable_dummy_resources", force: :cascade do |t|
-    t.jsonb "translatable_text"
-    t.string "title"
-    t.string "body"
-    t.text "address"
-    t.float "latitude"
-    t.float "longitude"
-    t.datetime "published_at"
-    t.datetime "deleted_at"
-    t.integer "coauthorships_count", default: 0, null: false
-    t.integer "likes_count", default: 0, null: false
-    t.integer "comments_count", default: 0, null: false
-    t.bigint "decidim_component_id"
-    t.bigint "decidim_category_id"
-    t.bigint "decidim_scope_id"
-    t.string "reference"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
-  create_table "decidim_dev_dummy_resources", force: :cascade do |t|
-    t.jsonb "translatable_text"
-    t.jsonb "title"
-    t.string "body"
-    t.text "address"
-    t.float "latitude"
-    t.float "longitude"
-    t.datetime "published_at"
-    t.datetime "deleted_at"
-    t.integer "coauthorships_count", default: 0, null: false
-    t.integer "likes_count", default: 0, null: false
-    t.integer "comments_count", default: 0, null: false
-    t.integer "follows_count", default: 0, null: false
-    t.bigint "decidim_component_id"
-    t.integer "decidim_author_id"
-    t.string "decidim_author_type"
-    t.integer "decidim_user_group_id"
-    t.bigint "decidim_category_id"
-    t.bigint "decidim_scope_id"
-    t.string "reference"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
-  create_table "decidim_dev_nested_dummy_resources", force: :cascade do |t|
-    t.jsonb "translatable_text"
-    t.string "title"
-    t.bigint "dummy_resource_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
   end
 
   create_table "decidim_editor_images", force: :cascade do |t|
@@ -2175,6 +2143,8 @@ ActiveRecord::Schema[7.2].define(version: 2026_11_04_122024) do
   add_foreign_key "decidim_airtable_import_records", "decidim_airtable_import_configurations"
   add_foreign_key "decidim_airtable_import_records", "decidim_organizations"
   add_foreign_key "decidim_airtable_import_records", "decidim_proposals_proposals", column: "decidim_proposal_id"
+  add_foreign_key "decidim_airtable_import_runs", "decidim_airtable_import_configurations"
+  add_foreign_key "decidim_airtable_import_runs", "decidim_users"
   add_foreign_key "decidim_area_types", "decidim_organizations"
   add_foreign_key "decidim_areas", "decidim_area_types", column: "area_type_id"
   add_foreign_key "decidim_areas", "decidim_organizations"

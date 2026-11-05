@@ -11,10 +11,17 @@ module Decidim
 
         def call
           return broadcast(:invalid) unless import_configuration.active?
+          return broadcast(:invalid) unless current_user&.organization == import_configuration.organization
+          return broadcast(:invalid) if import_configuration.import_runs.active.exists?
 
-          Decidim::Airtable::RunImportJob.perform_later(import_configuration.id, current_user.id)
+          import_run = import_configuration.import_runs.create!(requested_by: current_user, status: :pending)
+          job = Decidim::Airtable::RunImportJob.perform_later(import_configuration.id, current_user.id, import_run.id)
+          import_run.update!(job_id: job.job_id)
 
-          broadcast(:ok)
+          broadcast(:ok, import_run)
+        rescue StandardError => e
+          import_run&.update(status: :failed, last_error: e.message, completed_at: Time.current)
+          broadcast(:invalid)
         end
 
         private
