@@ -61,15 +61,31 @@ describe Decidim::Airtable::ProposalDataMapper do
   end
 
   it "omits unmapped and blank Airtable values" do
-    result = mapper.map(id: "rec001", fields: { "fldTitle" => "", "fldUnknown" => "ignored" })
+    result = mapper.map(
+      id: "rec001",
+      fields: {
+        "fldTitle" => "",
+        "fldCreatedAt" => "2026-10-30 09:00",
+        "fldUnknown" => "ignored"
+      }
+    )
 
-    expect(result[:proposal_data]).to eq(component: component)
+    expect(result[:proposal_data]).to eq(
+      component: component,
+      created_at: Time.zone.parse("2026-10-30 09:00")
+    )
     expect(result[:auxiliary_mappings]).to be_empty
   end
 
   it "raises a field-specific error when created_at text is not parseable" do
     expect do
       mapper.map(id: "rec001", fields: { "fldCreatedAt" => "not a date" })
+    end.to raise_error(Decidim::Airtable::ProposalDataMapper::InvalidDateTimeError, /fldCreatedAt.*created_at/)
+  end
+
+  it "raises a field-specific error when created_at text is blank" do
+    expect do
+      mapper.map(id: "rec001", fields: { "fldCreatedAt" => "" })
     end.to raise_error(Decidim::Airtable::ProposalDataMapper::InvalidDateTimeError, /fldCreatedAt.*created_at/)
   end
 end

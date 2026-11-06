@@ -34,7 +34,11 @@ module Decidim
             next
           end
 
-          next if value.nil? || value == ""
+          if value.nil? || value == ""
+            raise InvalidDateTimeError.new(airtable_field_id:, target_field: mapped_value) if %w(created_at published_at).include?(mapped_value)
+
+            next
+          end
 
           next unless Decidim::Airtable::ProposalFieldOptions::STANDARD_FIELDS.has_key?(mapped_value)
 
@@ -89,9 +93,16 @@ module Decidim
       end
 
       def parse_date_time(value, mapped_value, airtable_field_id)
-        return value.in_time_zone if value.respond_to?(:in_time_zone)
+        return value.in_time_zone unless value.is_a?(String)
 
-        Time.parse(value.to_s).in_time_zone
+        parsed_parts = Date._parse(value.to_s, false)
+        date_parts = [:year, :mon, :mday, :yday, :cwyear, :cweek]
+        raise ArgumentError unless parsed_parts.keys.intersect?(date_parts)
+
+        parsed_time = Time.zone.parse(value.to_s)
+        raise ArgumentError if parsed_time.nil?
+
+        parsed_time
       rescue ArgumentError, TypeError
         raise InvalidDateTimeError.new(airtable_field_id:, target_field: mapped_value)
       end
