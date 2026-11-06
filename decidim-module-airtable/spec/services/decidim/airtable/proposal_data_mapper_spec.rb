@@ -66,4 +66,10 @@ describe Decidim::Airtable::ProposalDataMapper do
     expect(result[:proposal_data]).to eq(component: component)
     expect(result[:auxiliary_mappings]).to be_empty
   end
+
+  it "raises a field-specific error when created_at text is not parseable" do
+    expect do
+      mapper.map(id: "rec001", fields: { "fldCreatedAt" => "not a date" })
+    end.to raise_error(Decidim::Airtable::ProposalDataMapper::InvalidDateTimeError, /fldCreatedAt.*created_at/)
+  end
 end

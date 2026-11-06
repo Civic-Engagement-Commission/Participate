@@ -5,6 +5,12 @@ require "digest"
 module Decidim
   module Airtable
     class ProposalDataMapper
+      class InvalidDateTimeError < StandardError
+        def initialize(airtable_field_id:, target_field:)
+          super("Airtable field #{airtable_field_id} mapped to #{target_field} must contain a valid date/time")
+        end
+      end
+
       def initialize(import_configuration:, component:)
         @import_configuration = import_configuration
         @component = component
@@ -32,7 +38,7 @@ module Decidim
 
           next unless Decidim::Airtable::ProposalFieldOptions::STANDARD_FIELDS.has_key?(mapped_value)
 
-          proposal_data[proposal_attribute(mapped_value)] = normalize_value(mapped_value, value)
+          proposal_data[proposal_attribute(mapped_value)] = normalize_value(mapped_value, value, airtable_field_id)
         end
 
         {
@@ -69,17 +75,25 @@ module Decidim
         mapped_value.to_sym
       end
 
-      def normalize_value(mapped_value, value)
+      def normalize_value(mapped_value, value, airtable_field_id)
         case mapped_value
         when "latitude", "longitude"
           Float(value)
         when "cost"
           BigDecimal(value.to_s)
         when "created_at", "published_at"
-          value.is_a?(Time) ? value : Time.zone.parse(value.to_s)
+          parse_date_time(value, mapped_value, airtable_field_id)
         else
           value
         end
+      end
+
+      def parse_date_time(value, mapped_value, airtable_field_id)
+        return value.in_time_zone if value.respond_to?(:in_time_zone)
+
+        Time.parse(value.to_s).in_time_zone
+      rescue ArgumentError, TypeError
+        raise InvalidDateTimeError.new(airtable_field_id:, target_field: mapped_value)
       end
     end
   end

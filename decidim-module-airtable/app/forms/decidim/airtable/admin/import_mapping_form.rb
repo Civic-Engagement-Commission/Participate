@@ -11,7 +11,7 @@ module Decidim
         ATTACHMENT_AIRTABLE_FIELD_TYPES = %w(multipleAttachments attachment).freeze
         CREATED_AT_MAPPING_VALUE = "created_at"
         PUBLISHED_AT_MAPPING_VALUE = "published_at"
-        PUBLISHED_AT_AIRTABLE_FIELD_TYPES = %w(date dateTime createdTime lastModifiedTime formula).freeze
+        PUBLISHED_AT_AIRTABLE_FIELD_TYPES = %w(date dateTime createdTime lastModifiedTime formula singleLineText multilineText).freeze
 
         attribute :id, Integer
         attribute :field_mappings, Hash, default: {}

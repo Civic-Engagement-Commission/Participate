@@ -52,7 +52,7 @@ Each Airtable field can be mapped to one Decidim target. Available mappings depe
 
 | Mapping | Behavior |
 | --- | --- |
-| Title, body, address, latitude, longitude, reference, cost, state, created at, published at | Updates the corresponding proposal field. Title and body are written in the organization's default locale. State must match a state configured for the selected component. Created at and published at require an Airtable date/time-compatible field. |
+| Title, body, address, latitude, longitude, reference, cost, state, created at, published at | Updates the corresponding proposal field. Title and body are written in the organization's default locale. State must match a state configured for the selected component. Created at and published at accept Airtable date/time fields or text fields containing parseable date/time values; invalid values fail only that row. |
 | Author by nickname or email | Finds Decidim users in the same organization. Nicknames may include a leading `@`. Multiple values can be separated by commas, semicolons, or newlines. When users are mapped, they replace the previously Airtable-managed authors; unrelated manual coauthors are preserved. If the configured author field is blank, the organization remains the author fallback when no other authors remain. |
 | Taxonomy | Maps text to a taxonomy item under the selected root. The item name must match, ignoring case. Blank values clear the Airtable-managed selection under that root. |
 | Decidim Awesome custom field | Maps to a configured public or private proposal custom field. The relevant Decidim Awesome field must still exist when the import runs. |

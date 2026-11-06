@@ -110,6 +110,37 @@ describe Decidim::Airtable::RunImport do
     )
   end
 
+  it "fails only the row with an unparseable created_at text value" do
+    import_configuration.update!(settings: import_configuration.settings.merge(
+      "proposal_field_mappings" => {
+        "fldTitle" => "title",
+        "fldBody" => "body",
+        "fldCreatedAt" => "created_at"
+      }
+    ))
+    allow(records_api).to receive(:all).and_return(
+      [
+        { id: "rec-invalid-date", fields: { "fldTitle" => "Invalid date row", "fldBody" => "Body", "fldCreatedAt" => "not a date" } },
+        { id: "rec-valid-date", fields: { "fldTitle" => "Valid date row", "fldBody" => "Body", "fldCreatedAt" => "2026-10-30 09:00" } }
+      ]
+    )
+
+    result = nil
+    described_class.call(import_configuration:, current_user:) do
+      on(:ok) { |payload| result = payload }
+      on(:invalid) { |payload| result = payload }
+    end
+
+    expect(result).to include(created_count: 1, failed_count: 1, fetched_count: 2)
+    expect(result[:errors].first).to include(
+      airtable_record_id: "rec-invalid-date",
+      proposal_title: "Invalid date row",
+      error: include("fldCreatedAt", "created_at")
+    )
+    expect(Decidim::Proposals::Proposal.count).to eq(1)
+    expect(Decidim::Proposals::Proposal.last.title["en"]).to eq("Valid date row")
+  end
+
   it "stops before processing the next row after cancellation is requested" do
     import_run = import_configuration.import_runs.create!(requested_by: current_user, status: :running)
     allow(records_api).to receive(:all).and_return(

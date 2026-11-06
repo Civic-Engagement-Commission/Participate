@@ -17,7 +17,8 @@ describe Decidim::Airtable::Admin::ImportMappingForm do
       { id: "fldAttachment", name: "Photos", type: "multipleAttachments" },
       { id: "fldText", name: "Summary", type: "singleLineText" },
       { id: "fldDate", name: "Published", type: "dateTime" },
-      { id: "fldCreatedAt", name: "Created", type: "createdTime" }
+      { id: "fldCreatedAt", name: "Created", type: "createdTime" },
+      { id: "fldMultiline", name: "Imported timestamp", type: "multilineText" }
     ]
   end
 
@@ -64,20 +65,20 @@ describe Decidim::Airtable::Admin::ImportMappingForm do
     end
 
     context "when published_at uses non-date field" do
-      let(:field_mappings) { { fldText: "published_at" } }
+      let(:field_mappings) { { fldAttachment: "published_at" } }
 
       it "is invalid" do
         expect(form).to be_invalid
-        expect(form.errors[:field_mappings].join).to include("must be a date/datetime field")
+        expect(form.errors[:field_mappings].join).to include("must be a date/time or text field")
       end
     end
 
     context "when created_at uses non-date field" do
-      let(:field_mappings) { { fldText: "created_at" } }
+      let(:field_mappings) { { fldAttachment: "created_at" } }
 
       it "is invalid" do
         expect(form).to be_invalid
-        expect(form.errors[:field_mappings].join).to include("must be a date/datetime field")
+        expect(form.errors[:field_mappings].join).to include("must be a date/time or text field")
       end
     end
 
@@ -86,7 +87,7 @@ describe Decidim::Airtable::Admin::ImportMappingForm do
         {
           fldAttachment: "attachments",
           fldDate: "published_at",
-          fldCreatedAt: "created_at",
+          fldMultiline: "created_at",
           fldText: "writeback_proposal_id"
         }
       end

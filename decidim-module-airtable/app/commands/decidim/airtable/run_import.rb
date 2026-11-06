@@ -58,7 +58,13 @@ module Decidim
             break
           end
 
-          mapped_record = mapper.map(record)
+          begin
+            mapped_record = mapper.map(record)
+          rescue Decidim::Airtable::ProposalDataMapper::InvalidDateTimeError => e
+            results[:failed_count] += 1
+            results[:errors] << mapping_error_details(record, e.message)
+            next
+          end
 
           Decidim::Airtable::ProcessImportRow.call(import_configuration:, current_user:, mapped_record:) do
             on(:ok) do |result|
@@ -87,6 +93,24 @@ module Decidim
       def mapped_value(mapped_record, attribute)
         locale = import_configuration.organization.default_locale
         mapped_record.dig(:proposal_data, :"#{attribute}/#{locale}")
+      end
+
+      def mapping_error_details(record, message)
+        {
+          airtable_record_id: record[:id],
+          proposal_title: source_field_value(record, "title"),
+          proposal_reference: source_field_value(record, "reference"),
+          error: message
+        }
+      end
+
+      def source_field_value(record, mapping)
+        field_id = (import_configuration.settings&.dig("proposal_field_mappings") || {}).find do |_airtable_field_id, mapped_value|
+          mapped_value == mapping
+        end&.first
+        return if field_id.blank?
+
+        record.fetch(:fields, {})[field_id.to_s]
       end
     end
   end

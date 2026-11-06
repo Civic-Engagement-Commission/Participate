@@ -30,9 +30,9 @@ en:
               authors_by_nickname: Author by nickname
               body: Body
               cost: Cost
+              created_at: Created at
               custom_private: 'Custom field (private): %{label}'
               custom_public: 'Custom field (public): %{label}'
-              created_at: Created at
               groups:
                 attachments: Attachments
                 authors: Author
@@ -61,46 +61,49 @@ en:
               attachments_requires_file_field: Airtable field '%{field}' must be an
                 attachment field to map it as attachments.
               created_at_requires_date_field: Airtable field '%{field}' must be a
-                date/datetime field to map it to Created at.
+                date/time or text field to map it to Created at.
               published_at_requires_date_field: Airtable field '%{field}' must be
-                a date/datetime field to map it to Published at.
+                a date/time or text field to map it to Published at.
               writeback_target_mapped_more_than_once: "%{target} can only be mapped
                 once."
         import_runs:
           show:
             auto_refresh: This page refreshes while the import is queued or running.
             back: Back to imports
+            cancel_requested: Stop requested. The current row will finish first.
+            cancel_run: Stop run
+            cancel_unavailable: This run is no longer active.
+            cancellation_requested: Stop requested. Waiting for the current row to
+              finish.
             completed_at: Finished at
             configuration: Configuration
+            confirm_cancel: Stop this import after the current row finishes?
+            confirm_force_reset: This only resets the run status. It does not terminate
+              the worker. Use only if the worker has stopped.
             created_at: Queued at
             created_count: Proposals created
             error: Run error
             errors: Row errors
             failed_count: Rows failed
             fetched_count: Rows fetched
+            force_reset_run: Force reset status
+            force_reset_success: Run status force-reset. Verify the worker has stopped
+              before starting another run.
+            force_reset_unavailable: This run is no longer active.
+            proposal_label: Proposal
+            reference_label: Reference
             requested_by: Requested by
             started_at: Started at
             status: Run status
+            status_cancelled: Cancelled
+            status_cancelling: Stopping after the current row
             status_completed: Completed
             status_completed_with_errors: Completed with errors
             status_failed: Failed
             status_pending: Queued
             status_running: Running
-            status_cancelling: Stopping after the current row
-            status_cancelled: Cancelled
-            force_reset_run: Force reset status
-            confirm_force_reset: This only resets the run status. It does not terminate the worker. Use only if the worker has stopped.
-            force_reset_success: Run status force-reset. Verify the worker has stopped before starting another run.
-            force_reset_unavailable: This run is no longer active.
             title: Import run
             updated_count: Proposals updated
-            proposal_label: "Proposal"
-            reference_label: "Reference"
-            cancel_run: Stop run
-            confirm_cancel: Stop this import after the current row finishes?
-            cancel_requested: Stop requested. The current row will finish first.
-            cancel_unavailable: This run is no longer active.
-            cancellation_requested: Stop requested. Waiting for the current row to finish.
         imports:
           create:
             error: Could not create configuration. Please review the form fields.
@@ -130,9 +133,6 @@ en:
             title: Airtable Imports
             view_id: View ID
             view_run: View run
-          edit:
-            submit: Update configuration
-            title: Edit Airtable Configuration
           new:
             active_label: Active configuration
             airtable_base_fallback: No bases were loaded from Airtable. You can still
