@@ -28,6 +28,10 @@ The following environment variables control app-specific behavior:
 | ------------ | ----------- | ------------- |
 | PROPOSALS_TAXONOMIES_REQUIRED | Global switch that makes every taxonomy filter configured in a proposals component required (select, multiselect, radio or checkbox) when creating or editing a proposal. Set to `false`, `0` or `no` to disable. | `true` |
 
+## Airtable import
+
+A local module dedicated to import content from an Airtable database is available, check the [README](decidim-module-airtable/README.md).
+
 ## License
 
 This repository is a derivative of [Decidim](https://github.com/decidim/decidim), licensed under the [GNU Affero General Public License v3.0](LICENSE-AGPLv3.txt).

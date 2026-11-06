@@ -1,0 +1,7 @@
+<%= render layout: "layouts/decidim/admin/application" do %>
+  <% unless Decidim::Airtable.ready? %>
+    <%= render("decidim/airtable/admin/not_ready") %>
+  <% end %>
+
+  <%= yield %>
+<% end %>

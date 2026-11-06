@@ -1,8 +1,7 @@
 FROM ruby:3.3.11 AS builder
 
 ENV RAILS_ENV=production \
-    NODE_ENV=production \
-    SECRET_KEY_BASE=dummy
+    NODE_ENV=production
 
 WORKDIR /opt/decidim
 
@@ -25,11 +24,11 @@ RUN apt-get update && \
 
 # Install the Bundler version required by Gemfile.lock
 COPY Gemfile.lock ./
-
-RUN gem install bundler:$(awk '/BUNDLED WITH/{getline;print $1}' Gemfile.lock)
+COPY Gemfile ./
+COPY decidim-module-airtable ./decidim-module-airtable
 
 # Install Ruby dependencies
-COPY Gemfile ./
+RUN gem install bundler:$(awk '/BUNDLED WITH/{getline;print $1}' Gemfile.lock)
 
 RUN bundle config set frozen true && \
     bundle config set deployment true && \
@@ -49,9 +48,8 @@ COPY . .
 # Precompile
 RUN bundle exec bootsnap precompile --gemfile || true
 
-RUN SECRET_KEY_BASE=dummy \
-    bin/rails assets:precompile && \
-    bin/rails decidim_api:generate_docs
+RUN SECRET_KEY_BASE=dummy bin/rails assets:precompile && \
+  SECRET_KEY_BASE=dummy bin/rails decidim_api:generate_docs
 
 RUN bundle clean --force && \
     rm -rf \

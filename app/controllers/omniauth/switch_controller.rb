@@ -2,7 +2,7 @@
 
 module Omniauth
   class SwitchController < DecidimController
-    def redirect
+    def redirect # rubocop:disable Decidim/EnforcePermissionTo
       render :redirect
     end
   end
