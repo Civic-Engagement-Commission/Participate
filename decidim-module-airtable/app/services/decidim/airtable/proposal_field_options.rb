@@ -24,6 +24,7 @@ module Decidim
         "reference" => "decidim.airtable.admin.import_configurations.show.proposal_fields.reference",
         "cost" => "decidim.airtable.admin.import_configurations.show.proposal_fields.cost",
         "state" => "decidim.airtable.admin.import_configurations.show.proposal_fields.state",
+        "created_at" => "decidim.airtable.admin.import_configurations.show.proposal_fields.created_at",
         "published_at" => "decidim.airtable.admin.import_configurations.show.proposal_fields.published_at"
       }.freeze
 

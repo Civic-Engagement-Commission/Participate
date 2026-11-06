@@ -9,6 +9,7 @@ module Decidim
         WRITEBACK_MAPPING_VALUES = %w(writeback_proposal_id writeback_proposal_url).freeze
         ATTACHMENTS_MAPPING_VALUE = "attachments"
         ATTACHMENT_AIRTABLE_FIELD_TYPES = %w(multipleAttachments attachment).freeze
+        CREATED_AT_MAPPING_VALUE = "created_at"
         PUBLISHED_AT_MAPPING_VALUE = "published_at"
         PUBLISHED_AT_AIRTABLE_FIELD_TYPES = %w(date dateTime createdTime lastModifiedTime formula).freeze
 
@@ -18,6 +19,7 @@ module Decidim
 
         validate :validate_unique_writeback_mappings
         validate :validate_attachments_mapping_types
+        validate :validate_created_at_mapping_types
         validate :validate_published_at_mapping_types
 
         def normalized_field_mappings
@@ -71,6 +73,24 @@ module Decidim
               :field_mappings,
               I18n.t(
                 "decidim.airtable.admin.import_configurations.update.validation.published_at_requires_date_field",
+                field: field_label(field)
+              )
+            )
+          end
+        end
+
+        def validate_created_at_mapping_types
+          normalized_field_mappings.each do |field_id, mapped_value|
+            next unless mapped_value == CREATED_AT_MAPPING_VALUE
+
+            field = airtable_field_by_id(field_id)
+            next if field.blank?
+            next if PUBLISHED_AT_AIRTABLE_FIELD_TYPES.include?(field_type(field))
+
+            errors.add(
+              :field_mappings,
+              I18n.t(
+                "decidim.airtable.admin.import_configurations.update.validation.created_at_requires_date_field",
                 field: field_label(field)
               )
             )

@@ -17,6 +17,7 @@ describe Decidim::Airtable::ProposalDataMapper do
           "fldBody" => "body",
           "fldLatitude" => "latitude",
           "fldCost" => "cost",
+          "fldCreatedAt" => "created_at",
           "fldAuthor" => "authors_by_email"
         },
         "proposal_field_mappings_snapshot" => {
@@ -37,6 +38,7 @@ describe Decidim::Airtable::ProposalDataMapper do
         "fldBody" => "Create a garden.",
         "fldLatitude" => "40.7128",
         "fldCost" => "125.50",
+        "fldCreatedAt" => "2026-10-30T09:00:00.000Z",
         "fldAuthor" => "person@example.org"
       }
     )
@@ -47,7 +49,8 @@ describe Decidim::Airtable::ProposalDataMapper do
       :"title/en" => "Community garden",
       :"body/en" => "Create a garden.",
       :latitude => 40.7128,
-      :cost => BigDecimal("125.50")
+      :cost => BigDecimal("125.50"),
+      :created_at => Time.zone.parse("2026-10-30T09:00:00.000Z")
     )
     expect(result[:auxiliary_mappings]).to contain_exactly(
       :airtable_field_id => "fldAuthor",

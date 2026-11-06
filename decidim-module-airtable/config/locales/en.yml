@@ -12,6 +12,8 @@ en:
     airtable:
       admin:
         import_configurations:
+          new:
+            validation_errors: 'Please fix the following errors:'
           show:
             airtable_field: Airtable field
             back: Back to imports
@@ -30,6 +32,7 @@ en:
               cost: Cost
               custom_private: 'Custom field (private): %{label}'
               custom_public: 'Custom field (public): %{label}'
+              created_at: Created at
               groups:
                 attachments: Attachments
                 authors: Author
@@ -57,6 +60,8 @@ en:
             validation:
               attachments_requires_file_field: Airtable field '%{field}' must be an
                 attachment field to map it as attachments.
+              created_at_requires_date_field: Airtable field '%{field}' must be a
+                date/datetime field to map it to Created at.
               published_at_requires_date_field: Airtable field '%{field}' must be
                 a date/datetime field to map it to Published at.
               writeback_target_mapped_more_than_once: "%{target} can only be mapped
@@ -146,7 +151,6 @@ en:
             target_component_help: Imported proposals will be created in this component.
             target_component_prompt: Select a proposals component
             title: New Airtable Configuration
-            validation_errors: 'Please fix the following errors:'
           run:
             error: Could not queue the import. Check that the configuration is active
               and no run is already in progress.

@@ -75,7 +75,7 @@ module Decidim
           Float(value)
         when "cost"
           BigDecimal(value.to_s)
-        when "published_at"
+        when "created_at", "published_at"
           value.is_a?(Time) ? value : Time.zone.parse(value.to_s)
         else
           value

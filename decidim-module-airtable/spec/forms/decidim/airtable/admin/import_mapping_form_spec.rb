@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "rails_helper"
+require_relative "../../../../rails_helper"
 
 describe Decidim::Airtable::Admin::ImportMappingForm do
   subject(:form) { described_class.from_params(params) }
@@ -16,7 +16,8 @@ describe Decidim::Airtable::Admin::ImportMappingForm do
     [
       { id: "fldAttachment", name: "Photos", type: "multipleAttachments" },
       { id: "fldText", name: "Summary", type: "singleLineText" },
-      { id: "fldDate", name: "Published", type: "dateTime" }
+      { id: "fldDate", name: "Published", type: "dateTime" },
+      { id: "fldCreatedAt", name: "Created", type: "createdTime" }
     ]
   end
 
@@ -71,11 +72,21 @@ describe Decidim::Airtable::Admin::ImportMappingForm do
       end
     end
 
+    context "when created_at uses non-date field" do
+      let(:field_mappings) { { fldText: "created_at" } }
+
+      it "is invalid" do
+        expect(form).to be_invalid
+        expect(form.errors[:field_mappings].join).to include("must be a date/datetime field")
+      end
+    end
+
     context "when mappings follow type constraints" do
       let(:field_mappings) do
         {
           fldAttachment: "attachments",
           fldDate: "published_at",
+          fldCreatedAt: "created_at",
           fldText: "writeback_proposal_id"
         }
       end

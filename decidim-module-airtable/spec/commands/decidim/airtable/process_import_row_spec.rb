@@ -62,6 +62,16 @@ describe Decidim::Airtable::ProcessImportRow do
     expect(tracking.row_checksum).to eq("checksum-1")
   end
 
+  it "persists a mapped created_at timestamp" do
+    created_at = Time.zone.parse("2026-10-30T09:00:00.000Z")
+    row = mapped_record.deep_merge(proposal_data: { created_at: })
+
+    outcome, result = process_row(row)
+
+    expect(outcome).to eq(:ok)
+    expect(result[:proposal].created_at).to eq(created_at)
+  end
+
   it "accepts string-keyed mapped rows when locating their tracking record" do
     outcome, result = process_row(mapped_record.deep_stringify_keys)
 
