@@ -15,7 +15,7 @@ module Decidim
           selected_count = (compact_taxonomies & filter.filter_taxonomy_ids).size
           next if selected_count <= max
 
-          errors.add(:taxonomies, :too_many, count: max)
+          errors.add(Decidim::Nyc::TaxonomyFilterSettings.error_key(filter), errors.generate_message(:taxonomies, :too_many, count: max))
         end
       end
     end

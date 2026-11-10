@@ -9,6 +9,14 @@ module Decidim
 
       module_function
 
+      def required?
+        Decidim::Env.new("PROPOSALS_TAXONOMIES_REQUIRED", "true").present?
+      end
+
+      def error_key(filter)
+        :"taxonomies_#{filter.id}"
+      end
+
       # settings: Decidim::SettingsManifest schema instance (component.settings)
       # filter: Decidim::TaxonomyFilter
       def max_for(settings, filter)
