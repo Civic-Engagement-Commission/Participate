@@ -17,10 +17,11 @@ gem "decidim-elections", DECIDIM_VERSION
 gem "decidim-templates", DECIDIM_VERSION
 
 # External Decidim modules
+gem "bootsnap", "~> 1.4"
+gem "decidim-airtable", path: "decidim-module-airtable"
+
 gem "decidim-decidim_awesome", github: "decidim-ice/decidim-module-decidim_awesome", branch: "release/0.31-stable"
 gem "decidim-term_customizer", github: "openpoke/decidim-module-term_customizer", branch: "release/0.31-stable"
-
-gem "bootsnap", "~> 1.4"
 gem "deface"
 gem "puma", ">= 6.3.1"
 
