@@ -190,38 +190,36 @@ h2.heading-large {
 
 /* Menu */
 
-.home__menu-element--link, 
-.awesome-landing-menu-element--link {
+.home__menu {
+  height: 68px;
+  padding-top: 20px;
+  padding-bottom: 0;
+}
+
+.home__menu-element--link {
   color: black;
 }
 
-.home__menu-element:last-child::before,
-.home__menu-element::after {
-  background-color: black;  
-}
-
-.home__menu-element--link:hover {
-  text-decoration-color: black;
-}
-
-/* Awesome global menu styles */
-
-.awesome-landing-menu .awesome-landing-menu-element:not(:first-child)::before {
-  background-color: black;
-  opacity: 1;
-}
-
-.awesome-landing-menu-element--link:hover { 
+.home__menu-element--link:hover { 
   text-decoration: none;
 }
 
-.awesome-landing-menu-element--link {
+.home__menu-element::after {
+  background-color: black;
+}
+
+.home__menu-element:first-child::after,
+.home__menu-element:last-child::before {
+  content: none;
+}
+
+.home__menu-element--link {
   font-weight: 400;
   font-size: 16px;
   padding-right: 20px;
   padding-left: 20px;
 }
-.awesome-landing-menu-element:first-child .awesome-landing-menu-element--link {
+.home__menu-element:first-child .home__menu-element--link {
   font-weight: bolder;
 }
 
