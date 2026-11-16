@@ -37,7 +37,8 @@ module Decidim
         end
       rescue URI::InvalidURIError => e
         raise Error, "Invalid Airtable attachment URL: #{e.message}"
-      rescue Net::OpenTimeout, Net::ReadTimeout, SocketError, IOError => e
+      # Net::ProtocolError covers a proxy refusing the CONNECT tunnel (e.g. 403 or 407 from the proxy).
+      rescue Net::OpenTimeout, Net::ReadTimeout, Net::ProtocolError, SocketError, SystemCallError, IOError, OpenSSL::SSL::SSLError => e
         raise Error, "Airtable attachment download failed: #{e.message}"
       end
 
