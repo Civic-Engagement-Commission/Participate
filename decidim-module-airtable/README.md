@@ -36,6 +36,20 @@ Do not commit the token. The token needs Airtable's `schema.bases:read` and `dat
 
 The module reads `AIRTABLE_PERSONAL_TOKEN` at runtime. Restart the web and worker processes after changing it.
 
+### Outbound proxy
+
+When the servers reach the internet through an HTTP proxy, set it for the Airtable import only:
+
+```sh
+AIRTABLE_PROXY_URL=http://proxy.example.org:8080
+# or, when the proxy requires Basic authentication (URL-encode special characters):
+AIRTABLE_PROXY_URL=http://user:password@proxy.example.org:8080
+```
+
+Airtable API calls (`api.airtable.com`) and attachment downloads (`*.airtableusercontent.com`, `dl.airtable.com`) then go through that proxy; the rest of the application is not affected. The proxy must allow both kinds of hosts. Proxies that only accept NTLM or Kerberos authentication are not supported.
+
+Without `AIRTABLE_PROXY_URL`, the import uses the process-wide `https_proxy` / `no_proxy` environment variables, if set.
+
 ## Configure an Import
 
 1. Sign in as an organization administrator and open **Admin → Airtable**.
