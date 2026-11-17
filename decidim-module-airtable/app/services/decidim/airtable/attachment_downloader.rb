@@ -37,7 +37,8 @@ module Decidim
         end
       rescue URI::InvalidURIError => e
         raise Error, "Invalid Airtable attachment URL: #{e.message}"
-      rescue Net::OpenTimeout, Net::ReadTimeout, SocketError, IOError => e
+      # Net::ProtocolError covers a proxy refusing the CONNECT tunnel (e.g. 403 or 407 from the proxy).
+      rescue Net::OpenTimeout, Net::ReadTimeout, Net::ProtocolError, SocketError, SystemCallError, IOError, OpenSSL::SSL::SSLError => e
         raise Error, "Airtable attachment download failed: #{e.message}"
       end
 
@@ -48,8 +49,17 @@ module Decidim
         raise Error, "Airtable attachment URL is not allowed" unless uri.is_a?(URI::HTTPS) && allowed_host
       end
 
+      # Without AIRTABLE_PROXY_URL, Net::HTTP keeps its default and reads the proxy from the environment.
+      def proxy_arguments
+        proxy_uri = Decidim::Airtable.proxy_uri
+        return [] unless proxy_uri
+
+        [proxy_uri.host, proxy_uri.port, proxy_uri.user && URI.decode_www_form_component(proxy_uri.user),
+         proxy_uri.password && URI.decode_www_form_component(proxy_uri.password)]
+      end
+
       def request(uri, tempfile)
-        http = Net::HTTP.new(uri.host, uri.port)
+        http = Net::HTTP.new(uri.host, uri.port, *proxy_arguments)
         http.use_ssl = true
         http.open_timeout = 5
         http.read_timeout = 30

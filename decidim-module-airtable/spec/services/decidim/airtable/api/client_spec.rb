@@ -3,6 +3,31 @@
 require_relative "../../../../rails_helper"
 
 describe Decidim::Airtable::Api::Client do
+  describe "proxy" do
+    after { Decidim::Airtable.proxy_url = nil }
+
+    it "routes Airtable API requests through the configured proxy" do
+      Decidim::Airtable.proxy_url = "http://user:secret@proxy.example.org:8080"
+      proxy = described_class.new(personal_token: "token").send(:airrecord_client).connection.proxy
+
+      expect(proxy.uri.host).to eq("proxy.example.org")
+      expect(proxy.uri.port).to eq(8080)
+      expect(proxy.user).to eq("user")
+      expect(proxy.password).to eq("secret")
+    end
+
+    it "leaves the Airrecord connection untouched without a configured proxy" do
+      Decidim::Airtable.proxy_url = nil
+      airrecord_client = instance_double(Airrecord::Client)
+      allow(Airrecord::Client).to receive(:new).with("token").and_return(airrecord_client)
+      allow(airrecord_client).to receive(:connection)
+
+      described_class.new(personal_token: "token").send(:airrecord_client)
+
+      expect(airrecord_client).not_to have_received(:connection)
+    end
+  end
+
   describe "#list_records" do
     it "requests a selected view with Airtable field IDs" do
       airrecord_client = instance_double(Airrecord::Client)

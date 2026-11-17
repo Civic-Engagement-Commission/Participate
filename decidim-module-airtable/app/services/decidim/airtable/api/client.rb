@@ -88,7 +88,10 @@ module Decidim
         private
 
         def airrecord_client
-          @airrecord_client ||= Airrecord::Client.new(@personal_token)
+          @airrecord_client ||= Airrecord::Client.new(@personal_token).tap do |client|
+            proxy_uri = Decidim::Airtable.proxy_uri
+            client.connection.proxy = proxy_uri.to_s if proxy_uri
+          end
         end
       end
     end
