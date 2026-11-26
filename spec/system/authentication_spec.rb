@@ -173,7 +173,7 @@ describe "Authentication" do
 
         find(".login__omniauth-button.login__omniauth-button--facebook").click
 
-        expect(page).to have_content("Successfully")
+        expect(page).to have_content("Successfully authenticated from Facebook account")
         expect_current_user_to_be(user)
       end
 
@@ -207,7 +207,7 @@ describe "Authentication" do
 
           find(".login__omniauth-button.login__omniauth-button--facebook").click
 
-          expect(page).to have_content("Successfully")
+          expect(page).to have_content("Successfully authenticated from Facebook account")
           expect_current_user_to_be(user)
         end
 
@@ -221,7 +221,7 @@ describe "Authentication" do
           it "can log in without being prompted to change the password" do
             click_on("Log in", match: :first)
             click_on "Log in with Facebook"
-            expect(page).to have_content("Successfully")
+            expect(page).to have_content("Successfully authenticated from Facebook account")
           end
         end
       end

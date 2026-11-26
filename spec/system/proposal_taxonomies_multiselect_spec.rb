@@ -54,7 +54,7 @@ describe "Proposal taxonomies multiselect" do
       end
       click_on "Publish"
 
-      expect(page).to have_content("successfully")
+      expect(page).to have_content("Proposal successfully published")
       expect(page).to have_content(decidim_sanitize_translated(taxonomy_item.name))
     end
   end
@@ -80,7 +80,7 @@ describe "Proposal taxonomies multiselect" do
       click_on "Publish"
 
       expect(page).to have_css("[data-tags] .tag", count: 2)
-      expect(page).to have_content("successfully")
+      expect(page).to have_content("Proposal successfully published")
       expect(page).to have_content(decidim_sanitize_translated(taxonomy_item.name))
       expect(page).to have_content(decidim_sanitize_translated(other_taxonomy_item.name))
     end
@@ -135,7 +135,7 @@ describe "Proposal taxonomies multiselect" do
       end
       click_on "Publish"
 
-      expect(page).to have_content("successfully")
+      expect(page).to have_content("Proposal successfully published")
       expect(page).to have_content(decidim_sanitize_translated(taxonomy_item.name))
       expect(page).to have_content(decidim_sanitize_translated(second_taxonomy_item.name))
       expect(page).to have_content(decidim_sanitize_translated(second_other_taxonomy_item.name))
@@ -183,7 +183,7 @@ describe "Proposal taxonomies multiselect" do
       end
       click_on "Publish"
 
-      expect(page).to have_content("successfully")
+      expect(page).to have_content("Proposal successfully published")
       expect(page).to have_content(decidim_sanitize_translated(taxonomy_item.name))
       expect(page).to have_content(decidim_sanitize_translated(second_taxonomy_item.name))
     end
@@ -224,7 +224,7 @@ describe "Proposal taxonomies multiselect" do
         end
         click_on "Publish"
 
-        expect(page).to have_content("successfully")
+        expect(page).to have_content("Proposal successfully published")
       end
     end
   end

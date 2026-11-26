@@ -71,7 +71,7 @@ describe Decidim::Airtable::ProposalDataMapper do
     )
 
     expect(result[:proposal_data]).to eq(
-      component: component,
+      component:,
       created_at: Time.zone.parse("2026-10-30 09:00")
     )
     expect(result[:auxiliary_mappings]).to be_empty

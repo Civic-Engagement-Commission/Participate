@@ -73,7 +73,7 @@ describe "NYC.ID login" do
 
       click_on "Keep unchecked"
 
-      expect(page).to have_content("Successfully")
+      expect(page).to have_content("Successfully authenticated from Nyc account")
       expect(Decidim::User.find_by(email: "user@nyc.gov")).to be_present
     end
   end

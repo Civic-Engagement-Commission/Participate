@@ -32,8 +32,8 @@ module Decidim
 
           query = Decidim::Airtable::ImportConfiguration
                   .where(decidim_organization_id: organization.id,
-                         airtable_base_id: airtable_base_id,
-                         airtable_table_id: airtable_table_id)
+                         airtable_base_id:,
+                         airtable_table_id:)
           query = query.where.not(id:) if id.present?
           exists = query.exists?
 

@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.email = ["ivan@pokecode.net"]
   s.license = "AGPL-3.0"
   s.homepage = "https://github.com/Civic-Engagement-Commission/Participate"
-  s.required_ruby_version = ">= 3.3"
+  s.required_ruby_version = ">= 3.4.12"
 
   s.name = "decidim-airtable"
   s.summary = "Extras for Airtable Decidim instance."

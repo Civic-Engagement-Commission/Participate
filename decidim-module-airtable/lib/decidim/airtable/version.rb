@@ -2,7 +2,7 @@
 
 module Decidim
   module Airtable
-    VERSION = "0.1"
-    COMPAT_DECIDIM_VERSION = "~> 0.31.0"
+    VERSION = "0.2.3"
+    COMPAT_DECIDIM_VERSION = "~> 0.32.3"
   end
 end

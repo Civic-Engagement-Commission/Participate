@@ -75,3 +75,5 @@ minio_data
 .rspec-failures
 
 app/views/static/api/docs/
+/public/sw.js*
+/public/sw.js*

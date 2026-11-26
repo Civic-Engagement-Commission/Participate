@@ -33,7 +33,7 @@ namespace :nyc do
       end
       if email
         puts "ASSIGN GROUP MEMBERS COAUTHORSHIPS TO GROUP #{group.id}"
-        UserGroupMembership.where(group: group).find_each do |membership|
+        UserGroupMembership.where(group:).find_each do |membership|
           coauthorships = user_coauthorships(membership.user).where(decidim_user_group_id: group.id)
           coauthorships.find_each do |coauthorship|
             puts "Moving coauthorship #{coauthorship.id} from author #{coauthorship.decidim_author_id} to group #{coauthorship.decidim_user_group_id}"
@@ -41,7 +41,7 @@ namespace :nyc do
           end
         end
 
-        existing_user = Decidim::User.find_by(email: email)
+        existing_user = Decidim::User.find_by(email:)
         coauthorships = user_coauthorships(existing_user)
         if existing_user != group && group.email != email && existing_user && coauthorships.exists?
           puts "USER #{email} HAS COAUTHORSHIPS, moving #{coauthorships.count} coauthorships to group #{group.id}..."
@@ -61,7 +61,7 @@ namespace :nyc do
         puts "CHANGE EMAIL FROM #{group.email} TO #{email}..."
         begin
           group.skip_reconfirmation!
-          group.update!(email: email) unless group.email == email
+          group.update!(email:) unless group.email == email
         rescue StandardError => e
           puts "ERROR: #{e.message}, SKIPPED"
         end

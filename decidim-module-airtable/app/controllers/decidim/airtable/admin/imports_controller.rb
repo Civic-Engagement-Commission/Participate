@@ -40,7 +40,7 @@ module Decidim
             on(:invalid) do
               flash.now[:alert] = t(".error")
               prepare_new_form
-              render :new, status: :unprocessable_entity
+              render :new, status: :unprocessable_content
             end
           end
         end
@@ -68,7 +68,7 @@ module Decidim
             on(:invalid) do
               flash.now[:alert] = t(".error")
               prepare_edit_form
-              render :new, status: :unprocessable_entity
+              render :new, status: :unprocessable_content
             end
           end
         end
@@ -101,7 +101,7 @@ module Decidim
           tables = Decidim::Airtable::Api::Tables.new.for_base(params[:base_id])
           render json: tables.map { |table| { id: table[:id], name: table[:name] } }
         rescue Decidim::Airtable::Api::Error
-          render json: [], status: :unprocessable_entity
+          render json: [], status: :unprocessable_content
         end
 
         def view_options
@@ -109,7 +109,7 @@ module Decidim
           views = Decidim::Airtable::Api::Views.new.for_base_and_table(params[:base_id], params[:table_id])
           render json: views
         rescue Decidim::Airtable::Api::Error
-          render json: [], status: :unprocessable_entity
+          render json: [], status: :unprocessable_content
         end
 
         private

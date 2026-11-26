@@ -56,16 +56,16 @@ module Decidim
       def metadata_by_value
         @metadata_by_value ||= begin
           standard = standard_metadata
-          custom = awesome_custom_fields.each_with_object({}) do |field, output|
-            output[field[:value]] = field.except(:value).merge(kind: "awesome_custom")
+          custom = awesome_custom_fields.to_h do |field|
+            [field[:value], field.except(:value).merge(kind: "awesome_custom")]
           end
-          taxonomies = root_taxonomies.each_with_object({}) do |taxonomy, output|
-            output[taxonomy_value_for(taxonomy.id)] = {
+          taxonomies = root_taxonomies.to_h do |taxonomy|
+            [taxonomy_value_for(taxonomy.id), {
               kind: "taxonomy_root",
               target: "taxonomy",
               taxonomy_id: taxonomy.id,
               label: taxonomy_label_for(taxonomy)
-            }
+            }]
           end
           attachments = {
             ATTACHMENTS_VALUE => {

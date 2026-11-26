@@ -32,7 +32,7 @@ module Decidim
 
             on(:invalid) do
               flash.now[:alert] = t("decidim.airtable.admin.import_configurations.update.error")
-              render :show, status: :unprocessable_entity
+              render :show, status: :unprocessable_content
             end
           end
         end
@@ -46,7 +46,7 @@ module Decidim
         end
 
         def import_mapping_params
-          params.require(:import_mapping_form).permit(field_mappings: {}).to_h
+          params.expect(import_mapping_form: [{ field_mappings: {} }]).to_h
         end
 
         def current_field_mappings

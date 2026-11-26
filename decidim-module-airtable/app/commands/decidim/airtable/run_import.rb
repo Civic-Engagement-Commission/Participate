@@ -36,7 +36,7 @@ module Decidim
         component_id = import_configuration.settings&.dig("decidim_component_id")
         return if component_id.blank?
 
-        component = Decidim::Component.find_by(id: component_id, manifest_name: "proposals")
+        component = Decidim::Component.find_by(id: component_id, manifest_name: "proposals") # rubocop:disable Decidim/OrganizationScopedFinder
         return unless component&.participatory_space&.organization == import_configuration.organization
 
         component

@@ -12,7 +12,7 @@ namespace :dev do
     organization = Decidim::Organization.first
     abort "No organization found in the database." unless organization
 
-    organization.update!(host: host)
+    organization.update!(host:)
     puts "Host updated to #{host} for organization: #{organization.name}"
     organization.update!(users_registration_mode: "enabled")
     puts "Users registration mode updated to 'enabled' for organization: #{organization.name}"
