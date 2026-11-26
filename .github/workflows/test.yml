@@ -38,6 +38,9 @@ jobs:
         with:
           fetch-depth: 1
 
+      - run: |
+          sudo apt-get -y update; sudo apt-get -f install libvips libvips-tools
+
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ env.RUBY_VERSION }}
