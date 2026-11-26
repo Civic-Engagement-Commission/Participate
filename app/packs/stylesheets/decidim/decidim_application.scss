@@ -50,3 +50,25 @@ header {
     }
   }
 }
+
+header .main-bar__container {
+  flex-direction: column;
+}
+
+.language-chooser-bar {
+  @apply container items-center py-5 h-24 relative z-40;
+
+  .goog-te-gadget {
+    @apply w-full text-center;
+
+    select {
+      @apply block w-full xl:w-2/3 px-4 py-1.5 mx-auto font-sans text-md;
+
+      color: var(--secondary);
+    }
+
+    img {
+      @apply inline box-content;
+    }
+  }
+}

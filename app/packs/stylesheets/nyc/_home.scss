@@ -188,38 +188,38 @@ h2.heading-large {
   color: #f1cd1e;
 }
 
-/* Menu */
+/* Global Menu */
 
-.home__menu {
+[id^="awesome-landing-menu"].awesome-landing-menu {
+  color: #000;
   height: 68px;
-  padding-top: 24px;
   padding-bottom: 0;
 }
 
-.home__menu-element--link {
+.awesome-landing-menu__container {
+  padding-top: 10px;
+}
+
+.awesome-landing-menu-element--link {
   color: black;
 }
 
-.home__menu-element--link:hover { 
+.awesome-landing-menu-element--link:hover { 
   text-decoration: none;
 }
 
-.home__menu-element::after {
+.awesome-landing-menu .awesome-landing-menu-element:not(:first-child)::before {
   background-color: black;
+  opacity: 1;
 }
 
-.home__menu-element:first-child::after,
-.home__menu-element:last-child::before {
-  content: none;
-}
-
-.home__menu-element--link {
+.awesome-landing-menu-element--link {
   font-weight: 400;
   font-size: 16px;
   padding-right: 20px;
   padding-left: 20px;
 }
-.home__menu-element:first-child .home__menu-element--link {
+.awesome-landing-menu-element:first-child .awesome-landing-menu-element--link {
   font-weight: bolder;
 }
 
