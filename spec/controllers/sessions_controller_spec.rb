@@ -35,7 +35,7 @@ module Decidim
                     .and_return(["dummy_authorization_handler"])
                 end
 
-                it { is_expected.to eq("/") }
+                it { is_expected.to eq("/en") }
 
                 context "when there is a pending redirection" do
                   before do
@@ -50,7 +50,7 @@ module Decidim
                     user.confirmed_at = nil
                   end
 
-                  it { is_expected.to eq("/") }
+                  it { is_expected.to eq("/en") }
                 end
 
                 context "when the user is blocked" do
@@ -58,7 +58,7 @@ module Decidim
                     user.blocked = true
                   end
 
-                  it { is_expected.to eq("/") }
+                  it { is_expected.to eq("/en") }
                 end
 
                 context "when the user is not blocked" do
@@ -66,7 +66,7 @@ module Decidim
                     user.blocked = false
                   end
 
-                  it { is_expected.to eq("/") }
+                  it { is_expected.to eq("/en") }
                 end
               end
 
@@ -75,14 +75,14 @@ module Decidim
                   allow(user.organization).to receive(:available_authorizations).and_return([])
                 end
 
-                it { is_expected.to eq("/") }
+                it { is_expected.to eq("/en") }
               end
             end
 
             context "and it is not the first time to log in" do
               let(:user) { build(:user, sign_in_count: 2) }
 
-              it { is_expected.to eq("/") }
+              it { is_expected.to eq("/en") }
             end
           end
         end
@@ -90,6 +90,7 @@ module Decidim
 
       describe "POST create" do
         let(:params) { { user: { email: user.email, password: } } }
+        let(:request_params) { params.merge(locale: I18n.default_locale) }
         let(:user) { create(:user, :confirmed, password:) }
         let(:password) { "decidim123456789" }
 
@@ -103,7 +104,7 @@ module Decidim
             let(:password) { "decidim123" }
 
             it "does not update password_updated_at" do
-              post(:create, params:)
+              post(:create, params: request_params)
 
               expect(user.reload.password_updated_at).not_to be_nil
             end
@@ -115,7 +116,7 @@ module Decidim
             let(:user) { create(:user, :confirmed, :admin) }
 
             it "does not change password_updated_at" do
-              post(:create, params:)
+              post(:create, params: request_params)
 
               expect(user.reload.password_updated_at).not_to be_nil
             end
@@ -132,7 +133,7 @@ module Decidim
             end
 
             it "sets password_updated_at to nil" do
-              post(:create, params:)
+              post(:create, params: request_params)
 
               expect(user.reload.password_updated_at).to be_nil
             end
@@ -151,7 +152,7 @@ module Decidim
         end
 
         it "clears the current user" do
-          delete :destroy
+          delete :destroy, params: { locale: I18n.locale }
 
           expect(controller.current_user).to be_nil
         end
