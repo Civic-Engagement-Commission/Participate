@@ -1,6 +1,6 @@
 <!-- insert_before "erb[silent]:contains('cache current_organization')" -->
 
-<div class=""login__info font-semibold"
+<div class="login__info font-semibold">
   <p>
     <%= t("decidim.devise.sessions.new.sign_in_disabled") %>
   </p>

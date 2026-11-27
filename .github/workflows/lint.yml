@@ -7,7 +7,7 @@ on:
   pull_request:
 
 env:
-  RUBY_VERSION: 3.3.11
+  RUBY_VERSION: 3.4.12
 
 jobs:
   rubocop:

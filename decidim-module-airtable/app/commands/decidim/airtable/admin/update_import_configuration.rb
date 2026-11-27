@@ -39,7 +39,7 @@ module Decidim
             airtable_base_id: form.airtable_base_id,
             airtable_table_id: form.airtable_table_id,
             airtable_view_id: form.airtable_view_id,
-            settings: settings,
+            settings:,
             active: form.active
           }
         end
@@ -58,7 +58,7 @@ module Decidim
         end
 
         def selected_component
-          @selected_component ||= Decidim::Component.find_by(id: form.decidim_component_id)
+          @selected_component ||= Decidim::Component.find_by(id: form.decidim_component_id) # rubocop:disable Decidim/OrganizationScopedFinder
         end
 
         def translated_name(value)

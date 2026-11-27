@@ -51,6 +51,10 @@ header {
   }
 }
 
+header .main-bar__container {
+  flex-direction: column;
+}
+
 .language-chooser-bar {
   @apply container items-center py-5 h-24 relative z-40;
 

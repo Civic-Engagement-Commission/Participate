@@ -5,6 +5,7 @@ require "spec_helper"
 describe "Account" do
   let(:user) { create(:user, :confirmed, password:) }
   let(:password) { "dqCFgjfDbC7dPbrv" }
+  let(:personal_url) { "https://example.org/personal-profile" }
   let(:organization) { user.organization }
 
   before do
@@ -59,7 +60,7 @@ describe "Account" do
         end
 
         within_flash_messages do
-          expect(page).to have_content("successfully")
+          expect(page).to have_content("Your account was successfully updated.")
         end
 
         user.reload
@@ -168,7 +169,7 @@ describe "Account" do
           find("*[type=submit]").click
         end
         within_flash_messages do
-          expect(page).to have_content("successfully")
+          expect(page).to have_content("Your account was successfully updated")
         end
         expect(user.reload.encrypted_password).not_to eq(encrypted_password)
         expect(page).to have_no_field("user[password]", with: "", type: "password")
@@ -274,7 +275,7 @@ describe "Account" do
         end
 
         within_flash_messages do
-          expect(page).to have_content("successfully")
+          expect(page).to have_content("Your notifications settings were successfully updated")
         end
       end
 
@@ -296,7 +297,7 @@ describe "Account" do
           end
 
           within_flash_messages do
-            expect(page).to have_content("successfully")
+            expect(page).to have_content("Your notifications settings were successfully updated")
           end
         end
       end
@@ -320,7 +321,7 @@ describe "Account" do
         click_on "Yes, I want to delete my account"
 
         within_flash_messages do
-          expect(page).to have_content("successfully")
+          expect(page).to have_content("Your account was successfully deleted")
         end
 
         click_on("Log in", match: :first)
@@ -386,7 +387,7 @@ describe "Account" do
           end
 
           within_flash_messages do
-            expect(page).to have_content("successfully")
+            expect(page).to have_content("Your notifications settings were successfully updated")
           end
 
           find("[data-push-notifications-toggle]", visible: :all).execute_script("this.checked = true")

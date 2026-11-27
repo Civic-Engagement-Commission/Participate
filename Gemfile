@@ -4,7 +4,7 @@ source "https://rubygems.org"
 
 ruby RUBY_VERSION
 
-DECIDIM_VERSION = { github: "openpoke/decidim", branch: "0.31-backports" }.freeze
+DECIDIM_VERSION = { github: "openpoke/decidim", branch: "0.32-backports" }.freeze
 
 gem "decidim", DECIDIM_VERSION
 # Optional Decidim modules (not in the meta-gem). Uncomment what you need.
@@ -20,8 +20,8 @@ gem "decidim-templates", DECIDIM_VERSION
 gem "bootsnap", "~> 1.4"
 gem "decidim-airtable", path: "decidim-module-airtable"
 
-gem "decidim-decidim_awesome", github: "decidim-ice/decidim-module-decidim_awesome", branch: "release/0.31-stable"
-gem "decidim-term_customizer", github: "openpoke/decidim-module-term_customizer", branch: "release/0.31-stable"
+gem "decidim-decidim_awesome", github: "decidim-ice/decidim-module-decidim_awesome", branch: "main"
+gem "decidim-term_customizer", github: "openpoke/decidim-module-term_customizer", branch: "main"
 gem "deface"
 gem "puma", ">= 6.3.1"
 
@@ -38,7 +38,7 @@ group :development, :test do
 
   gem "decidim-dev", DECIDIM_VERSION
 
-  gem "brakeman", "~> 6.1"
+  gem "brakeman", "~> 7.0"
   gem "parallel_tests", "~> 4.2"
 end
 

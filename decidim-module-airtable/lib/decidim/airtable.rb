@@ -6,17 +6,8 @@ require "decidim/airtable/admin_engine"
 
 module Decidim
   module Airtable
-    include ActiveSupport::Configurable
-    config_accessor :personal_token do
-      ENV.fetch("AIRTABLE_PERSONAL_TOKEN", nil)
-    end
-
-    # Outbound HTTP proxy for Airtable API calls and attachment downloads,
-    # e.g. "http://proxy.example.org:8080" or "http://user:pass@proxy.example.org:8080".
-    # When blank, requests use the process-wide proxy environment (https_proxy, no_proxy) if any.
-    config_accessor :proxy_url do
-      ENV.fetch("AIRTABLE_PROXY_URL", nil)
-    end
+    mattr_accessor :personal_token, default: Decidim::Env.new("AIRTABLE_PERSONAL_TOKEN", nil).value
+    mattr_accessor :proxy_url, default: Decidim::Env.new("AIRTABLE_PROXY_URL", nil).value
 
     def self.ready?
       !personal_token.nil?

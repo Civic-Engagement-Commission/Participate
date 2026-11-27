@@ -58,7 +58,7 @@ module Decidim
       end
 
       def tracking_record
-        @tracking_record ||= Decidim::Airtable::ImportRecord.find_by(
+        @tracking_record ||= Decidim::Airtable::ImportRecord.find_by( # rubocop:disable Decidim/OrganizationScopedFinder
           import_configuration:,
           airtable_record_id: mapped_record.fetch(:airtable_record_id)
         )
@@ -79,14 +79,14 @@ module Decidim
         proposal_id = mapping&.fetch(:value)
         return if proposal_id.blank? || !proposal_id.to_s.match?(/\A\d+\z/)
 
-        Decidim::Proposals::Proposal.find_by(id: proposal_id)
+        Decidim::Proposals::Proposal.find_by(id: proposal_id) # rubocop:disable Decidim/OrganizationScopedFinder
       end
 
       def proposal_from_reference
         reference = proposal_data[:reference]
         return if reference.blank?
 
-        Decidim::Proposals::Proposal.find_by(component:, reference:)
+        Decidim::Proposals::Proposal.find_by(component:, reference:) # rubocop:disable Decidim/OrganizationScopedFinder
       end
 
       def create_proposal
@@ -161,7 +161,7 @@ module Decidim
         token = proposal_data[:state].presence
         return if token.blank?
 
-        state = Decidim::Proposals::ProposalState.find_by(component:, token: token.to_s)
+        state = Decidim::Proposals::ProposalState.find_by(component:, token: token.to_s) # rubocop:disable Decidim/OrganizationScopedFinder
         raise RowError, "Unknown proposal state '#{token}' for the configured component" unless state
 
         proposal.proposal_state = state
@@ -262,7 +262,7 @@ module Decidim
       end
 
       def find_author(lookup_by, value)
-        users = Decidim::User.where(organization: import_configuration.organization)
+        users = Decidim::User.where(organization: import_configuration.organization) # rubocop:disable Decidim/OrganizationScopedFinder
         case lookup_by
         when "email"
           users.where("LOWER(email) = ?", value.to_s.downcase).first
@@ -279,7 +279,7 @@ module Decidim
       def resolve_auxiliary_mappings(prefix)
         auxiliary_mappings.select { |mapping| mapping.fetch(:mapping).start_with?(prefix) }.map do |mapping|
           root_id = mapping.dig(:metadata, "taxonomy_id").to_i
-          root = Decidim::Taxonomy.for(import_configuration.organization).roots.find_by(id: root_id)
+          root = Decidim::Taxonomy.for(import_configuration.organization).roots.find_by(id: root_id) # rubocop:disable Decidim/OrganizationScopedFinder
           raise RowError, "Configured taxonomy root is no longer available" unless root
 
           taxonomies = taxonomy_values(mapping.fetch(:value)).map do |value|

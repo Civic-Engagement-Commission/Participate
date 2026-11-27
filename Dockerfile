@@ -1,4 +1,4 @@
-FROM ruby:3.3.11 AS builder
+FROM ruby:3.4.12 AS builder
 
 ENV RAILS_ENV=production \
     NODE_ENV=production
@@ -68,7 +68,7 @@ RUN bundle clean --force && \
 
 ################################################################################
 
-FROM ruby:3.3.11-slim
+FROM ruby:3.4.12-slim
 
 ENV RAILS_ENV=production \
     NODE_ENV=production \
@@ -80,7 +80,8 @@ ENV RAILS_ENV=production \
 RUN apt-get update && \
     apt-get install --no-install-recommends -y \
       curl \
-      imagemagick \
+      libicu76 \
+      libvips libvips-tools \
       postgresql-client \
       p7zip \
       libjemalloc2 && \

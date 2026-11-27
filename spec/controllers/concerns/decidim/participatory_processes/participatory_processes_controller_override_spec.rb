@@ -38,7 +38,7 @@ module Decidim
         end
 
         it "keeps an explicit date filter from params" do
-          get :index, params: { filter: { with_date: "active" } }
+          get :index, params: { locale: I18n.default_locale, filter: { with_date: "active" } }
 
           expect(controller.helpers.participatory_processes).to contain_exactly(active)
         end

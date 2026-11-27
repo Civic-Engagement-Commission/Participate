@@ -26,10 +26,10 @@ module Decidim
 
           if auxiliary_mapping?(mapped_value, value)
             auxiliary_mappings << {
-              airtable_field_id: airtable_field_id,
+              airtable_field_id:,
               mapping: mapped_value,
               metadata: mapping_snapshot[airtable_field_id] || {},
-              value: value
+              value:
             }
             next
           end
@@ -49,8 +49,8 @@ module Decidim
           airtable_record_id: record.fetch(:id),
           airtable_created_at: record[:created_at],
           row_checksum: Digest::SHA256.hexdigest(JSON.generate(fields.sort.to_h)),
-          proposal_data: proposal_data,
-          auxiliary_mappings: auxiliary_mappings
+          proposal_data:,
+          auxiliary_mappings:
         }
       end
 

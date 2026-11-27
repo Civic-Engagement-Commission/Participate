@@ -37,7 +37,7 @@ module Decidim
       end
 
       def record_by_airtable_id
-        Decidim::Airtable::ImportRecord.find_by(
+        Decidim::Airtable::ImportRecord.find_by( # rubocop:disable Decidim/OrganizationScopedFinder
           decidim_airtable_import_configuration_id: import_configuration.id,
           airtable_record_id:
         )
@@ -46,7 +46,7 @@ module Decidim
       def record_by_external_identifier
         return if external_identifier.blank?
 
-        Decidim::Airtable::ImportRecord.find_by(
+        Decidim::Airtable::ImportRecord.find_by( # rubocop:disable Decidim/OrganizationScopedFinder
           decidim_airtable_import_configuration_id: import_configuration.id,
           external_identifier:
         )

@@ -14,13 +14,13 @@ describe Decidim::Proposals::Import::ProposalCreator do
   let(:data) do
     {
       taxonomies: { "ids" => [] },
-      scope: scope,
+      scope:,
       "title/en": "Imported title",
       "body/en": "Imported body",
       address: "Wall street 1",
       latitude: 40.7,
       longitude: -74.0,
-      component: component
+      component:
     }
   end
   let(:context) do

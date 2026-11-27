@@ -17,7 +17,7 @@ module Decidim
           Decidim.traceability.update!(
             import_configuration,
             current_user,
-            settings: settings
+            settings:
           )
 
           broadcast(:ok, import_configuration)

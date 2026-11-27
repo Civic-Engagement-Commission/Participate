@@ -1,2 +1,2 @@
 <!-- insert_before "nav.main-bar__links-desktop" -->
-  <%= render partial: "/layouts/decidim/language_chooser_icon" %>
+<%= render partial: "/layouts/decidim/language_chooser_icon" %>
